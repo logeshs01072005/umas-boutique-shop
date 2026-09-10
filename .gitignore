@@ -3,3 +3,9 @@ node_modules/
 npm-debug.log
 .DS_Store
 *.log
+dist/
+uploads/*
+!uploads/.gitkeep
+!uploads/invoices/
+uploads/invoices/*
+!uploads/invoices/.gitkeep

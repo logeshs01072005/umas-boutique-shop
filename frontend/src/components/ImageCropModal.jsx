@@ -81,12 +81,67 @@ export default function ImageCropModal({ imageSrc, onCropComplete, onClose, titl
   const handleMouseUp = () => setIsDragging(false);
 
   const handleCrop = () => {
-    if (!canvasRef.current) return;
-    const canvas = canvasRef.current;
-    canvas.toBlob((blob) => {
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
-      onCropComplete(dataUrl, blob);
-    }, "image/jpeg", 0.92);
+    if (!imgRef.current) return;
+    const img = imgRef.current;
+
+    // Determine high-resolution export canvas dimensions
+    let exportWidth = 1200;
+    let exportHeight = 1600; // 3:4 portrait
+    let previewW = 400;
+    let previewH = 500;
+
+    if (aspectRatio === "1:1") {
+      exportWidth = 1200;
+      exportHeight = 1200;
+      previewW = 400;
+      previewH = 400;
+    } else if (aspectRatio === "16:9") {
+      exportWidth = 1920;
+      exportHeight = 1080;
+      previewW = 533;
+      previewH = 300;
+    } else if (aspectRatio === "free") {
+      exportWidth = 1400;
+      exportHeight = 1400;
+      previewW = 450;
+      previewH = 450;
+    }
+
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = exportWidth;
+    exportCanvas.height = exportHeight;
+    const ctx = exportCanvas.getContext("2d");
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
+    const factor = exportWidth / previewW;
+    ctx.translate(exportWidth / 2 + offset.x * factor, exportHeight / 2 + offset.y * factor);
+    ctx.rotate((rotation * Math.PI) / 180);
+
+    const scale = Math.max(exportWidth / img.width, exportHeight / img.height) * zoom;
+    const drawWidth = img.width * scale;
+    const drawHeight = img.height * scale;
+
+    ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+
+    exportCanvas.toBlob(
+      (blob) => {
+        const dataUrl = exportCanvas.toDataURL("image/jpeg", 0.95);
+        onCropComplete(dataUrl, blob);
+      },
+      "image/jpeg",
+      0.95
+    );
+  };
+
+  const handleUseOriginal = () => {
+    if (imageSrc instanceof Blob || imageSrc instanceof File) {
+      const dataUrl = URL.createObjectURL(imageSrc);
+      onCropComplete(dataUrl, imageSrc);
+    } else if (canvasRef.current) {
+      handleCrop();
+    }
   };
 
   return (
@@ -189,21 +244,31 @@ export default function ImageCropModal({ imageSrc, onCropComplete, onClose, titl
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-2">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
             <button
               type="button"
-              onClick={onClose}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+              onClick={handleUseOriginal}
+              className="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-3 py-2 rounded-lg border border-rose-200 transition-colors"
+              title="Upload the original uncropped high-resolution photo"
             >
-              Cancel
+              Use Original (Skip Crop)
             </button>
-            <button
-              type="button"
-              onClick={handleCrop}
-              className="px-6 py-2.5 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 rounded-xl shadow-lg shadow-rose-600/30 transition-all flex items-center gap-2"
-            >
-              <Check className="w-4 h-4" /> Apply & Upload
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleCrop}
+                className="px-5 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 rounded-xl shadow-lg shadow-rose-600/30 transition-all flex items-center gap-2"
+              >
+                <Check className="w-4 h-4" /> Apply & Upload (HD)
+              </button>
+            </div>
           </div>
         </div>
       </div>

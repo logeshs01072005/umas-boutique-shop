@@ -24,13 +24,13 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && proce
     params: {
       folder: "umas-fashion",
       allowed_formats: ["jpg", "jpeg", "png", "webp", "gif"],
-      transformation: [{ width: 800, quality: "auto", fetch_format: "auto" }],
+      transformation: [{ width: 1920, crop: "limit", quality: "auto:good", fetch_format: "auto" }],
     },
   });
 
   upload = multer({
     storage: cloudinaryStorage,
-    limits: { fileSize: 5 * 1024 * 1024 },
+    limits: { fileSize: 10 * 1024 * 1024 },
   });
 
   console.log("☁️  Image uploads → Cloudinary");
@@ -58,7 +58,7 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && proce
     cb(new Error("Only images (jpg, jpeg, png, webp, gif) are allowed."));
   };
 
-  upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter });
+  upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 }, fileFilter });
 }
 
 router.post("/", requireAuth, upload.single("image"), (req, res) => {

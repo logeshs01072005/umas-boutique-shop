@@ -38,6 +38,8 @@ app.use(helmet({
         "'self'",
         "data:",
         "blob:",
+        "https:",
+        "http:",
         "https://res.cloudinary.com",
         "https://*.razorpay.com",
         "https://*.googleapis.com",
