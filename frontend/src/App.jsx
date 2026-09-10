@@ -819,18 +819,28 @@ function WhatsAppIcon({ size = 20, className = "" }) {
 
 /* ---------------------- WhatsApp AI & Human Support Widget ---------------------- */
 
-function WhatsAppSupportWidget({ products = [], openProduct, setView }) {
+function WhatsAppSupportWidget({ products = [], categories = [], openProduct, setView }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("ai"); // 'ai' or 'human'
+
+  const catNames = useMemo(() => (categories && categories.length > 0 ? categories : ["Sarees", "Lehengas", "Kurtis"]), [categories]);
+
+  const welcomeText = useMemo(() => {
+    const catList = catNames.slice(0, 4).join(", ");
+    return `Hello! Welcome to Uma's Fashion Boutique. I am your AI assistant. How can I help you today? You can ask about ${catList}, Sizing (cm), or Delivery!`;
+  }, [catNames]);
+
   const [chatMessages, setChatMessages] = useState([
-    {
-      sender: "bot",
-      text: "Hello! Welcome to Uma's Fashion Boutique. I am your AI assistant. How can I help you today? You can ask about Sarees, Lehengas, Kurtis, Sizing (cm), or Delivery!"
-    }
+    { sender: "bot", text: "Hello! Welcome to Uma's Fashion Boutique. I am your AI assistant. How can I help you today? You can ask about Sarees, Lehengas, Kurtis, Sizing (cm), or Delivery!" }
   ]);
   const [inputMsg, setInputMsg] = useState("");
   const [attachedImage, setAttachedImage] = useState(null);
   const fileInputRef = useRef(null);
+
+  // Update welcome message when categories load from backend
+  useEffect(() => {
+    setChatMessages([{ sender: "bot", text: welcomeText }]);
+  }, [welcomeText]);
 
   const handleImageAttach = (e) => {
     const file = e.target.files?.[0];
@@ -843,14 +853,21 @@ function WhatsAppSupportWidget({ products = [], openProduct, setView }) {
     }
   };
 
-  const FAQS = [
-    { label: "🥻 Sarees", query: "Show me Sarees" },
-    { label: "👗 Lehengas", query: "Show me Lehengas" },
-    { label: "💳 Payment Methods", query: "What payment types are accepted?" },
-    { label: "📦 Track Order", query: "Track my order status" },
-    { label: "📏 Size Guide (cm)", query: "Size guide measurements in cm" },
-    { label: "🚚 Delivery Info", query: "Delivery timeframe" },
-  ];
+  // Dynamic FAQS — category buttons auto-generated from backend categories
+  const FAQS = useMemo(() => {
+    const catFaqs = catNames.map((cat) => ({
+      label: `${CATEGORY_EMOJI[cat] || "🛍️"} ${cat}`,
+      query: `Show me ${cat}`,
+    }));
+    return [
+      ...catFaqs,
+      { label: "🏷️ Offers & Coupons", query: "Any discount or coupon code?" },
+      { label: "💳 Payment Methods", query: "What payment types are accepted?" },
+      { label: "📦 Track Order", query: "Track my order status" },
+      { label: "📏 Size Guide (cm)", query: "Size guide measurements in cm" },
+      { label: "🚚 Delivery Info", query: "Delivery timeframe" },
+    ];
+  }, [catNames]);
 
   const handleSendMessage = (textToSend) => {
     const msg = textToSend || inputMsg.trim();
@@ -6349,7 +6366,7 @@ export default function App() {
         )}
       </div>
 
-      {view !== "admin" && <WhatsAppSupportWidget products={products} openProduct={openProduct} setView={setView} />}
+      {view !== "admin" && <WhatsAppSupportWidget products={products} categories={categories} openProduct={openProduct} setView={setView} />}
       {view !== "admin" && <Footer />}
       {authOpen && <AuthModal onClose={() => { setAuthOpen(false); setAuthError(""); }} onLogin={handleLogin} onSignup={handleSignup} error={authError} />}
       <Toast message={toast} />
