@@ -864,53 +864,66 @@ function WhatsAppSupportWidget({ products = [], openProduct, setView }) {
 
     // Simulate AI response logic
     setTimeout(() => {
-      let botResponse = imgPayload
-        ? "📸 Thank you for sending this photo inquiry! For custom design matching, fabric quality checks, and ordering based on this picture, you can also connect directly with our human boutique specialist on WhatsApp:"
-        : "Thank you for reaching out! You can also chat directly with our human expert on WhatsApp at +91 8489943146 for custom orders & assistance.";
+      let botResponse = "";
       let matchedProds = [];
       let isPhoto = Boolean(imgPayload);
 
-      const lower = (msg || "").toLowerCase();
+      const lower = (msg || "").trim().toLowerCase();
 
-      // Check category searches
-      const searchTerms = ["saree", "lehenga", "kurti", "top", "western", "accessories", "footwear", "dress"];
-      const matchTerm = searchTerms.find((term) => lower.includes(term));
-
-      if (matchTerm) {
-        matchedProds = products.filter((p) =>
-          p.category?.toLowerCase().includes(matchTerm) ||
-          p.name?.toLowerCase().includes(matchTerm)
-        ).slice(0, 4);
+      if (imgPayload) {
+        botResponse = "📸 Thank you for sending this photo inquiry! For custom design matching, fabric quality checks, and ordering based on this picture, you can also connect directly with our human boutique specialist on WhatsApp:";
+      } else if (!lower || /^(hi|hello|hey|vanakkam|namaste|good\s*(morning|afternoon|evening)|hola)\b/i.test(lower)) {
+        botResponse = "👋 Hello & welcome to Uma's Fashion Boutique! How can I assist you today?\n\nYou can ask me about:\n• 🥻 Sarees, Lehengas, Kurtis & Designer Tops\n• 🏷️ Current Discounts & Coupon Codes\n• 📏 Size Guide in cm (Bust, Waist, Length)\n• 🚚 Delivery Timeframe & 7-day Returns\n• 💳 Payment Methods (Razorpay, UPI, COD)";
+      } else if (lower.includes("offer") || lower.includes("discount") || lower.includes("coupon") || lower.includes("promo") || lower.includes("code") || lower.includes("sale") || lower.includes("deal")) {
+        botResponse = "🎉 Exclusive Boutique Offers:\n• Use coupon code UMA20 at checkout for FLAT 20% OFF on all Sarees & Tops!\n• 🚚 100% Free Express Delivery across India!\n• Browse our collection to explore special festive markdowns.";
+      } else if (lower.includes("price") || lower.includes("cost") || lower.includes("rate") || lower.includes("how much") || lower.includes("budget") || lower.includes("cheap")) {
+        if (products && products.length > 0) {
+          matchedProds = [...products].sort((a, b) => Number(a.price) - Number(b.price)).slice(0, 4);
+          botResponse = "🏷️ Our boutique designs start from just ₹799 with premium craftsmanship! Here are our best-value curated designs:";
+        } else {
+          botResponse = "🏷️ Our boutique designs start from ₹799 with premium fabrics and craftsmanship! Browse our Shop section to view all prices.";
+        }
+      } else if (lower.includes("payment") || lower.includes("pay") || lower.includes("upi") || lower.includes("card") || lower.includes("cod") || lower.includes("razorpay") || lower.includes("gpay") || lower.includes("phonepe")) {
+        botResponse = "💳 Accepted Payment Methods:\n• Razorpay (UPI: GPay, PhonePe, Paytm, BHIM)\n• Credit & Debit Cards (Visa, MasterCard, RuPay)\n• NetBanking (all major banks)\n• Cash on Delivery (COD) available across India";
+      } else if (lower.includes("track") || lower.includes("status") || lower.includes("where is my order") || lower.includes("my order")) {
+        botResponse = "📦 Live Order Tracking:\nLog in to your account and navigate to Account → My Orders to see real-time courier dispatch status and delivery estimates!";
+      } else if (lower.includes("cancel") || lower.includes("modify") || lower.includes("change address")) {
+        botResponse = "⚠️ Order Modifications & Cancellations:\nOrders can be modified or cancelled within 12 hours before courier dispatch. Please click 'Human Assistant' tab or message us on WhatsApp with your Order ID for prompt help!";
+      } else if (lower.includes("size") || lower.includes("cm") || lower.includes("fit") || lower.includes("measurement") || lower.includes("chart")) {
+        botResponse = "📏 Standard Measurements in Centimeters (cm):\n• S: Bust 86-89cm, Waist 71-74cm\n• M: Bust 91-94cm, Waist 76-79cm\n• L: Bust 97-102cm, Waist 81-86cm\n• XL: Bust 104-109cm, Waist 89-94cm\n• XXL: Bust 112-117cm, Waist 97-102cm\nClick 'Size Guide (cm)' on any product page for exact measurements!";
+      } else if (lower.includes("ship") || lower.includes("deliver") || lower.includes("time") || lower.includes("dispatch") || lower.includes("courier")) {
+        botResponse = "🚚 Free Express Shipping across India! Orders are carefully packed and dispatched in 1-2 business days, with delivery arriving in 3-5 business days.";
+      } else if (lower.includes("return") || lower.includes("refund") || lower.includes("exchange")) {
+        botResponse = "🔄 7-day Hassle-Free Returns on unworn items with original tags intact. Simply submit a return request from Account → My Orders.";
+      } else if (lower.includes("contact") || lower.includes("call") || lower.includes("whatsapp") || lower.includes("human") || lower.includes("agent") || lower.includes("number") || lower.includes("help")) {
+        botResponse = "💬 Click the 'Human Assistant' tab above or WhatsApp our fashion consultant directly at +91 8489943146!";
+      } else {
+        // Dynamic search across all product inventory (names, categories, tags, descriptions)
+        if (products && products.length > 0) {
+          const queryWords = lower.split(/\s+/).filter((w) => w.length > 2);
+          matchedProds = products.filter((p) => {
+            const pName = (p.name || "").toLowerCase();
+            const pCat = (p.category || "").toLowerCase();
+            const pTag = (p.tag || "").toLowerCase();
+            const pDesc = (p.description || "").toLowerCase();
+            return pName.includes(lower) || pCat.includes(lower) || pTag.includes(lower) ||
+              queryWords.some((w) => pName.includes(w) || pCat.includes(w) || pTag.includes(w) || pDesc.includes(w));
+          }).slice(0, 4);
+        }
 
         if (matchedProds.length > 0) {
-          botResponse = `✨ Here are popular ${matchTerm.charAt(0).toUpperCase() + matchTerm.slice(1)} items from our collection! Click any item to view full details on our store:`;
+          botResponse = `✨ Here are matching items from our boutique collection! Click to view full details:`;
         } else {
-          botResponse = `We have wonderful ${matchTerm} options arriving! You can browse our shop catalog or contact our human consultant below.`;
+          matchedProds = (products || []).slice(0, 3);
+          botResponse = "✨ Thank you for reaching out! Here are some of our popular boutique designs. For custom requirements, sizing help, or specific designs, you can also chat with our specialist on WhatsApp at +91 8489943146.";
         }
-      } else if (lower.includes("payment") || lower.includes("pay") || lower.includes("upi") || lower.includes("card") || lower.includes("cod") || lower.includes("razorpay")) {
-        botResponse = "💳 Accepted Payment Methods:\n• Razorpay (UPI - GPay/PhonePe/Paytm, Credit/Debit Cards, NetBanking)\n• Cash on Delivery (COD)";
-      } else if (lower.includes("track") || lower.includes("order status") || lower.includes("my order")) {
-        botResponse = "📦 Order Tracking & Status:\nLog in and go to Account → My Orders to track live shipping updates for all your purchases!";
-      } else if (lower.includes("inquiry") || lower.includes("custom") || lower.includes("customer")) {
-        botResponse = "🛍️ Customer Product & Custom Inquiry:\nNeed custom sizing or help with a specific saree/lehenga design? Click 'Human Assistant' tab or message our boutique specialist on WhatsApp at +91 8489943146!";
-      } else if (lower.includes("size") || lower.includes("cm") || lower.includes("fit") || lower.includes("measurement")) {
-        botResponse = "📏 Standard Measurements in Centimeters (cm):\n• S: Bust 86-89cm, Waist 71-74cm\n• M: Bust 91-94cm, Waist 76-79cm\n• L: Bust 97-102cm, Waist 81-86cm\n• XL: Bust 104-109cm, Waist 89-94cm\nClick 'Size Guide (cm)' on any product page for detailed size charts!";
-      } else if (lower.includes("ship") || lower.includes("deliver") || lower.includes("time")) {
-        botResponse = "🚚 Free Express Shipping across India! Orders dispatch in 1-2 days and arrive in 3-5 business days.";
-      } else if (lower.includes("return") || lower.includes("refund") || lower.includes("exchange")) {
-        botResponse = "🔄 7-day hassle-free returns on unworn items. Simply submit a return request from Account → My Orders.";
-      } else if (lower.includes("contact") || lower.includes("call") || lower.includes("whatsapp") || lower.includes("human") || lower.includes("agent")) {
-        botResponse = "💬 Click 'Human Assistant' tab above or message our fashion consultant on WhatsApp at +91 8489943146!";
-      } else if (lower.includes("recommend") || lower.includes("collection") || lower.includes("popular") || lower.includes("best")) {
-        matchedProds = products.slice(0, 4);
-        botResponse = "🌟 Here are our top featured boutique designs! Click to view full details:";
       }
 
       setChatMessages((prev) => [
         ...prev,
         { sender: "bot", text: botResponse, products: matchedProds, isPhotoInquiry: isPhoto }
       ]);
-    }, 500);
+    }, 400);
   };
 
   const openWhatsAppDirect = (customMsg, prod) => {
@@ -932,7 +945,15 @@ function WhatsAppSupportWidget({ products = [], openProduct, setView }) {
     } else if (!text) {
       text = `Hi Uma's Fashion, I am inquiring about boutique products.`;
     }
-    window.open(`https://wa.me/91${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, "_blank");
+    const waUrl = `https://api.whatsapp.com/send?phone=91${WHATSAPP_NUMBER}&text=${encodeURIComponent(text)}`;
+    try {
+      const win = window.open(waUrl, "_blank");
+      if (!win || win.closed || typeof win.closed === "undefined") {
+        window.location.href = waUrl;
+      }
+    } catch (e) {
+      window.location.href = waUrl;
+    }
   };
 
   return (
@@ -1329,7 +1350,15 @@ function ProductDetailView({ product, addToCart, setView, currentUser }) {
                       `💬 *Inquiry Letter:*`,
                       `Hi Uma's Fashion, I would like to inquire about this piece. Could you please confirm if size ${size || "Free Size"} is in stock, and share more details on fabric feel, border finish, and delivery time?`
                     ].filter(Boolean).join("\n");
-                    window.open(`https://wa.me/91${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines)}`, "_blank");
+                    const waUrl = `https://api.whatsapp.com/send?phone=91${WHATSAPP_NUMBER}&text=${encodeURIComponent(lines)}`;
+                    try {
+                      const win = window.open(waUrl, "_blank");
+                      if (!win || win.closed || typeof win.closed === "undefined") {
+                        window.location.href = waUrl;
+                      }
+                    } catch (e) {
+                      window.location.href = waUrl;
+                    }
                   }}
                   className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-full transition-colors shadow-sm flex items-center justify-center gap-2 text-center text-xs"
                   title="Inquire with Photo & Letter on WhatsApp (+91 8489943146)"
