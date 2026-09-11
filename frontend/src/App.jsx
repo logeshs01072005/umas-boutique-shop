@@ -81,6 +81,41 @@ const getImageUrl = (url) => {
   return url;
 };
 
+// Web Audio API Sound Chime Generator for Admin Real-Time Notifications
+const playAdminNotificationSound = () => {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+
+    // First chime tone (E5: 659.25 Hz)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = "sine";
+    osc1.frequency.setValueAtTime(659.25, ctx.currentTime);
+    gain1.gain.setValueAtTime(0.25, ctx.currentTime);
+    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(ctx.currentTime);
+    osc1.stop(ctx.currentTime + 0.25);
+
+    // Second higher chime tone (B5: 987.77 Hz)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = "sine";
+    osc2.frequency.setValueAtTime(987.77, ctx.currentTime + 0.15);
+    gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.15);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(ctx.currentTime + 0.15);
+    osc2.stop(ctx.currentTime + 0.45);
+  } catch (err) {
+    console.error("Notification audio playback error:", err);
+  }
+};
+
 // Calculate Estimated Delivery Date (5 days from now)
 const calculateEstimatedDelivery = () => {
   const date = new Date();
@@ -241,19 +276,27 @@ function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, sear
             )}
           </button>
 
-          <div className="hidden sm:flex items-center">
-            {searchOpen ? (
-              <input
-                autoFocus
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onBlur={() => !search && setSearchOpen(false)}
-                placeholder="Search products…"
-                className="bg-stone-900 border border-amber-500/30 text-stone-100 placeholder-stone-500 text-sm rounded-full px-4 py-2 w-48 focus:outline-none focus:border-amber-400"
-              />
-            ) : (
-              <button onClick={() => { setSearchOpen(true); setView("shop"); }} className="p-2 text-stone-300 hover:text-amber-300" aria-label="Search">
-                <Search size={19} />
+          {/* Permanently Visible & Responsive Search Bar */}
+          <div className="relative flex items-center w-36 sm:w-52 md:w-64">
+            <input
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                if (view !== "shop" && e.target.value.trim()) {
+                  setView("shop");
+                }
+              }}
+              placeholder="Search products…"
+              className="w-full bg-stone-900 border border-amber-500/30 text-stone-100 placeholder-stone-500 text-xs sm:text-sm rounded-full pl-9 pr-7 py-1.5 sm:py-2 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all"
+            />
+            <Search size={15} className="absolute left-3 text-stone-400 pointer-events-none" />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="absolute right-2.5 text-stone-400 hover:text-stone-200 text-xs font-bold p-1"
+                title="Clear search"
+              >
+                ✕
               </button>
             )}
           </div>
@@ -3406,7 +3449,7 @@ function ReturnRequestModal({ order, onClose, onSubmitted }) {
 
 function NewLaunchesModal({ products = [], onClose, onSelectProduct }) {
   const newProducts = useMemo(() => {
-    const list = products.filter((p) => p.tag === "New" || p.tag === "Bestseller");
+    const list = products.filter((p) => p.tag === "New" || p.tag === "New Arrival" || p.tag === "Bestseller");
     return list.length > 0 ? list : products.slice(0, 6);
   }, [products]);
 
@@ -3435,12 +3478,12 @@ function NewLaunchesModal({ products = [], onClose, onSelectProduct }) {
               const pct = discountPct(product.price, product.mrp);
               return (
                 <div
-                  key={product.id}
+                  key={product.id || product._id}
                   onClick={() => { onSelectProduct(product); onClose(); }}
                   className="bg-stone-50 border border-stone-200 rounded-md p-4 flex flex-col justify-between hover:border-amber-400 hover:shadow-md transition-all cursor-pointer group"
                 >
                   <div>
-                    <ProductArt category={product.category} tag={product.tag || "New"} imageUrl={product.imageUrl} size="h-44" />
+                    <ProductArt category={product.category} tag={product.tag || "New"} imageUrl={product.imageUrl || product.image_url} size="h-44" />
                     <div className="text-[10px] uppercase tracking-widest text-stone-500 mt-3">{product.category}</div>
                     <div className="font-serif text-base text-stone-900 group-hover:text-amber-700 font-medium leading-snug line-clamp-1 mt-0.5">
                       {product.name}
@@ -4405,6 +4448,36 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
     }
   };
 
+  const [adminNotifOpen, setAdminNotifOpen] = useState(false);
+  const prevPendingCountRef = useRef(null);
+
+  // Stock emergency products (Out of stock or low stock)
+  const stockEmergencies = useMemo(() => {
+    return (products || []).filter(
+      (p) => p.stock <= (p.lowStockThreshold || 5) || p.status === "Out of Stock" || p.status === "Unavailable"
+    );
+  }, [products]);
+
+  const totalAdminAlerts = (pendingPayments?.length || 0) + (stockEmergencies?.length || 0);
+
+  // Auto-polling for Admin notifications every 10 seconds with Audio chime alert
+  useEffect(() => {
+    const pollInterval = setInterval(() => {
+      fetchAdminData();
+    }, 10000);
+    return () => clearInterval(pollInterval);
+  }, []);
+
+  useEffect(() => {
+    if (pendingPayments) {
+      if (prevPendingCountRef.current !== null && pendingPayments.length > prevPendingCountRef.current) {
+        playAdminNotificationSound();
+        if (showToast) showToast(`🔔 Alert: ${pendingPayments.length - prevPendingCountRef.current} new payment verification request received!`);
+      }
+      prevPendingCountRef.current = pendingPayments.length;
+    }
+  }, [pendingPayments]);
+
   return (
     <div className="min-h-screen bg-stone-50 text-stone-900 p-3 sm:p-6 font-sans">
       <div className="max-w-7xl mx-auto">
@@ -4415,7 +4488,123 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
             <h1 className="font-serif text-2xl sm:text-3xl text-stone-900 font-bold mt-0.5">Boutique Control Center</h1>
             <p className="text-stone-500 text-xs mt-0.5 hidden sm:block">Uma's Fashion & Boutique — Storefront & Inventory Management</p>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap relative">
+            {/* Real-time Admin Notification Bell with Sound & Visual Badge */}
+            <div className="relative">
+              <button
+                onClick={() => setAdminNotifOpen((v) => !v)}
+                className={`relative p-2.5 rounded-full border transition-all flex items-center gap-1.5 text-xs font-bold ${totalAdminAlerts > 0
+                    ? "bg-amber-500/10 border-amber-500 text-amber-900 hover:bg-amber-500/20"
+                    : "bg-stone-100 border-stone-300 text-stone-700 hover:bg-stone-200"
+                  }`}
+                title="Admin Notification Alerts"
+              >
+                <Bell size={16} className={totalAdminAlerts > 0 ? "text-amber-700 animate-bounce" : "text-stone-600"} />
+                <span className="hidden sm:inline">Alerts</span>
+                {totalAdminAlerts > 0 && (
+                  <span className="bg-rose-600 text-white text-[10px] font-extrabold rounded-full px-1.5 py-0.2 shadow-sm">
+                    {totalAdminAlerts}
+                  </span>
+                )}
+              </button>
+
+              {/* Notification Center Dropdown */}
+              {adminNotifOpen && (
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-stone-200 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                  <div className="bg-stone-950 text-stone-100 p-4 flex items-center justify-between border-b border-amber-500/20">
+                    <div className="flex items-center gap-2">
+                      <Bell size={16} className="text-amber-400" />
+                      <span className="font-serif text-sm font-bold text-amber-300">Admin Notification Center</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => { playAdminNotificationSound(); showToast?.("🔊 Test sound notification chime played!"); }}
+                        className="text-[10px] bg-stone-800 hover:bg-stone-700 text-amber-300 px-2 py-1 rounded border border-stone-700 transition-colors"
+                        title="Test Alert Audio Chime"
+                      >
+                        🔊 Sound Test
+                      </button>
+                      <button onClick={() => setAdminNotifOpen(false)} className="text-stone-400 hover:text-white p-1">
+                        <X size={16} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="max-h-80 overflow-y-auto p-3 space-y-3">
+                    {/* Payment Verification Section */}
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider font-extrabold text-amber-700 mb-1.5 flex items-center justify-between">
+                        <span>💳 Pending Payment Verifications ({pendingPayments.length})</span>
+                      </div>
+                      {pendingPayments.length === 0 ? (
+                        <div className="text-xs text-stone-500 bg-stone-50 p-2.5 rounded-lg border border-stone-200">
+                          No pending payments requiring verification.
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {pendingPayments.slice(0, 4).map((p) => (
+                            <div key={p.id} className="bg-amber-50/70 border border-amber-200 rounded-xl p-3 flex items-center justify-between gap-2 shadow-xs">
+                              <div>
+                                <div className="font-bold text-xs text-stone-900">{p.shipping?.name || "Customer"}</div>
+                                <div className="text-[10px] text-amber-800 font-mono font-semibold">Ref: {p.paymentReference || "N/A"}</div>
+                                <div className="text-[10px] text-stone-500">{inr(p.total)} • {formatDateTime(p.createdAt)}</div>
+                              </div>
+                              <button
+                                onClick={() => { setAdminTab("payverify"); setAdminNotifOpen(false); }}
+                                className="bg-amber-500 hover:bg-amber-400 text-stone-950 text-[10px] font-extrabold uppercase px-2.5 py-1.5 rounded-lg shrink-0 shadow-xs"
+                              >
+                                Verify Now
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Stock Emergency Section */}
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider font-extrabold text-rose-700 mb-1.5 flex items-center justify-between">
+                        <span>⚠️ Stock & Product Emergencies ({stockEmergencies.length})</span>
+                      </div>
+                      {stockEmergencies.length === 0 ? (
+                        <div className="text-xs text-stone-500 bg-stone-50 p-2.5 rounded-lg border border-stone-200">
+                          All products are sufficiently stocked.
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {stockEmergencies.slice(0, 4).map((item) => (
+                            <div key={item.id} className="bg-rose-50/70 border border-rose-200 rounded-xl p-3 flex items-center justify-between gap-2 shadow-xs">
+                              <div>
+                                <div className="font-bold text-xs text-stone-900 leading-tight">{item.name}</div>
+                                <div className="text-[10px] text-rose-800 font-semibold">
+                                  Stock: {item.stock} left ({item.status})
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => { setEditingProduct(item); setProductModalOpen(true); setAdminNotifOpen(false); }}
+                                className="bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold uppercase px-2.5 py-1.5 rounded-lg shrink-0 shadow-xs"
+                              >
+                                Restock
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bg-stone-50 p-2.5 border-t border-stone-200 text-center">
+                    <button
+                      onClick={() => setAdminNotifOpen(false)}
+                      className="text-stone-600 hover:text-stone-900 text-xs font-semibold"
+                    >
+                      Close Notification Center
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <button
               onClick={() => { setEditingProduct(null); setProductModalOpen(true); }}
               className="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs uppercase tracking-wider px-4 py-2 sm:px-5 sm:py-2.5 rounded-full flex items-center gap-1.5 shadow-sm transition-colors"
@@ -6291,7 +6480,7 @@ export default function App() {
             onLogout={handleLogout}
             search={search}
             setSearch={(v) => { setSearch(v); handleSetView("shop"); }}
-            newLaunchesCount={products.slice(0, 4).length}
+            newLaunchesCount={products.filter((p) => p.tag === "New" || p.tag === "New Arrival" || p.tag === "Bestseller").length}
             onOpenNewLaunches={() => setShowNewLaunchesModal(true)}
             seasonalTheme={seasonalTheme}
             setSeasonalTheme={setSeasonalTheme}
