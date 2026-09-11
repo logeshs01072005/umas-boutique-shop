@@ -228,9 +228,8 @@ function SectionHeader({ title, description }) {
 
 /* --------------------------------- Nav bar ---------------------------------- */
 
-function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, search, setSearch, newLaunchesCount = 0, onOpenNewLaunches, seasonalTheme, setSeasonalTheme }) {
+function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, newLaunchesCount = 0, onOpenNewLaunches, seasonalTheme, setSeasonalTheme }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
 
   const navLink = (label, target) => (
@@ -275,31 +274,6 @@ function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, sear
               </span>
             )}
           </button>
-
-          {/* Permanently Visible & Responsive Search Bar */}
-          <div className="relative flex items-center w-36 sm:w-52 md:w-64">
-            <input
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                if (view !== "shop" && e.target.value.trim()) {
-                  setView("shop");
-                }
-              }}
-              placeholder="Search products…"
-              className="w-full bg-stone-900 border border-amber-500/30 text-stone-100 placeholder-stone-500 text-xs sm:text-sm rounded-full pl-9 pr-7 py-1.5 sm:py-2 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all"
-            />
-            <Search size={15} className="absolute left-3 text-stone-400 pointer-events-none" />
-            {search && (
-              <button
-                onClick={() => setSearch("")}
-                className="absolute right-2.5 text-stone-400 hover:text-stone-200 text-xs font-bold p-1"
-                title="Clear search"
-              >
-                ✕
-              </button>
-            )}
-          </div>
 
           {/* Account & User Dropdown */}
           <div className="relative">
@@ -699,12 +673,12 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
 
 /* ----------------------------------- Shop view ---------------------------------- */
 
-function ShopView({ products, categoryFilter, setCategoryFilter, search, openProduct, categories = DEFAULT_CATEGORIES }) {
+function ShopView({ products, categoryFilter, setCategoryFilter, search = "", setSearch, openProduct, categories = DEFAULT_CATEGORIES }) {
   const [sort, setSort] = useState("featured");
 
   const filtered = useMemo(() => {
     let list = products.filter((p) => (categoryFilter ? p.category === categoryFilter : true));
-    if (search.trim()) {
+    if (search && search.trim()) {
       const q = search.toLowerCase();
       list = list.filter((p) => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
     }
@@ -717,18 +691,48 @@ function ShopView({ products, categoryFilter, setCategoryFilter, search, openPro
   return (
     <div className="bg-stone-50 min-h-[70vh] py-10 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <h1 className="font-serif text-3xl text-stone-900">{categoryFilter || "All Products"}</h1>
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="border border-stone-300 rounded-full px-4 py-2 text-sm text-stone-700 bg-white focus:outline-none focus:border-amber-500"
-          >
-            <option value="featured">Featured</option>
-            <option value="bestseller">Bestsellers first</option>
-            <option value="low">Price: Low to High</option>
-            <option value="high">Price: High to Low</option>
-          </select>
+        {/* Purchasing / Shop Page Interactive Header Bar with Search Input */}
+        <div className="bg-white border border-stone-200 rounded-2xl p-5 md:p-6 mb-8 shadow-sm">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+            <div>
+              <span className="text-[10px] uppercase tracking-[0.2em] font-extrabold text-amber-700">Uma's Collections</span>
+              <h1 className="font-serif text-2xl sm:text-3xl text-stone-900 font-bold mt-0.5">{categoryFilter || "All Boutique Products"}</h1>
+            </div>
+
+            {/* In-Page Purchasing Search Input */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 max-w-xl">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch && setSearch(e.target.value)}
+                  placeholder="Search sarees, tops, kurtis, silk, lehengas..."
+                  className="w-full bg-stone-50 border border-stone-300 text-stone-900 placeholder-stone-400 text-xs sm:text-sm rounded-xl pl-10 pr-9 py-2.5 sm:py-3 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 shadow-inner transition-all"
+                />
+                <Search size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
+                {search && (
+                  <button
+                    onClick={() => setSearch && setSearch("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 bg-stone-200/80 p-0.5 rounded-full text-xs font-bold transition-colors"
+                    title="Clear search"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+                className="border border-stone-300 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-stone-800 bg-white focus:outline-none focus:border-amber-500 shadow-xs shrink-0"
+              >
+                <option value="featured">Featured</option>
+                <option value="bestseller">Bestsellers first</option>
+                <option value="low">Price: Low to High</option>
+                <option value="high">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <div className="flex gap-2 flex-wrap mb-10">
@@ -2879,11 +2883,12 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
   }
 
   return (
-    <div className="bg-stone-50 min-h-[75vh] py-10 px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white border border-stone-200 rounded-md p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-            <div className="w-20 h-20 rounded-full bg-stone-900 text-amber-300 flex items-center justify-center font-serif text-3xl font-bold border-2 border-amber-500/40 overflow-hidden shrink-0">
+    <div className="bg-stone-50 min-h-[75vh] py-10 px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* Customer Profile Header Banner Card */}
+        <div className="bg-white border border-stone-200 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm text-center md:text-left">
+          <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+            <div className="w-20 h-20 rounded-full bg-stone-950 text-amber-300 flex items-center justify-center font-serif text-3xl font-bold border-2 border-amber-500/40 overflow-hidden shrink-0 shadow-md">
               {currentUser?.avatarUrl ? (
                 <img src={currentUser.avatarUrl} alt={currentUser.name} className="w-full h-full object-cover" />
               ) : (
@@ -2891,9 +2896,10 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
               )}
             </div>
             <div>
-              <h1 className="font-serif text-2xl text-stone-900 font-medium">{currentUser?.name}</h1>
-              <p className="text-stone-500 text-sm">{currentUser?.email} • {currentUser?.phone || "No phone linked"}</p>
-              <p className="text-xs text-stone-400 mt-1">Customer since {formatDateTime(currentUser?.createdAt)}</p>
+              <div className="text-[10px] uppercase tracking-widest text-amber-700 font-extrabold">Valued Boutique Member</div>
+              <h1 className="font-serif text-2xl sm:text-3xl text-stone-900 font-bold mt-0.5">{currentUser?.name}</h1>
+              <p className="text-stone-500 text-xs sm:text-sm mt-1">{currentUser?.email} • {currentUser?.phone || "No phone linked"}</p>
+              <p className="text-[11px] text-stone-400 mt-1">Member since {formatDateTime(currentUser?.createdAt)}</p>
             </div>
           </div>
 
@@ -2904,30 +2910,34 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
               await fetchReturns();
               if (showToast) showToast("Profile & order history refreshed successfully!");
             }}
-            className="bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold px-5 py-2.5 rounded-full flex items-center gap-2 transition-all shadow-md shrink-0"
+            className="bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-extrabold uppercase tracking-wider px-5 py-2.5 rounded-full flex items-center gap-2 transition-all shadow-md shrink-0"
           >
             <RefreshCw size={15} /> Refresh Profile Data
           </button>
         </div>
 
-        {/* Profile Navigation Tabs */}
-        <div className="flex border-b border-stone-200 overflow-x-auto mb-8 gap-2">
-          {[
-            ["orders", "Orders & Invoices (New to Old)", ShoppingBag],
-            ["returns", "Return / Refunds", RotateCcw],
-            ["transactions", "Payment History", CreditCard],
-            ["details", "Personal Details", User],
-            ["password", "Change Password", Lock],
-          ].map(([tabKey, label, Icon]) => (
-            <button
-              key={tabKey}
-              onClick={() => setActiveTab(tabKey)}
-              className={`flex items-center gap-2 px-5 py-3 text-xs tracking-wider uppercase border-b-2 font-medium shrink-0 transition-colors ${activeTab === tabKey ? "border-amber-500 text-amber-800 bg-amber-50/50 font-bold" : "border-transparent text-stone-600 hover:text-stone-900"
-                }`}
-            >
-              <Icon size={16} /> {label}
-            </button>
-          ))}
+        {/* Profile Navigation Tabs Bar */}
+        <div className="bg-white border border-stone-200 rounded-2xl p-1.5 shadow-sm overflow-x-auto">
+          <div className="flex items-center gap-1.5 min-w-max">
+            {[
+              ["orders", "Orders & Invoices", ShoppingBag],
+              ["returns", "Return / Refunds", RotateCcw],
+              ["transactions", "Payment History", CreditCard],
+              ["details", "Personal Details", User],
+              ["password", "Change Password", Lock],
+            ].map(([tabKey, label, Icon]) => (
+              <button
+                key={tabKey}
+                onClick={() => setActiveTab(tabKey)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs tracking-wider uppercase font-bold transition-all shrink-0 ${activeTab === tabKey
+                    ? "bg-amber-500 text-stone-950 shadow-sm"
+                    : "text-stone-600 hover:text-stone-900 hover:bg-stone-100"
+                  }`}
+              >
+                <Icon size={15} /> {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Tab 1: Orders */}
@@ -2935,23 +2945,23 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="font-serif text-xl text-stone-900">Order &amp; Invoice History</h2>
+                <h2 className="font-serif text-xl sm:text-2xl text-stone-900 font-bold">Order &amp; Invoice History</h2>
                 <p className="text-xs text-stone-500">Track shipments in real time and download official boutique invoices.</p>
               </div>
-              <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full font-semibold self-start sm:self-auto">
-                Showing {sortedOrders.length} Invoices
+              <span className="text-xs text-amber-800 bg-amber-50 border border-amber-200 px-3.5 py-1 rounded-full font-bold self-start sm:self-auto shadow-xs">
+                {sortedOrders.length} {sortedOrders.length === 1 ? "Invoice" : "Invoices"} Recorded
               </span>
             </div>
 
             {/* Customer Order Search Bar */}
             <div className="relative">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
               <input
                 type="text"
                 value={customerOrderSearch}
                 onChange={(e) => setCustomerOrderSearch(e.target.value)}
-                placeholder="Search your orders by Order ID / Number (e.g. 1001), item name..."
-                className="w-full bg-white border border-stone-200 rounded-lg pl-9 pr-8 py-2.5 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-500 shadow-sm"
+                placeholder="Search orders by Order ID (e.g. 1001), item name..."
+                className="w-full bg-white border border-stone-200 rounded-xl pl-10 pr-8 py-2.5 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-500 shadow-xs"
               />
               {customerOrderSearch && (
                 <button
@@ -2963,26 +2973,26 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
               )}
             </div>
             {sortedOrders.length === 0 ? (
-              <div className="bg-white border border-stone-200 rounded-md p-10 text-center text-stone-500">
+              <div className="bg-white border border-stone-200 rounded-2xl p-12 text-center text-stone-500 font-medium">
                 You haven't placed any orders yet.
               </div>
             ) : (
               sortedOrders.map((ord) => (
-                <div key={ord.id} className="bg-white border border-stone-200 rounded-md p-6 shadow-sm">
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-100 pb-4 mb-4">
+                <div key={ord.id} className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-100 pb-4">
                     <div>
-                      <div className="font-serif text-lg text-stone-900 font-medium">Order #{ord.orderNumber}</div>
-                      <div className="text-xs text-stone-400">{formatDateTime(ord.createdAt)}</div>
+                      <div className="font-serif text-lg text-stone-900 font-bold">Order #{ord.orderNumber}</div>
+                      <div className="text-xs text-stone-400 mt-0.5">{formatDateTime(ord.createdAt)}</div>
                     </div>
-                    <div className="flex items-center gap-2.5">
-                      <span className={`text-xs uppercase px-3 py-1 rounded-full font-bold tracking-wider ${ord.status === "Delivered" ? "bg-emerald-100 text-emerald-800" :
-                        ord.status === "Cancelled" ? "bg-rose-100 text-rose-800" : "bg-amber-100 text-amber-800"
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <span className={`text-xs uppercase px-3 py-1 rounded-full font-extrabold tracking-wider ${ord.status === "Delivered" ? "bg-emerald-100 text-emerald-800" :
+                          ord.status === "Cancelled" ? "bg-rose-100 text-rose-800" : "bg-amber-100 text-amber-800"
                         }`}>
                         {ord.status}
                       </span>
                       <button
                         onClick={() => setTrackingModalOrder(ord)}
-                        className="bg-stone-900 text-amber-300 text-xs px-3 py-1.5 rounded-full hover:bg-stone-800 flex items-center gap-1"
+                        className="bg-stone-900 text-amber-300 text-xs px-3.5 py-1.5 rounded-full hover:bg-stone-800 flex items-center gap-1 font-bold shadow-xs transition-colors"
                       >
                         <Truck size={14} /> Track
                       </button>
@@ -2990,13 +3000,13 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
                         <>
                           <button
                             onClick={() => downloadSingleInvoice(ord)}
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-1 font-bold shadow-sm transition-colors"
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1 font-bold shadow-xs transition-colors"
                           >
                             <Download size={14} /> Download Bill
                           </button>
                           <button
                             onClick={() => setSelectedEBillOrder(ord)}
-                            className="bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs px-3 py-1.5 rounded-full flex items-center gap-1 font-semibold shadow-sm transition-colors"
+                            className="bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1 font-bold shadow-xs transition-colors"
                           >
                             <FileText size={14} /> View Invoice
                           </button>
@@ -3015,28 +3025,28 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
 
                   <div className="divide-y divide-stone-100">
                     {ord.items.map((item, idx) => (
-                      <div key={idx} className="py-3 flex justify-between items-center text-sm">
+                      <div key={idx} className="py-2.5 flex justify-between items-center text-sm">
                         <div>
-                          <span className="font-medium text-stone-900">{item.name}</span>
+                          <span className="font-bold text-stone-900">{item.name}</span>
                           <span className="text-xs text-stone-500 ml-2">({item.category} • Size: {item.size} • Qty: {item.quantity})</span>
                         </div>
-                        <span className="text-stone-900 font-medium">{inr(item.price * item.quantity)}</span>
+                        <span className="text-stone-900 font-bold">{inr(item.price * item.quantity)}</span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="border-t border-stone-100 pt-4 mt-4 flex flex-wrap items-center justify-between gap-4 text-xs text-stone-600">
+                  <div className="border-t border-stone-100 pt-3 flex flex-wrap items-center justify-between gap-4 text-xs text-stone-600">
                     <div>Payment: <b className="uppercase text-stone-900">{ord.paymentMethod}</b> ({ord.paymentStatus})</div>
                     <div className="flex items-center gap-4">
                       {ord.status === "Delivered" && (
                         <button
                           onClick={() => setReturnModalOrder(ord)}
-                          className="text-amber-700 hover:underline font-medium flex items-center gap-1"
+                          className="text-amber-700 hover:underline font-bold flex items-center gap-1"
                         >
-                          <RotateCcw size={12} /> Return / Refund Item
+                          <RotateCcw size={13} /> Return / Refund Item
                         </button>
                       )}
-                      <span className="text-sm font-bold text-stone-900">Total: {inr(ord.total)}</span>
+                      <span className="text-sm font-extrabold text-stone-900">Total: {inr(ord.total)}</span>
                     </div>
                   </div>
                 </div>
@@ -3048,27 +3058,27 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
         {/* Tab 2: Return Requests */}
         {activeTab === "returns" && (
           <div className="space-y-6">
-            <h2 className="font-serif text-xl text-stone-900">Return &amp; Refund Claims</h2>
+            <h2 className="font-serif text-xl sm:text-2xl text-stone-900 font-bold">Return &amp; Refund Claims</h2>
             {returns.length === 0 ? (
-              <div className="bg-white border border-stone-200 rounded-md p-10 text-center text-stone-500">
+              <div className="bg-white border border-stone-200 rounded-2xl p-12 text-center text-stone-500 font-medium">
                 No active or past return requests.
               </div>
             ) : (
               returns.map((ret) => (
-                <div key={ret._id} className="bg-white border border-stone-200 rounded-md p-6 shadow-sm">
+                <div key={ret._id} className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
                   <div className="flex justify-between items-center border-b border-stone-100 pb-3 mb-3">
                     <div>
-                      <div className="font-medium text-stone-900">Order #{ret.order_number}</div>
-                      <div className="text-xs text-stone-500">Product: <b>{ret.product_name}</b></div>
+                      <div className="font-bold text-stone-900">Order #{ret.order_number}</div>
+                      <div className="text-xs text-stone-500 mt-0.5">Product: <b>{ret.product_name}</b></div>
                     </div>
-                    <span className={`text-xs uppercase font-bold px-3 py-1 rounded-full ${ret.status === "Approved" ? "bg-emerald-100 text-emerald-800" :
-                      ret.status === "Refund Completed" ? "bg-blue-100 text-blue-800" :
-                        ret.status === "Rejected" ? "bg-rose-100 text-rose-800" : "bg-amber-100 text-amber-800"
+                    <span className={`text-xs uppercase font-extrabold px-3 py-1 rounded-full ${ret.status === "Approved" ? "bg-emerald-100 text-emerald-800" :
+                        ret.status === "Refund Completed" ? "bg-blue-100 text-blue-800" :
+                          ret.status === "Rejected" ? "bg-rose-100 text-rose-800" : "bg-amber-100 text-amber-800"
                       }`}>
                       {ret.status}
                     </span>
                   </div>
-                  <div className="text-xs text-stone-600 space-y-1">
+                  <div className="text-xs text-stone-600 space-y-1.5">
                     <div><b>Reason:</b> {ret.reason} {ret.custom_reason ? `(${ret.custom_reason})` : ""}</div>
                     {ret.comments && <div><b>Comments:</b> {ret.comments}</div>}
                     <div><b>Requested Date:</b> {formatDateTime(ret.requested_at)}</div>
@@ -3082,38 +3092,38 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
         {/* Tab 3: Transactions */}
         {activeTab === "transactions" && (
           <div className="space-y-6">
-            <h2 className="font-serif text-xl text-stone-900">Payment &amp; Transaction Logs</h2>
+            <h2 className="font-serif text-xl sm:text-2xl text-stone-900 font-bold">Payment &amp; Transaction Logs</h2>
             {transactions.length === 0 ? (
-              <div className="bg-white border border-stone-200 rounded-md p-10 text-center text-stone-500">
+              <div className="bg-white border border-stone-200 rounded-2xl p-12 text-center text-stone-500 font-medium">
                 No payment transactions recorded.
               </div>
             ) : (
-              <div className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-sm">
+              <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch" }}>
                   <table className="w-full text-left text-xs text-stone-600 min-w-[540px]">
-                    <thead className="bg-stone-900 text-amber-300 uppercase tracking-wider">
+                    <thead className="bg-stone-950 text-amber-300 uppercase tracking-wider font-extrabold">
                       <tr>
-                        <th className="p-3">Txn ID</th>
-                        <th className="p-3">Method</th>
-                        <th className="p-3">Type</th>
-                        <th className="p-3">Amount</th>
-                        <th className="p-3">Status</th>
-                        <th className="p-3">Date</th>
+                        <th className="p-3.5">Txn ID</th>
+                        <th className="p-3.5">Method</th>
+                        <th className="p-3.5">Type</th>
+                        <th className="p-3.5">Amount</th>
+                        <th className="p-3.5">Status</th>
+                        <th className="p-3.5">Date</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-200">
                       {transactions.map((t) => (
                         <tr key={t._id} className="hover:bg-stone-50">
-                          <td className="p-3 font-mono font-medium">{t.transaction_id}</td>
-                          <td className="p-3">{t.payment_method}</td>
-                          <td className="p-3 font-semibold">{t.type}</td>
-                          <td className="p-3 font-bold text-stone-900">{inr(t.amount)}</td>
-                          <td className="p-3">
-                            <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${t.status === "Success" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>
+                          <td className="p-3.5 font-mono font-bold text-stone-900">{t.transaction_id}</td>
+                          <td className="p-3.5 uppercase">{t.payment_method}</td>
+                          <td className="p-3.5 font-semibold">{t.type}</td>
+                          <td className="p-3.5 font-bold text-stone-900">{inr(t.amount)}</td>
+                          <td className="p-3.5">
+                            <span className={`px-2.5 py-0.5 rounded text-[10px] uppercase font-bold ${t.status === "Success" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>
                               {t.status}
                             </span>
                           </td>
-                          <td className="p-3 text-stone-400">{formatDateTime(t.created_at)}</td>
+                          <td className="p-3.5 text-stone-400">{formatDateTime(t.created_at)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -3124,62 +3134,78 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
           </div>
         )}
 
-        {/* Tab 4: Details */}
+        {/* Tab 4: Personal Details Form (Perfectly Centered & Aligned) */}
         {activeTab === "details" && (
-          <form onSubmit={handleUpdateProfile} className="bg-white border border-stone-200 rounded-md p-6 max-w-2xl space-y-4">
-            <h2 className="font-serif text-xl text-stone-900 mb-4">Edit Personal Information</h2>
-            <div>
-              <label className="block text-xs uppercase tracking-wider text-stone-600 mb-1">Full Name</label>
-              <input value={profileForm.name} onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} className="w-full border border-stone-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
-            </div>
-            <div>
-              <label className="block text-xs uppercase tracking-wider text-stone-600 mb-1">Phone Number</label>
-              <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} className="w-full border border-stone-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
-            </div>
-            <div>
-              <label className="block text-xs uppercase tracking-wider text-stone-600 mb-1">Address</label>
-              <input value={profileForm.address} onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })} className="w-full border border-stone-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+          <div className="max-w-2xl mx-auto bg-white border border-stone-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <form onSubmit={handleUpdateProfile} className="space-y-5">
+              <div className="border-b border-stone-100 pb-4 mb-2">
+                <h2 className="font-serif text-xl sm:text-2xl text-stone-900 font-bold">Edit Personal Information</h2>
+                <p className="text-xs text-stone-500 mt-1">Keep your delivery address and contact information updated.</p>
+              </div>
+
               <div>
-                <label className="block text-xs uppercase tracking-wider text-stone-600 mb-1">City</label>
-                <input value={profileForm.city} onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })} className="w-full border border-stone-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">Full Name</label>
+                <input value={profileForm.name} onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
               </div>
               <div>
-                <label className="block text-xs uppercase tracking-wider text-stone-600 mb-1">Pincode</label>
-                <input value={profileForm.pincode} onChange={(e) => setProfileForm({ ...profileForm, pincode: e.target.value })} className="w-full border border-stone-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">Phone Number</label>
+                <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
               </div>
-            </div>
-            <div>
-              <label className="block text-xs uppercase tracking-wider text-stone-600 mb-1">Profile Photo URL (Optional)</label>
-              <input value={profileForm.avatarUrl} onChange={(e) => setProfileForm({ ...profileForm, avatarUrl: e.target.value })} placeholder="https://example.com/photo.jpg" className="w-full border border-stone-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
-            </div>
-            <button type="submit" className="bg-amber-500 hover:bg-amber-400 text-stone-950 font-medium px-6 py-2.5 rounded-full text-sm">
-              Save Profile Changes
-            </button>
-          </form>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">Delivery Address</label>
+                <input value={profileForm.address} onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">City</label>
+                  <input value={profileForm.city} onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">Pincode</label>
+                  <input value={profileForm.pincode} onChange={(e) => setProfileForm({ ...profileForm, pincode: e.target.value })} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">Profile Photo URL (Optional)</label>
+                <input value={profileForm.avatarUrl} onChange={(e) => setProfileForm({ ...profileForm, avatarUrl: e.target.value })} placeholder="https://example.com/photo.jpg" className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" />
+              </div>
+              <div className="pt-2 flex justify-end">
+                <button type="submit" className="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-7 py-3 rounded-full text-xs uppercase tracking-wider shadow-md transition-all">
+                  Save Profile Changes
+                </button>
+              </div>
+            </form>
+          </div>
         )}
 
-        {/* Tab 5: Password */}
+        {/* Tab 5: Password Form (Perfectly Centered & Aligned) */}
         {activeTab === "password" && (
-          <form onSubmit={handleChangePassword} className="bg-white border border-stone-200 rounded-md p-6 max-w-md space-y-4">
-            <h2 className="font-serif text-xl text-stone-900 mb-4">Change Password</h2>
-            <div>
-              <label className="block text-xs uppercase tracking-wider text-stone-600 mb-1">Current Password</label>
-              <input type="password" value={passForm.currentPassword} onChange={(e) => setPassForm({ ...passForm, currentPassword: e.target.value })} className="w-full border border-stone-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" required />
-            </div>
-            <div>
-              <label className="block text-xs uppercase tracking-wider text-stone-600 mb-1">New Password</label>
-              <input type="password" value={passForm.newPassword} onChange={(e) => setPassForm({ ...passForm, newPassword: e.target.value })} className="w-full border border-stone-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" required />
-            </div>
-            <div>
-              <label className="block text-xs uppercase tracking-wider text-stone-600 mb-1">Confirm New Password</label>
-              <input type="password" value={passForm.confirmPassword} onChange={(e) => setPassForm({ ...passForm, confirmPassword: e.target.value })} className="w-full border border-stone-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" required />
-            </div>
-            <button type="submit" className="bg-stone-900 hover:bg-stone-800 text-amber-300 font-medium px-6 py-2.5 rounded-full text-sm">
-              Update Password
-            </button>
-          </form>
+          <div className="max-w-xl mx-auto bg-white border border-stone-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <form onSubmit={handleChangePassword} className="space-y-5">
+              <div className="border-b border-stone-100 pb-4 mb-2">
+                <h2 className="font-serif text-xl sm:text-2xl text-stone-900 font-bold">Change Account Password</h2>
+                <p className="text-xs text-stone-500 mt-1">Ensure your account security with a strong new password.</p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">Current Password</label>
+                <input type="password" value={passForm.currentPassword} onChange={(e) => setPassForm({ ...passForm, currentPassword: e.target.value })} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" required />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">New Password</label>
+                <input type="password" value={passForm.newPassword} onChange={(e) => setPassForm({ ...passForm, newPassword: e.target.value })} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" required />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">Confirm New Password</label>
+                <input type="password" value={passForm.confirmPassword} onChange={(e) => setPassForm({ ...passForm, confirmPassword: e.target.value })} className="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" required />
+              </div>
+              <div className="pt-2 flex justify-end">
+                <button type="submit" className="bg-stone-950 hover:bg-stone-800 text-amber-300 font-bold px-7 py-3 rounded-full text-xs uppercase tracking-wider shadow-md transition-all">
+                  Update Password
+                </button>
+              </div>
+            </form>
+          </div>
         )}
       </div>
 
@@ -6495,8 +6521,6 @@ export default function App() {
             currentUser={currentUser}
             onOpenAuth={() => setAuthOpen(true)}
             onLogout={handleLogout}
-            search={search}
-            setSearch={(v) => { setSearch(v); handleSetView("shop"); }}
             newLaunchesCount={Math.min(products.length, 5)}
             onOpenNewLaunches={() => setShowNewLaunchesModal(true)}
             seasonalTheme={seasonalTheme}
@@ -6505,7 +6529,7 @@ export default function App() {
         )}
 
         {view === "home" && <HomeView products={products} banners={banners} promoSettings={promoSettings} setView={setView} setCategoryFilter={setCategoryFilter} openProduct={openProduct} seasonalTheme={seasonalTheme} categories={categories} />}
-        {view === "shop" && <ShopView products={products} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} search={search} openProduct={openProduct} categories={categories} />}
+        {view === "shop" && <ShopView products={products} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} search={search} setSearch={setSearch} openProduct={openProduct} categories={categories} />}
         {view === "product" && activeProduct && <ProductDetailView product={activeProduct} addToCart={addToCart} setView={setView} currentUser={currentUser} />}
         {view === "cart" && <CartView cart={cart} updateQty={updateQty} removeItem={removeItem} setView={setView} subtotal={subtotal} />}
         {view === "checkout" && <CheckoutView cart={cart} subtotal={subtotal} currentUser={currentUser} onOpenAuth={() => setAuthOpen(true)} placeOrder={placeOrder} setView={setView} />}
