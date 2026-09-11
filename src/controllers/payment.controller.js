@@ -188,46 +188,14 @@ async function verifyPayment(req, res, next) {
     // Clear the user's cart once payment is confirmed.
     await CartItem.deleteMany({ user_id: req.user.id });
 
-    // Generate a simple e-bill (HTML) and store it under /uploads/invoices/{orderId}.html
+    // Generate e-bill HTML and store under /uploads/invoices/{orderId}.html
     try {
       const uploadsDir = path.join(__dirname, "../../uploads/invoices");
       if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
       const invoicePath = `/uploads/invoices/${order._id}.html`;
       const fullInvoiceFile = path.join(uploadsDir, `${order._id}.html`);
-      const invoiceDate = formatInvoiceDate(order.payment_verified_at || order.created_at || Date.now());
-
-      const invoiceHtml = `<!doctype html>
-<html>
-<head><meta charset="utf-8"><title>Invoice - ${order.order_number}</title></head>
-<body style="font-family: Arial, sans-serif; max-width:800px;margin:0 auto;padding:20px;">
-  <h1>Uma's Fashion & Boutique</h1>
-  <h2>Invoice — ${order.order_number}</h2>
-  <p><strong>Date:</strong> ${invoiceDate}</p>
-      ${order.payment_reference ? `<p><strong>Payment ref:</strong> ${order.payment_reference}</p>` : ""}
-  <h3>Billing / Shipping</h3>
-  <p>${order.ship_name}<br/>${order.ship_phone}<br/>${order.ship_address}, ${order.ship_city} - ${order.ship_pincode}</p>
-  <h3>Items</h3>
-  <table style="width:100%;border-collapse:collapse;">
-    <thead><tr><th style="text-align:left;border-bottom:1px solid #ddd;padding:8px">Item</th><th style="text-align:right;border-bottom:1px solid #ddd;padding:8px">Qty</th><th style="text-align:right;border-bottom:1px solid #ddd;padding:8px">Price</th></tr></thead>
-    <tbody>
-      ${order.items
-          .map(
-            (it) => `<tr><td style="padding:8px;border-bottom:1px solid #f1f1f1">${it.product_name} (${it.size})</td><td style="padding:8px;border-bottom:1px solid #f1f1f1;text-align:right">${it.quantity}</td><td style="padding:8px;border-bottom:1px solid #f1f1f1;text-align:right">₹${Number(
-              it.price
-            ).toFixed(2)}</td></tr>`
-          )
-          .join("")}
-    </tbody>
-  </table>
-  <h3 style="text-align:right">Subtotal: ₹${Number(order.subtotal).toFixed(2)}</h3>
-  <h3 style="text-align:right">Shipping: ${Number(order.shipping_fee) > 0 ? `₹${Number(order.shipping_fee).toFixed(2)}` : 'FREE (₹0.00)'}</h3>
-  <h2 style="text-align:right">Total: ₹${Number(order.total).toFixed(2)}</h2>
-  <p>Thank you for shopping with Uma's Fashion & Boutique.</p>
-</body>
-</html>`;
-
-      fs.writeFileSync(fullInvoiceFile, invoiceHtml, "utf8");
+      fs.writeFileSync(fullInvoiceFile, generateInvoiceHtml(order), "utf8");
 
       order.invoice_url = invoicePath;
       order.notified = false;
@@ -385,45 +353,14 @@ async function manualConfirm(req, res, next) {
     // Clear the user's cart once payment is confirmed.
     await CartItem.deleteMany({ user_id: order.user_id });
 
-    // generate invoice same as other flows
+    // Generate e-bill HTML using shared template
     try {
       const uploadsDir = path.join(__dirname, "../../uploads/invoices");
       if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
       const invoicePath = `/uploads/invoices/${order._id}.html`;
       const fullInvoiceFile = path.join(uploadsDir, `${order._id}.html`);
-      const invoiceDate = formatInvoiceDate(order.payment_verified_at || order.created_at || Date.now());
-
-      const invoiceHtml = `<!doctype html>
-<html>
-<head><meta charset="utf-8"><title>Invoice - ${order.order_number}</title></head>
-<body style="font-family: Arial, sans-serif; max-width:800px;margin:0 auto;padding:20px;">
-  <h1>Uma's Fashion & Boutique</h1>
-  <h2>Invoice — ${order.order_number}</h2>
-  <p><strong>Date:</strong> ${invoiceDate}</p>
-  <h3>Billing / Shipping</h3>
-  <p>${order.ship_name}<br/>${order.ship_phone}<br/>${order.ship_address}, ${order.ship_city} - ${order.ship_pincode}</p>
-  <h3>Items</h3>
-  <table style="width:100%;border-collapse:collapse;">
-    <thead><tr><th style="text-align:left;border-bottom:1px solid #ddd;padding:8px">Item</th><th style="text-align:right;border-bottom:1px solid #ddd;padding:8px">Qty</th><th style="text-align:right;border-bottom:1px solid #ddd;padding:8px">Price</th></tr></thead>
-    <tbody>
-      ${order.items
-          .map(
-            (it) => `<tr><td style="padding:8px;border-bottom:1px solid #f1f1f1">${it.product_name} (${it.size})</td><td style="padding:8px;border-bottom:1px solid #f1f1f1;text-align:right">${it.quantity}</td><td style="padding:8px;border-bottom:1px solid #f1f1f1;text-align:right">₹${Number(
-              it.price
-            ).toFixed(2)}</td></tr>`
-          )
-          .join("")}
-    </tbody>
-  </table>
-  <h3 style="text-align:right">Subtotal: ₹${Number(order.subtotal).toFixed(2)}</h3>
-  <h3 style="text-align:right">Shipping: ${Number(order.shipping_fee) > 0 ? `₹${Number(order.shipping_fee).toFixed(2)}` : 'FREE (₹0.00)'}</h3>
-  <h2 style="text-align:right">Total: ₹${Number(order.total).toFixed(2)}</h2>
-  <p>Thank you for shopping with Uma's Fashion & Boutique.</p>
-</body>
-</html>`;
-
-      fs.writeFileSync(fullInvoiceFile, invoiceHtml, "utf8");
+      fs.writeFileSync(fullInvoiceFile, generateInvoiceHtml(order), "utf8");
       order.invoice_url = invoicePath;
       order.notified = false;
       await order.save();

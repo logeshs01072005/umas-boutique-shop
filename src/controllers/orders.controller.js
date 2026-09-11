@@ -393,6 +393,38 @@ async function verifyOrderPayment(req, res, next) {
   }
 }
 
+async function submitPaymentReference(req, res, next) {
+  try {
+    const { paymentReference } = req.body;
+    if (!paymentReference || !paymentReference.trim()) {
+      return res.status(400).json({ error: "Bank RRN / Payment Reference is required." });
+    }
+
+    const order = await Order.findOne({ _id: req.params.id, user_id: req.user.id });
+    if (!order) return res.status(404).json({ error: "Order not found." });
+
+    if (order.payment_status === "paid") {
+      return res.status(400).json({ error: "This order payment is already verified." });
+    }
+
+    order.payment_reference = String(paymentReference).trim();
+    order.payment_status = "verification_requested";
+    order.updated_at = Date.now();
+    await order.save();
+
+    // Also clear cart once reference is submitted
+    await CartItem.deleteMany({ user_id: req.user.id });
+
+    res.json({
+      success: true,
+      message: "Payment reference submitted successfully. Admin will verify and activate your E-Bill.",
+      order: mapOrder(order),
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   placeOrder,
   getMyOrders,
@@ -402,4 +434,5 @@ module.exports = {
   getAllOrders,
   updateOrderStatus,
   verifyOrderPayment,
+  submitPaymentReference,
 };
