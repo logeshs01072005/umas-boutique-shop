@@ -1487,11 +1487,10 @@ function ProductDetailView({ product, addToCart, setView, currentUser }) {
                   key={tab.id}
                   type="button"
                   onClick={() => setProductInfoTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
-                    active
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${active
                       ? "bg-stone-900 text-amber-300 shadow-sm ring-1 ring-amber-500/30"
                       : "bg-white text-stone-600 hover:text-stone-900 border border-stone-200 hover:border-stone-300"
-                  }`}
+                    }`}
                 >
                   <Icon size={14} className={active ? "text-amber-400" : "text-stone-400"} />
                   <span>{tab.label}</span>
@@ -3029,9 +3028,8 @@ function AdminPurchaseBillModal({ order, onClose }) {
                 </div>
                 <div className="flex justify-between">
                   <span>Payment Status:</span>
-                  <span className={`font-bold uppercase px-2 py-0.5 rounded text-[10px] ${
-                    isPaid ? "bg-emerald-100 text-emerald-800 border border-emerald-300" : "bg-amber-100 text-amber-900 border border-amber-300"
-                  }`}>
+                  <span className={`font-bold uppercase px-2 py-0.5 rounded text-[10px] ${isPaid ? "bg-emerald-100 text-emerald-800 border border-emerald-300" : "bg-amber-100 text-amber-900 border border-amber-300"
+                    }`}>
                     {isPaid ? "PAID / CONFIRMED" : isCod ? "COD (COLLECT CASH ON DELIVERY)" : order.paymentStatus || "PENDING"}
                   </span>
                 </div>
@@ -3537,8 +3535,8 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
                 key={tabKey}
                 onClick={() => setActiveTab(tabKey)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs tracking-wider uppercase font-bold transition-all shrink-0 ${activeTab === tabKey
-                    ? "bg-amber-500 text-stone-950 shadow-sm"
-                    : "text-stone-600 hover:text-stone-900 hover:bg-stone-100"
+                  ? "bg-amber-500 text-stone-950 shadow-sm"
+                  : "text-stone-600 hover:text-stone-900 hover:bg-stone-100"
                   }`}
               >
                 <Icon size={15} /> {label}
@@ -3593,7 +3591,7 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
                     </div>
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <span className={`text-xs uppercase px-3 py-1 rounded-full font-extrabold tracking-wider ${ord.status === "Delivered" ? "bg-emerald-100 text-emerald-800" :
-                          ord.status === "Cancelled" ? "bg-rose-100 text-rose-800" : "bg-amber-100 text-amber-800"
+                        ord.status === "Cancelled" ? "bg-rose-100 text-rose-800" : "bg-amber-100 text-amber-800"
                         }`}>
                         {ord.status}
                       </span>
@@ -3679,8 +3677,8 @@ function CustomerProfileView({ currentUser, orders = [], setView, onProfileUpdat
                       <div className="text-xs text-stone-500 mt-0.5">Product: <b>{ret.product_name}</b></div>
                     </div>
                     <span className={`text-xs uppercase font-extrabold px-3 py-1 rounded-full ${ret.status === "Approved" ? "bg-emerald-100 text-emerald-800" :
-                        ret.status === "Refund Completed" ? "bg-blue-100 text-blue-800" :
-                          ret.status === "Rejected" ? "bg-rose-100 text-rose-800" : "bg-amber-100 text-amber-800"
+                      ret.status === "Refund Completed" ? "bg-blue-100 text-blue-800" :
+                        ret.status === "Rejected" ? "bg-rose-100 text-rose-800" : "bg-amber-100 text-amber-800"
                       }`}>
                       {ret.status}
                     </span>
@@ -5428,35 +5426,67 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
           </div>
         )}
 
-        {/* 3. Inventory Tab */}
+        {/* 3. Dynamic Responsive Inventory Control Center (Scrollable Mobile/Tablet/Laptop) */}
         {adminTab === "inventory" && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center bg-white border border-stone-200 rounded-xl p-5 shadow-sm">
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Header & Quick Action Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-stone-200 rounded-2xl p-5 shadow-sm">
               <div>
-                <h2 className="font-serif text-xl text-stone-900 font-bold">Inventory &amp; Product Stock Management</h2>
-                <p className="text-stone-500 text-xs mt-0.5">Manage live product listings, stock levels, and store categories.</p>
+                <div className="text-[10px] uppercase tracking-widest text-amber-700 font-extrabold flex items-center gap-1.5">
+                  <Package size={13} /> Live Inventory &amp; Stock Control
+                </div>
+                <h2 className="font-serif text-xl sm:text-2xl text-stone-900 font-bold mt-0.5">Storefront Inventory Control Center</h2>
+                <p className="text-stone-500 text-xs mt-0.5">Monitor stock levels, update product quantities, and manage store categories in real time across mobile, tablet &amp; desktop.</p>
               </div>
-              <button
-                onClick={() => { setEditingProduct(null); setProductModalOpen(true); }}
-                className="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-full flex items-center gap-1.5 shadow-sm transition-colors"
-              >
-                <Plus size={14} /> Add Product
-              </button>
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <button
+                  onClick={() => { setEditingProduct(null); setProductModalOpen(true); }}
+                  className="bg-amber-500 hover:bg-amber-400 text-stone-950 font-extrabold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full flex items-center gap-2 shadow-md transition-all shrink-0"
+                >
+                  <Plus size={15} /> Add New Product
+                </button>
+              </div>
             </div>
 
-            {/* Category Management Control */}
-            <div className="bg-white border border-stone-200 rounded-xl p-5 space-y-4 shadow-sm">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-stone-200 pb-3">
+            {/* Live Inventory Summary Badges */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+              <div className="bg-white border border-stone-200 p-4 rounded-xl shadow-xs">
+                <div className="text-[10px] uppercase font-bold text-stone-500 tracking-wider">Total Products</div>
+                <div className="text-xl sm:text-2xl font-serif font-bold text-stone-900 mt-1">{products?.length || 0} Items</div>
+              </div>
+              <div className="bg-white border border-stone-200 p-4 rounded-xl shadow-xs">
+                <div className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider">Available &amp; In Stock</div>
+                <div className="text-xl sm:text-2xl font-serif font-bold text-emerald-800 mt-1">
+                  {(products || []).filter((p) => p.stock > 5 && p.status !== "Out of Stock").length}
+                </div>
+              </div>
+              <div className="bg-white border border-rose-200 bg-rose-50/40 p-4 rounded-xl shadow-xs">
+                <div className="text-[10px] uppercase font-bold text-rose-700 tracking-wider">Low Stock (&le; 5)</div>
+                <div className="text-xl sm:text-2xl font-serif font-bold text-rose-700 mt-1">
+                  {(products || []).filter((p) => p.stock > 0 && p.stock <= 5).length}
+                </div>
+              </div>
+              <div className="bg-white border border-rose-300 bg-rose-100/50 p-4 rounded-xl shadow-xs">
+                <div className="text-[10px] uppercase font-bold text-rose-900 tracking-wider">Out of Stock</div>
+                <div className="text-xl sm:text-2xl font-serif font-bold text-rose-900 mt-1">
+                  {(products || []).filter((p) => p.stock === 0 || p.status === "Out of Stock").length}
+                </div>
+              </div>
+            </div>
+
+            {/* Category Options Manager */}
+            <div className="bg-white border border-stone-200 rounded-2xl p-5 space-y-4 shadow-sm">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-stone-100 pb-3">
                 <div>
                   <h3 className="font-serif text-base text-stone-900 flex items-center gap-2 font-bold">
-                    <Tag size={16} className="text-amber-600" /> Product Category Options Manager
+                    <Tag size={16} className="text-amber-600" /> Category Management Control
                   </h3>
-                  <p className="text-xs text-stone-500">Add new categories or manage existing choices for storefront filtering and product creation.</p>
+                  <p className="text-xs text-stone-500">Add or remove product categories. Changes immediately reflect on the storefront filters.</p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                   <input
                     type="text"
-                    placeholder="New category (e.g. Jewelry)"
+                    placeholder="New category name..."
                     value={newCategoryInput}
                     onChange={(e) => setNewCategoryInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -5466,7 +5496,7 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
                         setNewCategoryInput("");
                       }
                     }}
-                    className="bg-white border border-stone-300 text-stone-900 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-amber-500 flex-1 sm:w-56"
+                    className="bg-stone-50 border border-stone-300 text-stone-900 px-3.5 py-2 rounded-xl text-xs focus:outline-none focus:border-amber-500 flex-1 sm:w-56"
                   />
                   <button
                     type="button"
@@ -5474,9 +5504,9 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
                       if (onAddCategory) onAddCategory(newCategoryInput);
                       setNewCategoryInput("");
                     }}
-                    className="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs px-4 py-1.5 rounded-lg flex items-center gap-1 shrink-0 transition-colors"
+                    className="bg-amber-500 hover:bg-amber-400 text-stone-950 font-extrabold text-xs px-4 py-2 rounded-xl flex items-center gap-1 shrink-0 transition-colors shadow-xs"
                   >
-                    <Plus size={14} /> Add Option
+                    <Plus size={14} /> Add Category
                   </button>
                 </div>
               </div>
@@ -5485,7 +5515,7 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
                 {categories.map((cat) => (
                   <span
                     key={cat}
-                    className="inline-flex items-center gap-1.5 bg-stone-100 border border-stone-300 text-stone-800 text-xs px-3 py-1 rounded-full font-medium shadow-xs"
+                    className="inline-flex items-center gap-2 bg-stone-100 border border-stone-300 text-stone-800 text-xs px-3.5 py-1.5 rounded-full font-bold shadow-xs"
                   >
                     <span>{cat}</span>
                     {categories.length > 1 && (
@@ -5495,7 +5525,7 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
                         className="text-stone-400 hover:text-rose-600 p-0.5 rounded-full transition-colors"
                         title={`Remove ${cat} category`}
                       >
-                        <X size={12} />
+                        <X size={13} />
                       </button>
                     )}
                   </span>
@@ -5503,72 +5533,245 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
               </div>
             </div>
 
-            <div className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-sm">
-              <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: "touch" }}>
-                <table className="w-full text-left text-xs text-stone-700 min-w-[640px]">
-                  <thead className="bg-stone-100 text-stone-800 uppercase tracking-wider font-bold border-b border-stone-200">
-                    <tr>
-                      <th className="p-3">Product Name</th>
-                      <th className="p-3">Category</th>
-                      <th className="p-3">Price</th>
-                      <th className="p-3">Stock Quantity</th>
-                      <th className="p-3">Status Tag</th>
-                      <th className="p-3">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-stone-200">
-                    {products.map((p) => (
-                      <tr key={p.id} className="hover:bg-stone-50 transition-colors">
-                        <td className="p-3 font-medium text-stone-900 flex items-center gap-2">
-                          {p.imageUrl && <img src={getImageUrl(p.imageUrl)} alt="" className="w-8 h-8 object-cover rounded-lg border border-stone-200" />}
-                          <span>{p.name}</span>
-                        </td>
-                        <td className="p-3 text-stone-600">{p.category}</td>
-                        <td className="p-3 font-semibold text-amber-700">{inr(p.price)}</td>
-                        <td className="p-3">
-                          {stockEditId === p.id ? (
-                            <div className="flex items-center gap-1">
-                              <input
-                                type="number"
-                                min="0"
-                                value={stockEditVal}
-                                onChange={(e) => setStockEditVal(e.target.value)}
-                                className="w-20 bg-white border border-amber-500 text-stone-900 px-2 py-1 rounded text-xs"
-                                autoFocus
-                              />
-                              <button onClick={() => handleSaveStock(p.id)} className="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded text-xs font-bold">
-                                <Check size={11} />
-                              </button>
-                              <button onClick={() => { setStockEditId(null); setStockEditVal(""); }} className="bg-stone-200 text-stone-700 px-2 py-1 rounded text-xs">
-                                <X size={11} />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <span className={`font-bold ${p.stock <= (p.lowStockThreshold || 5) ? "text-rose-600" : "text-emerald-700"}`}>{p.stock}</span>
-                              <button onClick={() => { setStockEditId(p.id); setStockEditVal(String(p.stock)); }} className="text-stone-400 hover:text-amber-700" title="Edit stock">
-                                <Edit2 size={11} />
-                              </button>
-                            </div>
-                          )}
-                        </td>
-                        <td className="p-3">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold border ${p.status === "Available" ? "bg-emerald-50 text-emerald-700 border-emerald-300" : p.status === "Coming Soon" ? "bg-blue-50 text-blue-700 border-blue-300" : "bg-rose-50 text-rose-700 border-rose-300"}`}>
-                            {p.status || "Available"}
-                          </span>
-                        </td>
-                        <td className="p-3 flex gap-2 flex-wrap">
-                          <button onClick={() => { setEditingProduct(p); setProductModalOpen(true); }} className="bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 px-2.5 py-1 rounded text-xs flex items-center gap-1 font-medium transition-colors">
-                            <Edit2 size={12} /> Edit
-                          </button>
-                          <button onClick={() => saveProduct({ ...p, stock: p.stock + 10 })} className="bg-amber-500 hover:bg-amber-400 text-stone-950 px-2.5 py-1 rounded text-xs font-bold transition-colors">+10 Stock</button>
-                          <button onClick={() => deleteProduct(p.id)} className="bg-rose-50 text-rose-700 hover:bg-rose-100 px-2.5 py-1 rounded text-xs border border-rose-200 font-medium transition-colors">Delete</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            {/* Inventory Scrollable Control Section */}
+            <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden space-y-4 p-4 sm:p-6">
+              {/* Search & Filter Bar */}
+              <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 border-b border-stone-100 pb-4">
+                <div className="relative flex-1">
+                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={trackingSearchQuery}
+                    onChange={(e) => setTrackingSearchQuery(e.target.value)}
+                    placeholder="Search inventory by product name, category, or ID..."
+                    className="w-full bg-stone-50 border border-stone-300 rounded-xl pl-10 pr-8 py-2.5 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-500"
+                  />
+                  {trackingSearchQuery && (
+                    <button onClick={() => setTrackingSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0" style={{ WebkitOverflowScrolling: "touch" }}>
+                  {[
+                    ["all", "All Stock"],
+                    ["low", "⚠️ Low Stock"],
+                    ["out", "🚫 Out of Stock"],
+                    ["available", "✓ Available"],
+                  ].map(([val, label]) => (
+                    <button
+                      key={val}
+                      onClick={() => setTrackingStatusFilter(val)}
+                      className={`px-3 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider whitespace-nowrap transition-all ${trackingStatusFilter === val
+                          ? "bg-amber-500 text-stone-950 shadow-xs"
+                          : "bg-stone-100 text-stone-600 hover:bg-stone-200 border border-stone-200"
+                        }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
+
+              {/* Scrollable Container with Sticky Table Header (Laptop/Desktop) & Responsive Grid (Mobile/Tablet) */}
+              {(() => {
+                const filteredProducts = (products || []).filter((p) => {
+                  const q = (trackingSearchQuery || "").toLowerCase();
+                  const matchesQ = !q || p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q) || String(p.id).toLowerCase().includes(q);
+                  const matchesFilter =
+                    trackingStatusFilter === "all" ||
+                    (trackingStatusFilter === "low" && p.stock > 0 && p.stock <= (p.lowStockThreshold || 5)) ||
+                    (trackingStatusFilter === "out" && (p.stock === 0 || p.status === "Out of Stock")) ||
+                    (trackingStatusFilter === "available" && p.stock > (p.lowStockThreshold || 5) && p.status !== "Out of Stock");
+                  return matchesQ && matchesFilter;
+                });
+
+                if (filteredProducts.length === 0) {
+                  return (
+                    <div className="py-12 text-center text-stone-500 font-medium bg-stone-50 rounded-xl border border-stone-200">
+                      No inventory items match your search or filter criteria.
+                    </div>
+                  );
+                }
+
+                return (
+                  <div>
+                    {/* Desktop & Laptop View: High-capacity Scrolling Table with Sticky Header */}
+                    <div className="hidden md:block max-h-[560px] overflow-y-auto border border-stone-200 rounded-xl" style={{ WebkitOverflowScrolling: "touch" }}>
+                      <table className="w-full text-left text-xs text-stone-700">
+                        <thead className="bg-stone-950 text-amber-300 uppercase tracking-wider font-extrabold sticky top-0 z-10 shadow-sm">
+                          <tr>
+                            <th className="p-3.5">Product</th>
+                            <th className="p-3.5">Category</th>
+                            <th className="p-3.5">Price</th>
+                            <th className="p-3.5">Stock Level</th>
+                            <th className="p-3.5">Status</th>
+                            <th className="p-3.5 text-right">Quick Restock / Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-stone-200 bg-white">
+                          {filteredProducts.map((p) => (
+                            <tr key={p.id} className="hover:bg-amber-50/40 transition-colors">
+                              <td className="p-3.5 font-bold text-stone-900 flex items-center gap-3">
+                                {p.imageUrl ? (
+                                  <img src={getImageUrl(p.imageUrl)} alt={p.name} className="w-10 h-10 object-cover rounded-xl border border-stone-200 shadow-xs shrink-0" />
+                                ) : (
+                                  <div className="w-10 h-10 bg-stone-100 rounded-xl border border-stone-200 flex items-center justify-center text-stone-400 font-bold shrink-0">📦</div>
+                                )}
+                                <div>
+                                  <div className="font-bold text-stone-900 text-xs sm:text-sm">{p.name}</div>
+                                  <div className="text-[10px] text-stone-400 font-mono">ID: {p.id}</div>
+                                </div>
+                              </td>
+                              <td className="p-3.5 text-stone-600 font-medium">{p.category}</td>
+                              <td className="p-3.5 font-extrabold text-amber-800">{inr(p.price)}</td>
+                              <td className="p-3.5">
+                                {stockEditId === p.id ? (
+                                  <div className="flex items-center gap-1.5">
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      value={stockEditVal}
+                                      onChange={(e) => setStockEditVal(e.target.value)}
+                                      className="w-20 bg-white border-2 border-amber-500 text-stone-900 px-2 py-1 rounded-lg text-xs font-bold focus:outline-none"
+                                      autoFocus
+                                    />
+                                    <button onClick={() => handleSaveStock(p.id)} className="bg-emerald-600 hover:bg-emerald-500 text-white p-1.5 rounded-lg font-bold shadow-xs">
+                                      <Check size={13} />
+                                    </button>
+                                    <button onClick={() => { setStockEditId(null); setStockEditVal(""); }} className="bg-stone-200 text-stone-700 p-1.5 rounded-lg">
+                                      <X size={13} />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-2">
+                                    <span className={`font-extrabold px-2.5 py-0.5 rounded-full text-xs ${p.stock === 0 ? "bg-rose-100 text-rose-800 border border-rose-300" :
+                                        p.stock <= (p.lowStockThreshold || 5) ? "bg-amber-100 text-amber-900 border border-amber-300" :
+                                          "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                                      }`}>
+                                      {p.stock} units
+                                    </span>
+                                    <button onClick={() => { setStockEditId(p.id); setStockEditVal(String(p.stock)); }} className="text-stone-400 hover:text-amber-700 p-1 rounded" title="Edit stock">
+                                      <Edit2 size={13} />
+                                    </button>
+                                  </div>
+                                )}
+                              </td>
+                              <td className="p-3.5">
+                                <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase font-extrabold tracking-wider border ${p.stock === 0 || p.status === "Out of Stock" ? "bg-rose-100 text-rose-800 border-rose-300" :
+                                    p.status === "Coming Soon" ? "bg-blue-100 text-blue-800 border-blue-300" :
+                                      "bg-emerald-100 text-emerald-800 border-emerald-300"
+                                  }`}>
+                                  {p.stock === 0 ? "Out of Stock" : p.status || "Available"}
+                                </span>
+                              </td>
+                              <td className="p-3.5 text-right">
+                                <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                                  <button
+                                    onClick={() => saveProduct({ ...p, stock: p.stock + 5 })}
+                                    className="bg-amber-500/10 hover:bg-amber-500 hover:text-stone-950 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-lg text-xs font-bold transition-all"
+                                  >
+                                    +5 Stock
+                                  </button>
+                                  <button
+                                    onClick={() => saveProduct({ ...p, stock: p.stock + 10 })}
+                                    className="bg-amber-500 hover:bg-amber-400 text-stone-950 px-2.5 py-1 rounded-lg text-xs font-extrabold shadow-xs transition-colors"
+                                  >
+                                    +10 Stock
+                                  </button>
+                                  <button
+                                    onClick={() => { setEditingProduct(p); setProductModalOpen(true); }}
+                                    className="bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
+                                  >
+                                    <Edit2 size={12} /> Edit
+                                  </button>
+                                  <button
+                                    onClick={() => deleteProduct(p.id)}
+                                    className="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 p-1.5 rounded-lg transition-colors"
+                                    title="Delete product"
+                                  >
+                                    <Trash2 size={13} />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Mobile & Tablet Card List — Perfectly scrollable & touch-friendly */}
+                    <div className="block md:hidden space-y-3 max-h-[540px] overflow-y-auto pr-1" style={{ WebkitOverflowScrolling: "touch" }}>
+                      {filteredProducts.map((p) => (
+                        <div key={p.id} className="bg-stone-50 border border-stone-200 rounded-2xl p-4 space-y-3 shadow-xs">
+                          <div className="flex items-start gap-3">
+                            {p.imageUrl ? (
+                              <img src={getImageUrl(p.imageUrl)} alt={p.name} className="w-14 h-14 object-cover rounded-xl border border-stone-200 shadow-xs shrink-0" />
+                            ) : (
+                              <div className="w-14 h-14 bg-stone-200 rounded-xl border border-stone-300 flex items-center justify-center text-stone-500 font-bold shrink-0">📦</div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <span className="text-[10px] uppercase font-bold text-amber-800 tracking-wider bg-amber-100 px-2 py-0.5 rounded-full">{p.category}</span>
+                              <h4 className="font-bold text-stone-900 text-sm mt-1 leading-snug truncate">{p.name}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="font-extrabold text-amber-800 text-sm">{inr(p.price)}</span>
+                                <span className={`text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full ${p.stock === 0 ? "bg-rose-100 text-rose-800" :
+                                    p.stock <= (p.lowStockThreshold || 5) ? "bg-amber-100 text-amber-900" : "bg-emerald-100 text-emerald-800"
+                                  }`}>
+                                  {p.stock === 0 ? "Out of Stock" : `${p.stock} left`}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Quick Mobile Stock Control Stepper */}
+                          <div className="flex items-center justify-between bg-white border border-stone-200 rounded-xl p-2.5">
+                            <span className="text-xs font-bold text-stone-700">Stock Stepper:</span>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={() => saveProduct({ ...p, stock: Math.max(0, p.stock - 1) })}
+                                className="w-8 h-8 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold flex items-center justify-center text-sm border border-stone-300"
+                              >
+                                -
+                              </button>
+                              <span className="w-10 text-center font-extrabold text-stone-900 text-xs">{p.stock}</span>
+                              <button
+                                onClick={() => saveProduct({ ...p, stock: p.stock + 1 })}
+                                className="w-8 h-8 rounded-lg bg-amber-500 text-stone-950 font-bold flex items-center justify-center text-sm shadow-xs"
+                              >
+                                +
+                              </button>
+                              <button
+                                onClick={() => saveProduct({ ...p, stock: p.stock + 10 })}
+                                className="px-2.5 py-1.5 rounded-lg bg-stone-900 text-amber-300 font-extrabold text-[10px] uppercase"
+                              >
+                                +10
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center justify-end gap-2 pt-1">
+                            <button
+                              onClick={() => { setEditingProduct(p); setProductModalOpen(true); }}
+                              className="flex-1 bg-stone-900 text-amber-300 text-xs font-extrabold py-2 rounded-xl flex items-center justify-center gap-1 shadow-xs"
+                            >
+                              <Edit2 size={13} /> Edit Details
+                            </button>
+                            <button
+                              onClick={() => deleteProduct(p.id)}
+                              className="bg-rose-100 hover:bg-rose-200 text-rose-800 text-xs font-bold px-3 py-2 rounded-xl border border-rose-200"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
