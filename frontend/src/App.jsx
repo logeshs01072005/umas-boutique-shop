@@ -145,7 +145,7 @@ function ProductArt({ category, tag, status, imageUrl, size = "h-64", showStatus
     const fullUrl = getImageUrl(imageUrl);
     return (
       <div className={`relative ${size} w-full rounded-md overflow-hidden bg-stone-100 flex items-center justify-center border border-stone-200/50`}>
-        <img src={fullUrl} alt={category} className="w-full h-full object-cover" />
+        <img src={fullUrl} alt={category} loading="lazy" decoding="async" className="w-full h-full object-cover" />
         {displayTag ? (
           <span className={`absolute top-3 left-3 text-[10px] tracking-widest uppercase px-2 py-1 rounded-sm font-medium shadow-sm ${displayTag === "Out of Stock" || displayTag === "Unavailable"
             ? "bg-rose-900 text-rose-100"
@@ -1243,6 +1243,20 @@ function WhatsAppSupportWidget({ products = [], categories = [], openProduct, se
 
 /* ------------------------------- Product detail view ------------------------------ */
 
+function SpecRow({ label, value }) {
+  const isMissing = !value || value === "Not specified" || value === "";
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2.5 px-3 rounded-lg border border-stone-200/60 bg-white hover:bg-stone-50/80 transition-colors">
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-500">
+        {label}
+      </span>
+      <span className={`text-xs font-medium mt-0.5 sm:mt-0 sm:text-right ${isMissing ? "text-stone-400 italic" : "text-stone-900"}`}>
+        {isMissing ? "Not specified" : value}
+      </span>
+    </div>
+  );
+}
+
 function ProductDetailView({ product, addToCart, setView, currentUser }) {
   const [size, setSize] = useState(product.sizes && product.sizes[0] ? product.sizes[0] : "Free Size");
   const [qty, setQty] = useState(1);
@@ -1251,6 +1265,7 @@ function ProductDetailView({ product, addToCart, setView, currentUser }) {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
+  const [productInfoTab, setProductInfoTab] = useState("all");
 
   const pct = discountPct(product.price, product.mrp);
   const delivery = calculateEstimatedDelivery();
@@ -1305,13 +1320,34 @@ function ProductDetailView({ product, addToCart, setView, currentUser }) {
               <RatingStars rating={product.avgRating || 0} numReviews={product.numReviews || 0} size={16} />
             </div>
 
-            <div className="flex items-baseline gap-3 mb-4">
-              <span className="text-2xl text-stone-900 font-medium">{inr(product.price)}</span>
-              {pct > 0 && <span className="text-stone-400 line-through">{inr(product.mrp)}</span>}
-              {pct > 0 && <span className="text-rose-700 text-sm font-medium">{pct}% off</span>}
+            {/* 4. Product Selling Price clearly in ₹ */}
+            <div className="bg-stone-100/80 border border-stone-200/90 rounded-xl p-3.5 mb-4 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] uppercase tracking-wider font-bold text-stone-500 block">
+                  Product Selling Price
+                </span>
+                <div className="flex items-baseline gap-2.5 mt-0.5">
+                  <span className="text-2xl sm:text-3xl text-stone-950 font-serif font-bold text-amber-800">
+                    {inr(product.price)}
+                  </span>
+                  {pct > 0 && <span className="text-stone-400 text-sm line-through font-normal">{inr(product.mrp)}</span>}
+                </div>
+              </div>
+              {pct > 0 ? (
+                <div className="text-right">
+                  <span className="bg-rose-100 text-rose-800 text-xs font-bold px-3 py-1 rounded-full border border-rose-200 inline-block">
+                    {pct}% OFF
+                  </span>
+                  <div className="text-[10px] text-stone-500 mt-1">Inclusive of all taxes</div>
+                </div>
+              ) : (
+                <span className="text-xs text-stone-500 font-medium">Inclusive of all taxes</span>
+              )}
             </div>
 
-            <p className="text-stone-600 text-sm leading-relaxed mb-6">{product.desc || product.description}</p>
+            <p className="text-stone-600 text-xs sm:text-sm leading-relaxed mb-5">
+              {product.desc || product.description || "Discover this exquisite boutique design, handpicked for exceptional finish and celebration styling."}
+            </p>
 
             {/* Estimated Delivery Information Box */}
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-md p-4 mb-6">
@@ -1429,6 +1465,185 @@ function ProductDetailView({ product, addToCart, setView, currentUser }) {
                 >
                   <MessageSquare size={16} /> Inquire with Photo & Details
                 </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ==================== SEPARATE PRODUCT SECTIONS ==================== */}
+        <div className="mt-12 border-t border-stone-200 pt-8">
+          {/* Section Navigation Tabs (Responsive on Mobile, Tablet & Desktop) */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar border-b border-stone-200">
+            {[
+              { id: "all", label: "All Sections", icon: FileText },
+              { id: "description", label: "1. Product Description", icon: Sparkles },
+              { id: "details", label: "2. Product Details", icon: Tag },
+              { id: "specifications", label: "3. Specifications", icon: Sliders },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const active = productInfoTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setProductInfoTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
+                    active
+                      ? "bg-stone-900 text-amber-300 shadow-sm ring-1 ring-amber-500/30"
+                      : "bg-white text-stone-600 hover:text-stone-900 border border-stone-200 hover:border-stone-300"
+                  }`}
+                >
+                  <Icon size={14} className={active ? "text-amber-400" : "text-stone-400"} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="space-y-6">
+            {/* 1. PRODUCT DESCRIPTION SECTION */}
+            {(productInfoTab === "all" || productInfoTab === "description") && (
+              <div className="bg-white border border-stone-200/90 rounded-2xl p-5 sm:p-7 shadow-xs">
+                <div className="flex items-center justify-between pb-3 mb-4 border-b border-stone-100">
+                  <div className="flex items-center gap-2.5">
+                    <span className="p-2 rounded-lg bg-amber-500/10 text-amber-800">
+                      <Sparkles size={18} />
+                    </span>
+                    <div>
+                      <h3 className="font-serif text-lg sm:text-xl font-bold text-stone-900">
+                        1. Product Description
+                      </h3>
+                      <p className="text-[11px] text-stone-500">
+                        Aesthetic appearance, craftsmanship design, style essence, and suitable occasions
+                      </p>
+                    </div>
+                  </div>
+                  <span className="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest text-amber-900 bg-amber-100/70 border border-amber-200 px-2.5 py-1 rounded-full">
+                    Boutique Curated
+                  </span>
+                </div>
+
+                <div className="text-stone-700 text-sm leading-relaxed mb-5">
+                  {product.description || product.desc ? (
+                    <p className="bg-stone-50/80 p-4 rounded-xl border border-stone-200/60 text-stone-800 leading-relaxed">
+                      {product.description || product.desc}
+                    </p>
+                  ) : (
+                    <p className="text-stone-400 italic bg-stone-50 p-4 rounded-xl border border-stone-200/60">Not specified</p>
+                  )}
+                </div>
+
+                {/* Quick Styling & Occasion Highlights */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                  <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-200/60">
+                    <div className="text-[10px] uppercase tracking-wider font-bold text-amber-900 mb-1">
+                      ✨ Design &amp; Appearance
+                    </div>
+                    <div className="text-xs text-stone-700">
+                      {product.pattern && product.pattern !== "Not specified"
+                        ? `${product.pattern} styling in an elegant ${product.color || "artisan"} palette.`
+                        : "Handcrafted silhouette featuring fine boutique finish."}
+                    </div>
+                  </div>
+                  <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-200/60">
+                    <div className="text-[10px] uppercase tracking-wider font-bold text-amber-900 mb-1">
+                      👗 Style Silhouette
+                    </div>
+                    <div className="text-xs text-stone-700">
+                      {product.style && product.style !== "Not specified"
+                        ? `${product.style} aesthetic tailored for effortless elegance.`
+                        : "Boutique drape designed for graceful celebration movement."}
+                    </div>
+                  </div>
+                  <div className="bg-stone-50 p-3.5 rounded-xl border border-stone-200/60">
+                    <div className="text-[10px] uppercase tracking-wider font-bold text-amber-900 mb-1">
+                      🎉 Suitable Occasions
+                    </div>
+                    <div className="text-xs text-stone-700">
+                      {product.occasion && product.occasion !== "Not specified"
+                        ? product.occasion
+                        : "Ideal for weddings, festive ceremonies, celebrations, and special gatherings."}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 2. PRODUCT DETAILS SECTION */}
+            {(productInfoTab === "all" || productInfoTab === "details") && (
+              <div className="bg-white border border-stone-200/90 rounded-2xl p-5 sm:p-7 shadow-xs">
+                <div className="flex items-center justify-between pb-3 mb-4 border-b border-stone-100">
+                  <div className="flex items-center gap-2.5">
+                    <span className="p-2 rounded-lg bg-amber-500/10 text-amber-800">
+                      <Tag size={18} />
+                    </span>
+                    <div>
+                      <h3 className="font-serif text-lg sm:text-xl font-bold text-stone-900">
+                        2. Product Details
+                      </h3>
+                      <p className="text-[11px] text-stone-500">
+                        Essential product details and garment attributes
+                      </p>
+                    </div>
+                  </div>
+                  <span className="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest text-stone-600 bg-stone-100 border border-stone-200 px-2.5 py-1 rounded-full">
+                    10 Specific Fields
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <SpecRow label="Product Type" value={product.productType} />
+                  <SpecRow label="Category" value={product.category} />
+                  <SpecRow label="Style" value={product.style} />
+                  <SpecRow label="Pattern" value={product.pattern} />
+                  <SpecRow label="Color" value={product.color} />
+                  <SpecRow label="Fabric" value={product.fabric} />
+                  <SpecRow label="Occasion" value={product.occasion} />
+                  <SpecRow label="Fit" value={product.fit} />
+                  <SpecRow label="Sleeve Type" value={product.sleeveType} />
+                  <SpecRow label="Neck Type" value={product.neckType} />
+                </div>
+              </div>
+            )}
+
+            {/* 3. PRODUCT SPECIFICATIONS SECTION */}
+            {(productInfoTab === "all" || productInfoTab === "specifications") && (
+              <div className="bg-white border border-stone-200/90 rounded-2xl p-5 sm:p-7 shadow-xs">
+                <div className="flex items-center justify-between pb-3 mb-4 border-b border-stone-100">
+                  <div className="flex items-center gap-2.5">
+                    <span className="p-2 rounded-lg bg-amber-500/10 text-amber-800">
+                      <Sliders size={18} />
+                    </span>
+                    <div>
+                      <h3 className="font-serif text-lg sm:text-xl font-bold text-stone-900">
+                        3. Product Specifications
+                      </h3>
+                      <p className="text-[11px] text-stone-500">
+                        Technical garment parameters, measurements, and care instructions
+                      </p>
+                    </div>
+                  </div>
+                  <span className="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest text-stone-600 bg-stone-100 border border-stone-200 px-2.5 py-1 rounded-full">
+                    Technical Specifications
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
+                  <SpecRow
+                    label="Size"
+                    value={product.sizes && product.sizes.length > 0 ? product.sizes.join(", ") : null}
+                  />
+                  <SpecRow label="Material / Fabric" value={product.fabric} />
+                  <SpecRow label="Color" value={product.color} />
+                  <SpecRow label="Pattern" value={product.pattern} />
+                  <SpecRow label="Sleeve" value={product.sleeveType} />
+                  <SpecRow label="Neck" value={product.neckType} />
+                  <SpecRow label="Fit" value={product.fit} />
+                  <SpecRow label="Care Instructions" value={product.careInstructions} />
+                  <div className="sm:col-span-2">
+                    <SpecRow label="Any Other Relevant Specification" value={product.otherSpecifications} />
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -1651,6 +1866,17 @@ function ProductFormModal({ product, onClose, onSave, categories = DEFAULT_CATEG
     sizes: product?.sizes && product.sizes.length > 0 ? product.sizes : ["Free Size"],
     sizePrices: product?.sizePrices || product?.size_prices || {},
     imageUrl: product?.imageUrl || "",
+    productType: product?.productType || product?.product_type || "",
+    style: product?.style || "",
+    pattern: product?.pattern || "",
+    color: product?.color || "",
+    fabric: product?.fabric || "",
+    occasion: product?.occasion || "",
+    fit: product?.fit || "",
+    sleeveType: product?.sleeveType || product?.sleeve_type || "",
+    neckType: product?.neckType || product?.neck_type || "",
+    careInstructions: product?.careInstructions || product?.care_instructions || "",
+    otherSpecifications: product?.otherSpecifications || product?.other_specifications || "",
   });
 
   const [uploading, setUploading] = useState(false);
@@ -1930,15 +2156,145 @@ function ProductFormModal({ product, onClose, onSave, categories = DEFAULT_CATEG
             </div>
           )}
 
-          <div>
-            <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Description</label>
+          {/* Section 1: Customer-Friendly Product Description */}
+          <div className="bg-amber-500/5 border border-amber-500/20 p-3.5 rounded-xl space-y-1.5">
+            <label className="block uppercase tracking-wider text-amber-900 mb-1 font-bold">
+              1. Customer-Friendly Product Description
+            </label>
+            <p className="text-[11px] text-stone-500 mb-1">
+              Short, attractive customer-friendly description describing appearance, design, style, and suitable occasions without repeating tabular details.
+            </p>
             <textarea
               rows={3}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="Detailed product fabric, weave, care instructions..."
+              placeholder="e.g. Handcrafted pure silk saree with luminous gold zari border, designed to elevate weddings and festive evenings with regal grace..."
               className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
             />
+          </div>
+
+          {/* Section 2: Product Details */}
+          <div className="bg-stone-50 border border-stone-200 p-4 rounded-xl space-y-3">
+            <div className="flex items-center justify-between border-b border-stone-200 pb-2">
+              <span className="uppercase tracking-wider text-stone-900 font-bold text-xs flex items-center gap-1.5">
+                🏷️ 2. Product Details
+              </span>
+              <span className="text-[10px] text-stone-500">Displays "Not specified" if left blank</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Product Type</label>
+                <input
+                  value={form.productType}
+                  onChange={(e) => setForm({ ...form, productType: e.target.value })}
+                  placeholder="e.g. Banarasi Saree, Anarkali Set, Lehenga Choli"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div>
+                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Style</label>
+                <input
+                  value={form.style}
+                  onChange={(e) => setForm({ ...form, style: e.target.value })}
+                  placeholder="e.g. Traditional Heritage, Contemporary, Flared"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div>
+                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Pattern</label>
+                <input
+                  value={form.pattern}
+                  onChange={(e) => setForm({ ...form, pattern: e.target.value })}
+                  placeholder="e.g. Floral Zari Jaal, Block Print, Sequin Scatter"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div>
+                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Color</label>
+                <input
+                  value={form.color}
+                  onChange={(e) => setForm({ ...form, color: e.target.value })}
+                  placeholder="e.g. Crimson Red & Gold, Peacock Blue"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div>
+                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Fabric</label>
+                <input
+                  value={form.fabric}
+                  onChange={(e) => setForm({ ...form, fabric: e.target.value })}
+                  placeholder="e.g. Pure Katan Silk, Georgette, Cotton Rayon"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div>
+                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Occasion</label>
+                <input
+                  value={form.occasion}
+                  onChange={(e) => setForm({ ...form, occasion: e.target.value })}
+                  placeholder="e.g. Weddings, Bridal Festivities, Casual"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div>
+                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Fit</label>
+                <input
+                  value={form.fit}
+                  onChange={(e) => setForm({ ...form, fit: e.target.value })}
+                  placeholder="e.g. Classic Draped, Empire Waist Flared, Straight"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div>
+                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Sleeve Type</label>
+                <input
+                  value={form.sleeveType}
+                  onChange={(e) => setForm({ ...form, sleeveType: e.target.value })}
+                  placeholder="e.g. 3/4th Sleeves, Sleeveless, Blouse Piece Included"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Neck Type</label>
+                <input
+                  value={form.neckType}
+                  onChange={(e) => setForm({ ...form, neckType: e.target.value })}
+                  placeholder="e.g. Round Neck with Slit, Sweetheart Neck, Customizable Blouse"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Product Specifications */}
+          <div className="bg-stone-50 border border-stone-200 p-4 rounded-xl space-y-3">
+            <div className="flex items-center justify-between border-b border-stone-200 pb-2">
+              <span className="uppercase tracking-wider text-stone-900 font-bold text-xs flex items-center gap-1.5">
+                📐 3. Product Specifications (Technical & Care)
+              </span>
+              <span className="text-[10px] text-stone-500">Care Instructions and Weave Details</span>
+            </div>
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Care Instructions</label>
+                <input
+                  value={form.careInstructions}
+                  onChange={(e) => setForm({ ...form, careInstructions: e.target.value })}
+                  placeholder="e.g. Strictly Dry Clean Only. Store wrapped in pure muslin cloth."
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div>
+                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Any Other Relevant Specifications</label>
+                <textarea
+                  rows={2}
+                  value={form.otherSpecifications}
+                  onChange={(e) => setForm({ ...form, otherSpecifications: e.target.value })}
+                  placeholder="e.g. Weave: Kadwa Jacquard; Zari: Tested Gold Zari; Lining: Attached Butter Crepe"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="bg-stone-50 p-4 rounded-xl border border-stone-200 space-y-3">
@@ -2263,15 +2619,15 @@ function downloadSingleInvoice(order) {
       : new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
     // Customer Detail Extractions
-    const customerName = String(order.shipName || order.user?.name || order.customerName || "Valued Customer");
-    const customerAddr = String(order.shipAddress || order.address || "Address on file");
+    const customerName = String(order.shipping?.name || order.shipName || order.user?.name || order.customerName || "Valued Customer");
+    const customerAddr = String(order.shipping?.address || order.shipAddress || order.address || "Address on file");
     const cityStatePin = [
-      order.shipCity || order.city,
-      order.shipState || order.state,
-      order.shipPincode || order.pincode || order.zip
+      order.shipping?.city || order.shipCity || order.city,
+      order.shipping?.state || order.shipState || order.state,
+      order.shipping?.pincode || order.shipPincode || order.pincode || order.zip
     ].filter(Boolean).join(" - ");
-    const customerPhone = String(order.shipPhone || order.phone || order.user?.phone || "N/A");
-    const customerEmail = String(order.shipEmail || order.email || order.user?.email || "N/A");
+    const customerPhone = String(order.shipping?.phone || order.shipPhone || order.phone || order.user?.phone || "N/A");
+    const customerEmail = String(order.shipping?.email || order.userEmail || order.shipEmail || order.email || order.user?.email || "N/A");
 
     // Header Background Bar
     doc.setFillColor(28, 25, 23); // #1c1917
@@ -2556,6 +2912,257 @@ function EBillInvoiceComponent({ order }) {
           >
             <Printer size={15} /> Print / Save PDF
           </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------- Admin Customer Purchase Bill (Shipping Slip) -------------------- */
+
+function AdminPurchaseBillModal({ order, onClose }) {
+  if (!order) return null;
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const customerName = String(order.shipping?.name || order.shipName || order.user?.name || order.customerName || "Customer");
+  const customerAddr = String(order.shipping?.address || order.shipAddress || order.address || "Address on file");
+  const cityStatePin = [
+    order.shipping?.city || order.shipCity || order.city,
+    order.shipping?.state || order.shipState || order.state,
+    order.shipping?.pincode || order.shipPincode || order.pincode
+  ].filter(Boolean).join(" - ");
+  const customerPhone = String(order.shipping?.phone || order.shipPhone || order.phone || "N/A");
+  const customerEmail = String(order.shipping?.email || order.userEmail || order.shipEmail || order.email || "N/A");
+
+  const formattedDate = order.createdAt
+    ? new Date(order.createdAt).toLocaleDateString("en-IN", {
+      year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+    })
+    : new Date().toLocaleDateString("en-IN");
+
+  const isCod = (order.paymentMethod || "").toLowerCase() === "cod";
+  const isPaid = isOrderPaid(order);
+
+  return (
+    <div className="fixed inset-0 z-[120] bg-stone-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto print:p-0 print:bg-white print:static print:z-auto">
+      <div className="bg-white border border-stone-200 text-stone-900 rounded-2xl max-w-3xl w-full p-6 sm:p-8 relative shadow-2xl my-4 print:shadow-none print:border-none print:p-0 print:m-0 print:w-full print:max-w-full printable-area">
+        {/* Top bar controls (hidden in print) */}
+        <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-200 print:hidden">
+          <div className="flex items-center gap-2">
+            <span className="bg-amber-100 text-amber-900 text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">
+              📦 Admin Shipping Bill / Packing Slip
+            </span>
+            <span className="text-xs text-stone-500 font-mono">Order #{order.orderNumber || order.id?.slice(-8)}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="bg-stone-900 hover:bg-stone-800 text-amber-300 font-bold text-xs px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors"
+            >
+              <Printer size={14} /> Print Bill
+            </button>
+            <button
+              type="button"
+              onClick={() => downloadSingleInvoice(order)}
+              className="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors"
+            >
+              <Download size={14} /> Save PDF
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-stone-400 hover:text-stone-700 p-2 rounded-lg transition-colors ml-1"
+              title="Close"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Invoice Header */}
+        <div className="border-b-2 border-stone-800 pb-5 mb-5 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+          <div>
+            <h1 className="font-serif text-2xl sm:text-3xl text-stone-950 font-bold tracking-tight">Uma's Fashion &amp; Boutique</h1>
+            <p className="text-xs text-stone-600 mt-1">Luxury Indian Handlooms, Designer Sarees, Lehengas &amp; Kurtis</p>
+            <p className="text-[11px] text-stone-500">GSTIN: 33AAAAA0000A1Z5 • Care: care@umasboutique.com • Ph: +91 8489943146</p>
+          </div>
+          <div className="sm:text-right bg-stone-50 sm:bg-transparent p-3 sm:p-0 rounded-lg border sm:border-none border-stone-200">
+            <div className="inline-block bg-stone-900 text-amber-300 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded mb-1">
+              CUSTOMER PURCHASE BILL
+            </div>
+            <div className="text-sm font-bold text-stone-900">Invoice #{order.orderNumber || order.id?.slice(-8)}</div>
+            <div className="text-xs text-stone-500">Date: {formattedDate}</div>
+            <div className="text-[11px] font-semibold text-amber-800 mt-1">Courier Dispatch Copy</div>
+          </div>
+        </div>
+
+        {/* Customer Shipping & Payment Cards */}
+        <div className="grid sm:grid-cols-2 gap-4 text-xs mb-5">
+          <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
+            <div className="font-bold text-stone-900 uppercase tracking-wider text-[11px] mb-2 flex items-center gap-1.5">
+              <Truck size={14} className="text-amber-700" /> Deliver &amp; Ship To:
+            </div>
+            <div className="font-bold text-stone-950 text-sm">{customerName}</div>
+            <div className="text-stone-700 mt-1 leading-relaxed">{customerAddr}</div>
+            {cityStatePin && <div className="text-stone-900 font-medium mt-0.5">{cityStatePin}</div>}
+            <div className="mt-2 text-stone-800 flex flex-col gap-0.5">
+              <span><b>Phone:</b> {customerPhone}</span>
+              {customerEmail && customerEmail !== "N/A" && <span><b>Email:</b> {customerEmail}</span>}
+            </div>
+          </div>
+
+          <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 flex flex-col justify-between">
+            <div>
+              <div className="font-bold text-stone-900 uppercase tracking-wider text-[11px] mb-2 flex items-center gap-1.5">
+                <CreditCard size={14} className="text-amber-700" /> Order &amp; Payment Details:
+              </div>
+              <div className="space-y-1 text-stone-700">
+                <div className="flex justify-between">
+                  <span>Payment Mode:</span>
+                  <strong className={`uppercase ${isCod ? "text-amber-900" : "text-stone-900"}`}>
+                    {order.paymentMethod || "ONLINE"}
+                  </strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Payment Status:</span>
+                  <span className={`font-bold uppercase px-2 py-0.5 rounded text-[10px] ${
+                    isPaid ? "bg-emerald-100 text-emerald-800 border border-emerald-300" : "bg-amber-100 text-amber-900 border border-amber-300"
+                  }`}>
+                    {isPaid ? "PAID / CONFIRMED" : isCod ? "COD (COLLECT CASH ON DELIVERY)" : order.paymentStatus || "PENDING"}
+                  </span>
+                </div>
+                {order.paymentReference && (
+                  <div className="flex justify-between">
+                    <span>Reference / Txn ID:</span>
+                    <span className="font-mono text-stone-900 font-semibold">{order.paymentReference}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span>Dispatch Priority:</span>
+                  <span className="text-stone-900 font-medium">Standard Express (3-5 Days)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Cash on delivery alert box */}
+            {isCod && (
+              <div className="mt-3 bg-amber-500/10 border border-amber-500/30 text-amber-950 p-2.5 rounded-lg text-[11px] font-bold flex items-center justify-between">
+                <span>⚠️ COD COLLECTIBLE:</span>
+                <span className="text-sm font-extrabold text-amber-900">{inr(order.total)}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Itemized Table */}
+        <div className="overflow-x-auto border border-stone-200 rounded-xl mb-5">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-stone-900 text-amber-300 uppercase tracking-wider text-[10px]">
+              <tr>
+                <th className="py-2.5 px-3">#</th>
+                <th className="py-2.5 px-3">Item Name</th>
+                <th className="py-2.5 px-3 text-center">Category</th>
+                <th className="py-2.5 px-3 text-center">Size</th>
+                <th className="py-2.5 px-3 text-center">Qty</th>
+                <th className="py-2.5 px-3 text-right">Unit Price</th>
+                <th className="py-2.5 px-3 text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-stone-200 bg-white">
+              {(order.items || []).map((item, idx) => (
+                <tr key={idx} className={idx % 2 === 1 ? "bg-stone-50/70" : ""}>
+                  <td className="py-2.5 px-3 text-stone-500 font-mono">{idx + 1}</td>
+                  <td className="py-2.5 px-3 font-medium text-stone-900">
+                    <div>{item.name}</div>
+                  </td>
+                  <td className="py-2.5 px-3 text-center text-stone-600">{item.category || "Apparel"}</td>
+                  <td className="py-2.5 px-3 text-center">
+                    <span className="bg-stone-200 text-stone-800 px-2 py-0.5 rounded text-[11px] font-bold">
+                      {item.size || "Free Size"}
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-3 text-center font-bold text-stone-900">{item.quantity || 1}</td>
+                  <td className="py-2.5 px-3 text-right text-stone-700">{inr(item.price)}</td>
+                  <td className="py-2.5 px-3 text-right font-bold text-stone-950">{inr((item.price || 0) * (item.quantity || 1))}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Totals & Courier Packing Signoff */}
+        <div className="grid sm:grid-cols-2 gap-4 items-end mb-6">
+          <div className="bg-stone-50 border border-stone-200 rounded-xl p-3.5 text-[11px] text-stone-600 space-y-1.5">
+            <div className="font-bold text-stone-800 uppercase tracking-wider text-[10px]">Shipping Inspection &amp; Packing Signoff:</div>
+            <div className="flex items-center gap-4 text-stone-700">
+              <label className="flex items-center gap-1.5">
+                <input type="checkbox" defaultChecked className="rounded text-amber-600" />
+                <span>Quality Verified</span>
+              </label>
+              <label className="flex items-center gap-1.5">
+                <input type="checkbox" defaultChecked className="rounded text-amber-600" />
+                <span>Tags Intact</span>
+              </label>
+              <label className="flex items-center gap-1.5">
+                <input type="checkbox" defaultChecked className="rounded text-amber-600" />
+                <span>Gift Sealed</span>
+              </label>
+            </div>
+            <div className="text-[10px] text-stone-400 pt-1">
+              Authorized Dispatch Officer: ______________________
+            </div>
+          </div>
+
+          <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 text-xs space-y-1.5">
+            <div className="flex justify-between text-stone-600">
+              <span>Subtotal:</span>
+              <span className="font-medium text-stone-900">{inr(order.subtotal || order.total)}</span>
+            </div>
+            <div className="flex justify-between text-stone-600">
+              <span>Shipping Charge:</span>
+              <span className="font-bold text-emerald-700">
+                {order.shippingFee && order.shippingFee > 0 ? inr(order.shippingFee) : "FREE"}
+              </span>
+            </div>
+            <div className="border-t border-stone-300 pt-2 flex justify-between items-baseline text-sm font-bold text-stone-950">
+              <span>Grand Total Amount:</span>
+              <span className="text-base text-amber-800 font-extrabold">{inr(order.total)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer info & WhatsApp Action (hidden in print) */}
+        <div className="border-t border-stone-200 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-500">
+          <div className="text-[11px]">
+            Thank you for choosing Uma's Fashion &amp; Boutique. For courier tracking &amp; help: +91 8489943146
+          </div>
+          <div className="flex items-center gap-2 print:hidden">
+            {customerPhone && customerPhone !== "N/A" && (
+              <button
+                type="button"
+                onClick={() => {
+                  const cleanPhone = customerPhone.replace(/\D/g, "");
+                  const text = `Hello ${customerName}, here is your purchase bill & shipping dispatch details for Order #${order.orderNumber || order.id?.slice(-8)} (Total: ${inr(order.total)}) from Uma's Fashion Boutique. Your parcel is ready for courier shipping!`;
+                  window.open(`https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(text)}`, "_blank");
+                }}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors"
+                title="Send Shipping Bill text to customer on WhatsApp"
+              >
+                <MessageSquare size={14} /> Send WhatsApp Bill
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="bg-stone-900 hover:bg-stone-800 text-amber-300 font-bold text-xs px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors"
+            >
+              <Printer size={14} /> Print Bill / Slip
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -4151,6 +4758,7 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
   const [reviews, setReviews] = useState([]);
   const [pendingPayments, setPendingPayments] = useState([]);
   const [trackingOrder, setTrackingOrder] = useState(null);
+  const [selectedAdminBillOrder, setSelectedAdminBillOrder] = useState(null);
   const [trackingDetails, setTrackingDetails] = useState(null);
   const [trackingLoading, setTrackingLoading] = useState(false);
   const [trackingSearchQuery, setTrackingSearchQuery] = useState("");
@@ -5326,6 +5934,14 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
                       </div>
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                         <button
+                          type="button"
+                          onClick={() => setSelectedAdminBillOrder(order)}
+                          className="bg-stone-900 hover:bg-stone-800 text-amber-300 text-xs uppercase tracking-wider font-bold px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors border border-amber-500/30 whitespace-nowrap"
+                          title="Print Customer Purchase Bill & Shipping Packing Slip"
+                        >
+                          <Printer size={14} /> Shipping Bill
+                        </button>
+                        <button
                           onClick={() => setTrackingOrder(order)}
                           className={`text-xs uppercase tracking-wider font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors ${trackingOrder?.id === order.id
                             ? "bg-amber-500 text-stone-950 ring-2 ring-amber-300"
@@ -5642,16 +6258,12 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
                               </div>
                             ))}
                           </div>
-                          {order.invoiceUrl && (
-                            <a
-                              href={order.invoiceUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="mt-2 inline-flex items-center gap-1 text-xs text-amber-700 font-semibold hover:underline"
-                            >
-                              <FileText size={12} /> View Invoice
-                            </a>
-                          )}
+                          <button
+                            onClick={() => downloadSingleInvoice(order)}
+                            className="mt-2 inline-flex items-center gap-1 text-xs text-amber-700 font-semibold hover:underline"
+                          >
+                            <FileText size={12} /> Download Invoice
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -5700,6 +6312,13 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
             )}
           </div>
         </div>
+      )}
+
+      {selectedAdminBillOrder && (
+        <AdminPurchaseBillModal
+          order={selectedAdminBillOrder}
+          onClose={() => setSelectedAdminBillOrder(null)}
+        />
       )}
     </div>
   );

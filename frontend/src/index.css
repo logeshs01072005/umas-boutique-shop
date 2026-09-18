@@ -95,15 +95,43 @@ textarea::placeholder {
   scrollbar-width: thin;
 }
 
-/* Ensure touch scroll is smooth across all mobile containers */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Touch and tap feedback */
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* High contrast print adjustments */
+/* High contrast print adjustments for shipping bills and invoices */
 @media print {
   body {
     background-color: #ffffff !important;
     color: #000000 !important;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .printable-area,
+  .printable-area * {
+    visibility: visible;
+  }
+  .printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 10mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+  }
+  .no-print,
+  button,
+  .print\:hidden {
+    display: none !important;
   }
 }

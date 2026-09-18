@@ -67,6 +67,63 @@ const productSchema = new mongoose.Schema({
     default: 12,
     min: 0,
   },
+  // Product Details
+  product_type: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  style: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  pattern: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  color: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  fabric: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  occasion: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  fit: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  sleeve_type: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  neck_type: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  // Product Specifications
+  care_instructions: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  other_specifications: {
+    type: String,
+    default: "",
+    trim: true,
+  },
   is_active: {
     type: Boolean,
     default: true,
@@ -84,6 +141,7 @@ const productSchema = new mongoose.Schema({
 // Indexes for high performance searching, filtering, and sorting
 productSchema.index({ is_active: 1, created_at: -1 });
 productSchema.index({ category: 1, is_active: 1 });
+productSchema.index({ category: 1, is_active: 1, created_at: -1 });
 productSchema.index({ price: 1 });
 
 module.exports = mongoose.model("Product", productSchema);
