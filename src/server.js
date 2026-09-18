@@ -102,10 +102,17 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads"), {
   etag: true,
 }));
 
-// Serve static frontend build with caching
+// Serve static frontend build (never cache index.html, cache assets immutably)
 app.use(express.static(path.join(__dirname, "../frontend/dist"), {
-  maxAge: "1d",
-  etag: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith(".html")) {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
+    } else {
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    }
+  },
 }));
 
 // General API rate limit (only in production to avoid blocking local development reloads)
@@ -133,11 +140,14 @@ app.use("/api/returns", returnsRoutes);
 app.use("/api/reviews", reviewsRoutes);
 app.use("/api/notifications", notificationsRoutes);
 
-// SPA routing fallback for React Frontend
+// SPA routing fallback for React Frontend (Always serve index.html with no-cache headers)
 app.get("*", (req, res, next) => {
   if (req.path.startsWith("/api") || req.path.startsWith("/uploads") || req.path === "/health") {
     return next();
   }
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
   res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
 });
 
