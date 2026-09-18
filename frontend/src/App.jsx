@@ -1488,8 +1488,8 @@ function ProductDetailView({ product, addToCart, setView, currentUser }) {
                   type="button"
                   onClick={() => setProductInfoTab(tab.id)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${active
-                      ? "bg-stone-900 text-amber-300 shadow-sm ring-1 ring-amber-500/30"
-                      : "bg-white text-stone-600 hover:text-stone-900 border border-stone-200 hover:border-stone-300"
+                    ? "bg-stone-900 text-amber-300 shadow-sm ring-1 ring-amber-500/30"
+                    : "bg-white text-stone-600 hover:text-stone-900 border border-stone-200 hover:border-stone-300"
                     }`}
                 >
                   <Icon size={14} className={active ? "text-amber-400" : "text-stone-400"} />
@@ -1983,7 +1983,7 @@ function ProductFormModal({ product, onClose, onSave, categories = DEFAULT_CATEG
   };
 
   return (
-    <div className="fixed inset-0 z-[95] bg-stone-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-[95] bg-stone-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
       {cropFile && (
         <ImageCropModal
           imageSrc={cropFile}
@@ -1992,395 +1992,414 @@ function ProductFormModal({ product, onClose, onSave, categories = DEFAULT_CATEG
           title="Crop & Resize Product Image"
         />
       )}
-      <div className="bg-white border border-stone-200 text-stone-900 rounded-2xl max-w-2xl w-full p-6 relative shadow-2xl my-8">
-        <button onClick={onClose} className="absolute top-4 right-4 text-stone-400 hover:text-stone-700"><X size={20} /></button>
-        <h2 className="font-serif text-2xl text-stone-900 font-bold mb-1">{form.id ? "Edit Product" : "Add New Product"}</h2>
-        <p className="text-stone-500 text-xs mb-6">Fill in the product details to publish to the boutique store catalog.</p>
-
-        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Product Name *</label>
-              <input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="e.g. Kanjeevaram Soft Silk Saree"
-                className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Category *</label>
-              <select
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
-              >
-                {(categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES).map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Product Tag</label>
-              <select
-                value={form.tag}
-                onChange={(e) => setForm({ ...form, tag: e.target.value })}
-                className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
-              >
-                <option value="">None</option>
-                <option value="Bestseller">Bestseller</option>
-                <option value="Sale">Sale</option>
-                <option value="New Arrival">New Arrival</option>
-                <option value="Handloom Special">Handloom Special</option>
-                <option value="Bridal Collection">Bridal Collection</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Base Selling Price (₹) *</label>
-              <input
-                type="number"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })}
-                className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">MRP Original (₹) *</label>
-              <input
-                type="number"
-                value={form.mrp}
-                onChange={(e) => setForm({ ...form, mrp: parseFloat(e.target.value) || 0 })}
-                className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Stock Quantity</label>
-              <input
-                type="number"
-                value={form.stock}
-                onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value) || 0 })}
-                className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
-              />
-            </div>
-
-            <div>
-              <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Status</label>
-              <select
-                value={form.status}
-                onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
-              >
-                <option value="Available">Available</option>
-                <option value="Coming Soon">Coming Soon</option>
-                <option value="Out of Stock">Out of Stock</option>
-                <option value="Unavailable">Unavailable</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Rating (1.0 to 5.0 Stars) ⭐</label>
-              <input
-                type="number"
-                step="0.1"
-                min="1"
-                max="5"
-                value={form.avgRating}
-                onChange={(e) => setForm({ ...form, avgRating: parseFloat(e.target.value) || 4.5 })}
-                placeholder="e.g. 4.5"
-                className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
-              />
-            </div>
-
-            <div>
-              <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Total Reviews Count</label>
-              <input
-                type="number"
-                min="0"
-                value={form.numReviews}
-                onChange={(e) => setForm({ ...form, numReviews: parseInt(e.target.value) || 0 })}
-                placeholder="e.g. 12"
-                className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
-              />
-            </div>
-          </div>
-
+      <div className="bg-white border border-stone-200 text-stone-900 rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        {/* Fixed Header */}
+        <div className="p-4 sm:p-5 border-b border-stone-200 flex items-center justify-between shrink-0 bg-stone-50 rounded-t-2xl">
           <div>
-            <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Available Sizes</label>
-            <div className="flex gap-2 flex-wrap bg-stone-50 p-3 rounded-lg border border-stone-200">
-              {ALL_SIZES.map((sz) => (
-                <button
-                  key={sz}
-                  type="button"
-                  onClick={() => handleSizeToggle(sz)}
-                  className={`px-3 py-1.5 rounded-md font-medium text-xs border transition-all ${form.sizes.includes(sz) ? "bg-amber-500 text-stone-950 border-amber-500 font-bold" : "bg-white text-stone-700 border-stone-300 hover:border-stone-400"}`}
-                >
-                  {sz}
-                </button>
-              ))}
-            </div>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-700">Storefront Product Management</span>
+            <h2 className="font-serif text-xl sm:text-2xl text-stone-900 font-bold mt-0.5">{form.id ? "Edit Product Details" : "Add New Product"}</h2>
+            <p className="text-stone-500 text-xs">Fill in product details to publish to your boutique catalog.</p>
           </div>
+          <button onClick={onClose} className="p-2 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-200 transition-colors">
+            <X size={20} />
+          </button>
+        </div>
 
-          {/* Size-Based Custom Pricing Matrix */}
-          {form.sizes && form.sizes.length > 0 && (
-            <div className="bg-stone-50 p-4 rounded-xl border border-stone-200">
-              <label className="block uppercase tracking-wider text-amber-900 mb-2 font-bold flex items-center justify-between">
-                <span>Custom Price Rate per Size (M, L, XL, etc.)</span>
-                <span className="text-[10px] text-stone-500 font-normal">Optional: Set specific rates per size</span>
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {form.sizes.map((sz) => (
-                  <div key={sz} className="bg-white p-2.5 rounded-lg border border-stone-200 shadow-xs">
-                    <span className="text-amber-800 font-bold block mb-1">Size {sz}</span>
-                    <div className="flex items-center gap-1">
-                      <span className="text-stone-500 text-xs">₹</span>
-                      <input
-                        type="number"
-                        value={form.sizePrices?.[sz] !== undefined ? form.sizePrices[sz] : form.price}
-                        onChange={(e) => handleSizePriceChange(sz, e.target.value)}
-                        placeholder={form.price}
-                        className="w-full bg-white border border-stone-300 rounded px-2 py-1 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                      />
-                    </div>
-                  </div>
+        {/* Scrollable Form Body & Sticky Action Footer */}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+          <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs flex-1" style={{ WebkitOverflowScrolling: "touch" }}>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Product Name *</label>
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="e.g. Kanjeevaram Soft Silk Saree"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Category *</label>
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
+                >
+                  {(categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES).map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Product Tag</label>
+                <select
+                  value={form.tag}
+                  onChange={(e) => setForm({ ...form, tag: e.target.value })}
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
+                >
+                  <option value="">None</option>
+                  <option value="Bestseller">Bestseller</option>
+                  <option value="Sale">Sale</option>
+                  <option value="New Arrival">New Arrival</option>
+                  <option value="Handloom Special">Handloom Special</option>
+                  <option value="Bridal Collection">Bridal Collection</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Base Selling Price (₹) *</label>
+                <input
+                  type="number"
+                  value={form.price}
+                  onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })}
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">MRP Original (₹) *</label>
+                <input
+                  type="number"
+                  value={form.mrp}
+                  onChange={(e) => setForm({ ...form, mrp: parseFloat(e.target.value) || 0 })}
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Stock Quantity</label>
+                <input
+                  type="number"
+                  value={form.stock}
+                  onChange={(e) => setForm({ ...form, stock: parseInt(e.target.value) || 0 })}
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Status</label>
+                <select
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: e.target.value })}
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
+                >
+                  <option value="Available">Available</option>
+                  <option value="Coming Soon">Coming Soon</option>
+                  <option value="Out of Stock">Out of Stock</option>
+                  <option value="Unavailable">Unavailable</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Rating (1.0 to 5.0 Stars) ⭐</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="1"
+                  max="5"
+                  value={form.avgRating}
+                  onChange={(e) => setForm({ ...form, avgRating: parseFloat(e.target.value) || 4.5 })}
+                  placeholder="e.g. 4.5"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Total Reviews Count</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.numReviews}
+                  onChange={(e) => setForm({ ...form, numReviews: parseInt(e.target.value) || 0 })}
+                  placeholder="e.g. 12"
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-sm text-stone-900 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block uppercase tracking-wider text-stone-700 mb-1 font-bold">Available Sizes</label>
+              <div className="flex gap-2 flex-wrap bg-stone-50 p-3 rounded-lg border border-stone-200">
+                {ALL_SIZES.map((sz) => (
+                  <button
+                    key={sz}
+                    type="button"
+                    onClick={() => handleSizeToggle(sz)}
+                    className={`px-3 py-1.5 rounded-md font-medium text-xs border transition-all ${form.sizes.includes(sz) ? "bg-amber-500 text-stone-950 border-amber-500 font-bold" : "bg-white text-stone-700 border-stone-300 hover:border-stone-400"}`}
+                  >
+                    {sz}
+                  </button>
                 ))}
               </div>
             </div>
-          )}
 
-          {/* Section 1: Customer-Friendly Product Description */}
-          <div className="bg-amber-500/5 border border-amber-500/20 p-3.5 rounded-xl space-y-1.5">
-            <label className="block uppercase tracking-wider text-amber-900 mb-1 font-bold">
-              1. Customer-Friendly Product Description
-            </label>
-            <p className="text-[11px] text-stone-500 mb-1">
-              Short, attractive customer-friendly description describing appearance, design, style, and suitable occasions without repeating tabular details.
-            </p>
-            <textarea
-              rows={3}
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="e.g. Handcrafted pure silk saree with luminous gold zari border, designed to elevate weddings and festive evenings with regal grace..."
-              className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-            />
-          </div>
-
-          {/* Section 2: Product Details */}
-          <div className="bg-stone-50 border border-stone-200 p-4 rounded-xl space-y-3">
-            <div className="flex items-center justify-between border-b border-stone-200 pb-2">
-              <span className="uppercase tracking-wider text-stone-900 font-bold text-xs flex items-center gap-1.5">
-                🏷️ 2. Product Details
-              </span>
-              <span className="text-[10px] text-stone-500">Displays "Not specified" if left blank</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div>
-                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Product Type</label>
-                <input
-                  value={form.productType}
-                  onChange={(e) => setForm({ ...form, productType: e.target.value })}
-                  placeholder="e.g. Banarasi Saree, Anarkali Set, Lehenga Choli"
-                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-              <div>
-                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Style</label>
-                <input
-                  value={form.style}
-                  onChange={(e) => setForm({ ...form, style: e.target.value })}
-                  placeholder="e.g. Traditional Heritage, Contemporary, Flared"
-                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-              <div>
-                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Pattern</label>
-                <input
-                  value={form.pattern}
-                  onChange={(e) => setForm({ ...form, pattern: e.target.value })}
-                  placeholder="e.g. Floral Zari Jaal, Block Print, Sequin Scatter"
-                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-              <div>
-                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Color</label>
-                <input
-                  value={form.color}
-                  onChange={(e) => setForm({ ...form, color: e.target.value })}
-                  placeholder="e.g. Crimson Red & Gold, Peacock Blue"
-                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-              <div>
-                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Fabric</label>
-                <input
-                  value={form.fabric}
-                  onChange={(e) => setForm({ ...form, fabric: e.target.value })}
-                  placeholder="e.g. Pure Katan Silk, Georgette, Cotton Rayon"
-                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-              <div>
-                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Occasion</label>
-                <input
-                  value={form.occasion}
-                  onChange={(e) => setForm({ ...form, occasion: e.target.value })}
-                  placeholder="e.g. Weddings, Bridal Festivities, Casual"
-                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-              <div>
-                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Fit</label>
-                <input
-                  value={form.fit}
-                  onChange={(e) => setForm({ ...form, fit: e.target.value })}
-                  placeholder="e.g. Classic Draped, Empire Waist Flared, Straight"
-                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-              <div>
-                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Sleeve Type</label>
-                <input
-                  value={form.sleeveType}
-                  onChange={(e) => setForm({ ...form, sleeveType: e.target.value })}
-                  placeholder="e.g. 3/4th Sleeves, Sleeveless, Blouse Piece Included"
-                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Neck Type</label>
-                <input
-                  value={form.neckType}
-                  onChange={(e) => setForm({ ...form, neckType: e.target.value })}
-                  placeholder="e.g. Round Neck with Slit, Sweetheart Neck, Customizable Blouse"
-                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Section 3: Product Specifications */}
-          <div className="bg-stone-50 border border-stone-200 p-4 rounded-xl space-y-3">
-            <div className="flex items-center justify-between border-b border-stone-200 pb-2">
-              <span className="uppercase tracking-wider text-stone-900 font-bold text-xs flex items-center gap-1.5">
-                📐 3. Product Specifications (Technical & Care)
-              </span>
-              <span className="text-[10px] text-stone-500">Care Instructions and Weave Details</span>
-            </div>
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Care Instructions</label>
-                <input
-                  value={form.careInstructions}
-                  onChange={(e) => setForm({ ...form, careInstructions: e.target.value })}
-                  placeholder="e.g. Strictly Dry Clean Only. Store wrapped in pure muslin cloth."
-                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-              <div>
-                <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Any Other Relevant Specifications</label>
-                <textarea
-                  rows={2}
-                  value={form.otherSpecifications}
-                  onChange={(e) => setForm({ ...form, otherSpecifications: e.target.value })}
-                  placeholder="e.g. Weave: Kadwa Jacquard; Zari: Tested Gold Zari; Lining: Attached Butter Crepe"
-                  className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-stone-50 p-4 rounded-xl border border-stone-200 space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="block uppercase tracking-wider text-stone-700 font-bold text-xs">Product Image</label>
-              <div className="flex bg-stone-200 p-0.5 rounded-lg text-[11px] font-medium">
-                <button
-                  type="button"
-                  onClick={() => setImageMode("upload")}
-                  className={`px-2.5 py-1 rounded-md transition-all ${imageMode === "upload" ? "bg-white text-amber-700 shadow-xs font-bold" : "text-stone-600 hover:text-stone-900"}`}
-                >
-                  Upload File
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setImageMode("url")}
-                  className={`px-2.5 py-1 rounded-md transition-all ${imageMode === "url" ? "bg-white text-amber-700 shadow-xs font-bold" : "text-stone-600 hover:text-stone-900"}`}
-                >
-                  Paste URL
-                </button>
-              </div>
-            </div>
-
-            {imageMode === "upload" ? (
-              <div className="flex flex-wrap gap-3 items-center">
-                {form.imageUrl ? (
-                  <div className="relative w-16 h-20 rounded-lg overflow-hidden border border-stone-300 bg-stone-100 flex-shrink-0 shadow-xs">
-                    <img src={getImageUrl(form.imageUrl)} alt="Preview" className="w-full h-full object-cover" />
-                  </div>
-                ) : null}
-                <div className="flex flex-wrap gap-2">
-                  <label className="cursor-pointer bg-white hover:bg-amber-50 text-amber-900 font-semibold px-3.5 py-2 rounded-lg border border-amber-300 transition-colors inline-flex items-center gap-1.5 text-xs shadow-xs">
-                    <Upload size={14} className="text-amber-600" />
-                    <span>{uploading ? "Uploading..." : form.imageUrl ? "Crop & Change Image (HD)" : "Choose & Crop Image (HD)"}</span>
-                    <input type="file" accept="image/*" onChange={handleFileSelect} className="hidden" disabled={uploading} />
-                  </label>
-                  <label className="cursor-pointer bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium px-3.5 py-2 rounded-lg border border-stone-300 transition-colors inline-flex items-center gap-1.5 text-xs">
-                    <span>Upload Original (Skip Crop)</span>
-                    <input type="file" accept="image/*" onChange={handleDirectUpload} className="hidden" disabled={uploading} />
-                  </label>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    placeholder="https://example.com/images/saree-hd.jpg (Paste direct image link)"
-                    value={form.imageUrl || ""}
-                    onChange={(e) => setForm({ ...form, imageUrl: e.target.value.trim() })}
-                    className="flex-1 bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
-                  />
-                  {form.imageUrl && (
-                    <button
-                      type="button"
-                      onClick={() => setForm({ ...form, imageUrl: "" })}
-                      className="px-2.5 py-1 text-xs text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-                {form.imageUrl && (
-                  <div className="flex items-center gap-3 pt-1">
-                    <div className="relative w-16 h-20 rounded-lg overflow-hidden border border-stone-300 bg-stone-100 flex-shrink-0 shadow-xs">
-                      <img
-                        src={getImageUrl(form.imageUrl)}
-                        alt="URL Preview"
-                        className="w-full h-full object-cover"
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                      />
+            {/* Size-Based Custom Pricing Matrix */}
+            {form.sizes && form.sizes.length > 0 && (
+              <div className="bg-stone-50 p-4 rounded-xl border border-stone-200">
+                <label className="block uppercase tracking-wider text-amber-900 mb-2 font-bold flex items-center justify-between">
+                  <span>Custom Price Rate per Size (M, L, XL, etc.)</span>
+                  <span className="text-[10px] text-stone-500 font-normal">Optional: Set specific rates per size</span>
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {form.sizes.map((sz) => (
+                    <div key={sz} className="bg-white p-2.5 rounded-lg border border-stone-200 shadow-xs">
+                      <span className="text-amber-800 font-bold block mb-1">Size {sz}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-stone-500 text-xs">₹</span>
+                        <input
+                          type="number"
+                          value={form.sizePrices?.[sz] !== undefined ? form.sizePrices[sz] : form.price}
+                          onChange={(e) => handleSizePriceChange(sz, e.target.value)}
+                          placeholder={form.price}
+                          className="w-full bg-white border border-stone-300 rounded px-2 py-1 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                        />
+                      </div>
                     </div>
-                    <span className="text-[11px] text-stone-500">Live preview of pasted image URL</span>
-                  </div>
-                )}
-                <p className="text-[10px] text-stone-500">
-                  💡 Paste any direct high-res image link from Cloudinary, Imgur, Shopify, Google Drive, or your supplier CDN.
-                </p>
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* Section 1: Customer-Friendly Product Description */}
+            <div className="bg-amber-500/5 border border-amber-500/20 p-3.5 rounded-xl space-y-1.5">
+              <label className="block uppercase tracking-wider text-amber-900 mb-1 font-bold">
+                1. Customer-Friendly Product Description
+              </label>
+              <p className="text-[11px] text-stone-500 mb-1">
+                Short, attractive customer-friendly description describing appearance, design, style, and suitable occasions without repeating tabular details.
+              </p>
+              <textarea
+                rows={3}
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                placeholder="e.g. Handcrafted pure silk saree with luminous gold zari border, designed to elevate weddings and festive evenings with regal grace..."
+                className="w-full bg-white border border-stone-300 rounded-lg p-2.5 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            {/* Section 2: Product Details */}
+            <div className="bg-stone-50 border border-stone-200 p-4 rounded-xl space-y-3">
+              <div className="flex items-center justify-between border-b border-stone-200 pb-2">
+                <span className="uppercase tracking-wider text-stone-900 font-bold text-xs flex items-center gap-1.5">
+                  🏷️ 2. Product Details
+                </span>
+                <span className="text-[10px] text-stone-500">Displays "Not specified" if left blank</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Product Type</label>
+                  <input
+                    value={form.productType}
+                    onChange={(e) => setForm({ ...form, productType: e.target.value })}
+                    placeholder="e.g. Banarasi Saree, Anarkali Set, Lehenga Choli"
+                    className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Style</label>
+                  <input
+                    value={form.style}
+                    onChange={(e) => setForm({ ...form, style: e.target.value })}
+                    placeholder="e.g. Traditional Heritage, Contemporary, Flared"
+                    className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Pattern</label>
+                  <input
+                    value={form.pattern}
+                    onChange={(e) => setForm({ ...form, pattern: e.target.value })}
+                    placeholder="e.g. Floral Zari Jaal, Block Print, Sequin Scatter"
+                    className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Color</label>
+                  <input
+                    value={form.color}
+                    onChange={(e) => setForm({ ...form, color: e.target.value })}
+                    placeholder="e.g. Crimson Red & Gold, Peacock Blue"
+                    className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Fabric</label>
+                  <input
+                    value={form.fabric}
+                    onChange={(e) => setForm({ ...form, fabric: e.target.value })}
+                    placeholder="e.g. Pure Katan Silk, Georgette, Cotton Rayon"
+                    className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Occasion</label>
+                  <input
+                    value={form.occasion}
+                    onChange={(e) => setForm({ ...form, occasion: e.target.value })}
+                    placeholder="e.g. Weddings, Bridal Festivities, Casual"
+                    className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Fit</label>
+                  <input
+                    value={form.fit}
+                    onChange={(e) => setForm({ ...form, fit: e.target.value })}
+                    placeholder="e.g. Classic Draped, Empire Waist Flared, Straight"
+                    className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Sleeve Type</label>
+                  <input
+                    value={form.sleeveType}
+                    onChange={(e) => setForm({ ...form, sleeveType: e.target.value })}
+                    placeholder="e.g. 3/4th Sleeves, Sleeveless, Blouse Piece Included"
+                    className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Neck Type</label>
+                  <input
+                    value={form.neckType}
+                    onChange={(e) => setForm({ ...form, neckType: e.target.value })}
+                    placeholder="e.g. Round Neck with Slit, Sweetheart Neck, Customizable Blouse"
+                    className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Product Specifications */}
+            <div className="bg-stone-50 border border-stone-200 p-4 rounded-xl space-y-3">
+              <div className="flex items-center justify-between border-b border-stone-200 pb-2">
+                <span className="uppercase tracking-wider text-stone-900 font-bold text-xs flex items-center gap-1.5">
+                  📐 3. Product Specifications (Technical & Care)
+                </span>
+                <span className="text-[10px] text-stone-500">Care Instructions and Weave Details</span>
+              </div>
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Care Instructions</label>
+                  <input
+                    value={form.careInstructions}
+                    onChange={(e) => setForm({ ...form, careInstructions: e.target.value })}
+                    placeholder="e.g. Strictly Dry Clean Only. Store wrapped in pure muslin cloth."
+                    className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block uppercase tracking-wider text-stone-600 mb-1 font-semibold text-[10px]">Any Other Relevant Specifications</label>
+                  <textarea
+                    rows={2}
+                    value={form.otherSpecifications}
+                    onChange={(e) => setForm({ ...form, otherSpecifications: e.target.value })}
+                    placeholder="e.g. Weave: Kadwa Jacquard; Zari: Tested Gold Zari; Lining: Attached Butter Crepe"
+                    className="w-full bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-stone-50 p-4 rounded-xl border border-stone-200 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="block uppercase tracking-wider text-stone-700 font-bold text-xs">Product Image</label>
+                <div className="flex bg-stone-200 p-0.5 rounded-lg text-[11px] font-medium">
+                  <button
+                    type="button"
+                    onClick={() => setImageMode("upload")}
+                    className={`px-2.5 py-1 rounded-md transition-all ${imageMode === "upload" ? "bg-white text-amber-700 shadow-xs font-bold" : "text-stone-600 hover:text-stone-900"}`}
+                  >
+                    Upload File
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setImageMode("url")}
+                    className={`px-2.5 py-1 rounded-md transition-all ${imageMode === "url" ? "bg-white text-amber-700 shadow-xs font-bold" : "text-stone-600 hover:text-stone-900"}`}
+                  >
+                    Paste URL
+                  </button>
+                </div>
+              </div>
+
+              {imageMode === "upload" ? (
+                <div className="flex flex-wrap gap-3 items-center">
+                  {form.imageUrl ? (
+                    <div className="relative w-16 h-20 rounded-lg overflow-hidden border border-stone-300 bg-stone-100 flex-shrink-0 shadow-xs">
+                      <img src={getImageUrl(form.imageUrl)} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  ) : null}
+                  <div className="flex flex-wrap gap-2">
+                    <label className="cursor-pointer bg-white hover:bg-amber-50 text-amber-900 font-semibold px-3.5 py-2 rounded-lg border border-amber-300 transition-colors inline-flex items-center gap-1.5 text-xs shadow-xs">
+                      <Upload size={14} className="text-amber-600" />
+                      <span>{uploading ? "Uploading..." : form.imageUrl ? "Crop & Change Image (HD)" : "Choose & Crop Image (HD)"}</span>
+                      <input type="file" accept="image/*" onChange={handleFileSelect} className="hidden" disabled={uploading} />
+                    </label>
+                    <label className="cursor-pointer bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium px-3.5 py-2 rounded-lg border border-stone-300 transition-colors inline-flex items-center gap-1.5 text-xs">
+                      <span>Upload Original (Skip Crop)</span>
+                      <input type="file" accept="image/*" onChange={handleDirectUpload} className="hidden" disabled={uploading} />
+                    </label>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      placeholder="https://example.com/images/saree-hd.jpg (Paste direct image link)"
+                      value={form.imageUrl || ""}
+                      onChange={(e) => setForm({ ...form, imageUrl: e.target.value.trim() })}
+                      className="flex-1 bg-white border border-stone-300 rounded-lg p-2 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                    />
+                    {form.imageUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, imageUrl: "" })}
+                        className="px-2.5 py-1 text-xs text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  {form.imageUrl && (
+                    <div className="flex items-center gap-3 pt-1">
+                      <div className="relative w-16 h-20 rounded-lg overflow-hidden border border-stone-300 bg-stone-100 flex-shrink-0 shadow-xs">
+                        <img
+                          src={getImageUrl(form.imageUrl)}
+                          alt="URL Preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                      </div>
+                      <span className="text-[11px] text-stone-500">Live preview of pasted image URL</span>
+                    </div>
+                  )}
+                  <p className="text-[10px] text-stone-500">
+                    💡 Paste any direct high-res image link from Cloudinary, Imgur, Shopify, Google Drive, or your supplier CDN.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="pt-4 flex justify-end gap-3 border-t border-stone-200">
-            <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-lg text-stone-600 hover:bg-stone-100 transition-colors">Cancel</button>
-            <button type="submit" disabled={saving || uploading} className="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-6 py-2.5 rounded-lg transition-colors shadow-sm">
-              {saving ? "Saving Product..." : form.id ? "Update Product" : "Publish Product"}
-            </button>
+          {/* Sticky Bottom Action Bar */}
+          <div className="p-4 border-t border-stone-200 shrink-0 bg-stone-50 rounded-b-2xl flex items-center justify-between gap-3 z-10">
+            <span className="text-xs text-stone-500 font-medium hidden sm:inline">
+              {form.id ? `Editing Product #${form.id}` : "Ready to add to store"}
+            </span>
+            <div className="flex items-center gap-2.5 ml-auto">
+              <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl text-stone-600 hover:bg-stone-200 text-xs font-bold transition-colors">
+                Cancel
+              </button>
+              <button type="submit" disabled={saving || uploading} className="bg-amber-500 hover:bg-amber-400 text-stone-950 font-extrabold px-7 py-2.5 rounded-xl text-xs transition-colors shadow-md">
+                {saving ? "Saving Product..." : form.id ? "Update Product" : "Publish Product"}
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -5564,8 +5583,8 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
                       key={val}
                       onClick={() => setTrackingStatusFilter(val)}
                       className={`px-3 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider whitespace-nowrap transition-all ${trackingStatusFilter === val
-                          ? "bg-amber-500 text-stone-950 shadow-xs"
-                          : "bg-stone-100 text-stone-600 hover:bg-stone-200 border border-stone-200"
+                        ? "bg-amber-500 text-stone-950 shadow-xs"
+                        : "bg-stone-100 text-stone-600 hover:bg-stone-200 border border-stone-200"
                         }`}
                     >
                       {label}
@@ -5647,8 +5666,8 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
                                 ) : (
                                   <div className="flex items-center gap-2">
                                     <span className={`font-extrabold px-2.5 py-0.5 rounded-full text-xs ${p.stock === 0 ? "bg-rose-100 text-rose-800 border border-rose-300" :
-                                        p.stock <= (p.lowStockThreshold || 5) ? "bg-amber-100 text-amber-900 border border-amber-300" :
-                                          "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                                      p.stock <= (p.lowStockThreshold || 5) ? "bg-amber-100 text-amber-900 border border-amber-300" :
+                                        "bg-emerald-100 text-emerald-800 border border-emerald-300"
                                       }`}>
                                       {p.stock} units
                                     </span>
@@ -5660,8 +5679,8 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
                               </td>
                               <td className="p-3.5">
                                 <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase font-extrabold tracking-wider border ${p.stock === 0 || p.status === "Out of Stock" ? "bg-rose-100 text-rose-800 border-rose-300" :
-                                    p.status === "Coming Soon" ? "bg-blue-100 text-blue-800 border-blue-300" :
-                                      "bg-emerald-100 text-emerald-800 border-emerald-300"
+                                  p.status === "Coming Soon" ? "bg-blue-100 text-blue-800 border-blue-300" :
+                                    "bg-emerald-100 text-emerald-800 border-emerald-300"
                                   }`}>
                                   {p.stock === 0 ? "Out of Stock" : p.status || "Available"}
                                 </span>
@@ -5717,7 +5736,7 @@ function AdminDashboard({ products, orders, stats, saveProduct, deleteProduct, u
                               <div className="flex items-center gap-2 mt-1">
                                 <span className="font-extrabold text-amber-800 text-sm">{inr(p.price)}</span>
                                 <span className={`text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full ${p.stock === 0 ? "bg-rose-100 text-rose-800" :
-                                    p.stock <= (p.lowStockThreshold || 5) ? "bg-amber-100 text-amber-900" : "bg-emerald-100 text-emerald-800"
+                                  p.stock <= (p.lowStockThreshold || 5) ? "bg-amber-100 text-amber-900" : "bg-emerald-100 text-emerald-800"
                                   }`}>
                                   {p.stock === 0 ? "Out of Stock" : `${p.stock} left`}
                                 </span>
