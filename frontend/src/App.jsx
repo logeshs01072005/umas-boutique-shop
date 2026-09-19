@@ -228,7 +228,7 @@ function SectionHeader({ title, description }) {
 
 /* --------------------------------- Nav bar ---------------------------------- */
 
-function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, newLaunchesCount = 0, onOpenNewLaunches, seasonalTheme, setSeasonalTheme }) {
+function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, newLaunchesCount = 0, onOpenNewLaunches, seasonalTheme, setSeasonalTheme, search = "", setSearch }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
 
@@ -364,7 +364,7 @@ function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, newL
           )}
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => setSearch && setSearch(e.target.value)}
             placeholder="Search products…"
             className="bg-stone-900 border border-amber-500/30 text-stone-100 placeholder-stone-500 text-sm rounded-full px-4 py-2 focus:outline-none focus:border-amber-400"
           />
@@ -7366,6 +7366,8 @@ export default function App() {
             onOpenNewLaunches={() => setShowNewLaunchesModal(true)}
             seasonalTheme={seasonalTheme}
             setSeasonalTheme={setSeasonalTheme}
+            search={search}
+            setSearch={setSearch}
           />
         )}
 
