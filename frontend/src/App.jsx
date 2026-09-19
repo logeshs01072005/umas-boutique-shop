@@ -244,12 +244,17 @@ function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, newL
   return (
     <header className="sticky top-0 z-40 bg-stone-950 border-b border-amber-500/20">
       <div className="max-w-7xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between gap-4">
-        <button onClick={() => setView("home")} className="flex flex-col items-start leading-none shrink-0 text-left">
-          <span className="font-serif text-2xl md:text-3xl text-amber-300 tracking-wide flex items-center gap-1.5">
-            Uma's
-            {seasonalTheme === "winter" && <span className="text-[10px] bg-sky-950 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded-full font-sans tracking-normal">❄️ Winter Edition</span>}
-          </span>
-          <span className="text-[10px] md:text-xs tracking-[0.3em] uppercase text-stone-400 mt-0.5">Fashion &amp; Boutique</span>
+        <button onClick={() => setView("home")} className="flex items-center gap-3 shrink-0 text-left group">
+          <div className="w-11 h-11 md:w-13 md:h-13 rounded-full overflow-hidden border border-amber-400/40 shadow-md group-hover:border-amber-300 transition-all shrink-0 bg-stone-900">
+            <img src="/logo.png" alt="Uma's Fashion & Boutique Logo" className="w-full h-full object-contain" />
+          </div>
+          <div className="flex flex-col items-start leading-none">
+            <span className="font-serif text-2xl md:text-3xl text-amber-300 tracking-wide flex items-center gap-1.5 group-hover:text-amber-200 transition-colors">
+              Uma's
+              {seasonalTheme === "winter" && <span className="text-[10px] bg-sky-950 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded-full font-sans tracking-normal">❄️ Winter Edition</span>}
+            </span>
+            <span className="text-[10px] md:text-xs tracking-[0.3em] uppercase text-stone-400 mt-0.5">Fashion &amp; Boutique</span>
+          </div>
         </button>
 
         <nav className="hidden md:flex items-center gap-8">
@@ -1029,8 +1034,8 @@ function WhatsAppSupportWidget({ products = [], categories = [], openProduct, se
           <div className="bg-emerald-600 text-white p-3.5 flex items-center justify-between shadow-md">
             <div className="flex items-center gap-2.5">
               <div className="relative">
-                <div className="w-9 h-9 rounded-full bg-white text-emerald-600 flex items-center justify-center shadow">
-                  <WhatsAppIcon size={22} />
+                <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center shadow overflow-hidden border border-emerald-300 shrink-0">
+                  <img src="/logo.png" alt="Uma's Boutique" className="w-full h-full object-contain" />
                 </div>
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-white rounded-full"></span>
               </div>
@@ -3003,10 +3008,13 @@ function AdminPurchaseBillModal({ order, onClose }) {
 
         {/* Invoice Header */}
         <div className="border-b-2 border-stone-800 pb-5 mb-5 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-          <div>
-            <h1 className="font-serif text-2xl sm:text-3xl text-stone-950 font-bold tracking-tight">Uma's Fashion &amp; Boutique</h1>
-            <p className="text-xs text-stone-600 mt-1">Luxury Indian Handlooms, Designer Sarees, Lehengas &amp; Kurtis</p>
-            <p className="text-[11px] text-stone-500">GSTIN: 33AAAAA0000A1Z5 • Care: care@umasboutique.com • Ph: +91 8489943146</p>
+          <div className="flex items-center gap-3.5">
+            <img src="/logo.png" alt="Uma's Fashion & Boutique Logo" className="w-14 h-14 object-contain rounded-full border border-stone-300 shadow-sm shrink-0" />
+            <div>
+              <h1 className="font-serif text-2xl sm:text-3xl text-stone-950 font-bold tracking-tight">Uma's Fashion &amp; Boutique</h1>
+              <p className="text-xs text-stone-600 mt-1">Luxury Indian Handlooms, Designer Sarees, Lehengas &amp; Kurtis</p>
+              <p className="text-[11px] text-stone-500">GSTIN: 33AAAAA0000A1Z5 • Care: care@umasboutique.com • Ph: +91 8489943146</p>
+            </div>
           </div>
           <div className="sm:text-right bg-stone-50 sm:bg-transparent p-3 sm:p-0 rounded-lg border sm:border-none border-stone-200">
             <div className="inline-block bg-stone-900 text-amber-300 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded mb-1">
@@ -3162,9 +3170,19 @@ function AdminPurchaseBillModal({ order, onClose }) {
               <button
                 type="button"
                 onClick={() => {
-                  const cleanPhone = customerPhone.replace(/\D/g, "");
+                  let digits = customerPhone.replace(/\D/g, "");
+                  if (digits.startsWith("0")) digits = digits.replace(/^0+/, "");
+                  const targetPhone = digits.length === 10 ? `91${digits}` : digits;
                   const text = `Hello ${customerName}, here is your purchase bill & shipping dispatch details for Order #${order.orderNumber || order.id?.slice(-8)} (Total: ${inr(order.total)}) from Uma's Fashion Boutique. Your parcel is ready for courier shipping!`;
-                  window.open(`https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(text)}`, "_blank");
+                  const waUrl = `https://api.whatsapp.com/send?phone=${targetPhone}&text=${encodeURIComponent(text)}`;
+                  try {
+                    const win = window.open(waUrl, "_blank");
+                    if (!win || win.closed || typeof win.closed === "undefined") {
+                      window.location.href = waUrl;
+                    }
+                  } catch (e) {
+                    window.location.href = waUrl;
+                  }
                 }}
                 className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors"
                 title="Send Shipping Bill text to customer on WhatsApp"
@@ -6553,8 +6571,15 @@ function Footer() {
     <footer className="bg-stone-950 text-stone-400 border-t border-amber-500/20 py-12 px-6 text-sm">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <div className="font-serif text-2xl text-amber-300 mb-2">Uma's</div>
-          <div className="text-xs tracking-widest uppercase text-stone-500 mb-4">Fashion &amp; Boutique</div>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-full overflow-hidden border border-amber-400/40 shadow-md shrink-0 bg-stone-900">
+              <img src="/logo.png" alt="Uma's Fashion & Boutique Logo" className="w-full h-full object-contain" />
+            </div>
+            <div>
+              <div className="font-serif text-2xl text-amber-300 leading-none">Uma's</div>
+              <div className="text-[10px] tracking-widest uppercase text-stone-500 mt-1">Fashion &amp; Boutique</div>
+            </div>
+          </div>
           <p className="text-xs text-stone-500 leading-relaxed">Handpicked sarees, bridal lehengas, kurtis and occasion wear finished for the modern wardrobe.</p>
         </div>
         <div>
