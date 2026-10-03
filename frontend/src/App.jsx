@@ -871,7 +871,7 @@ function WhatsAppIcon({ size = 20, className = "" }) {
 
 /* ---------------------- WhatsApp AI & Human Support Widget ---------------------- */
 
-function WhatsAppSupportWidget({ products = [], categories = [], openProduct, setView }) {
+function WhatsAppSupportWidget({ products = [], categories = [], openProduct, setView, setCategoryFilter }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("ai"); // 'ai' or 'human'
 
@@ -967,30 +967,116 @@ function WhatsAppSupportWidget({ products = [], categories = [], openProduct, se
       } else if (lower.includes("contact") || lower.includes("call") || lower.includes("whatsapp") || lower.includes("human") || lower.includes("agent") || lower.includes("number") || lower.includes("help")) {
         botResponse = "💬 Click the 'Human Assistant' tab above or WhatsApp our fashion consultant directly at +91 8489943146!";
       } else {
-        // Dynamic search across all product inventory (names, categories, tags, descriptions)
-        if (products && products.length > 0) {
-          const queryWords = lower.split(/\s+/).filter((w) => w.length > 2);
-          matchedProds = products.filter((p) => {
-            const pName = (p.name || "").toLowerCase();
-            const pCat = (p.category || "").toLowerCase();
-            const pTag = (p.tag || "").toLowerCase();
-            const pDesc = (p.description || "").toLowerCase();
-            return pName.includes(lower) || pCat.includes(lower) || pTag.includes(lower) ||
-              queryWords.some((w) => pName.includes(w) || pCat.includes(w) || pTag.includes(w) || pDesc.includes(w));
-          }).slice(0, 4);
+        // Fashion query stop words (words that cause false positives in general keyword search)
+        const fashionStopWords = new Set([
+          "show", "me", "the", "a", "an", "in", "of", "to", "for", "with", "and", "or",
+          "have", "any", "some", "i", "want", "need", "looking", "can", "you", "please",
+          "tell", "give", "get", "do", "does", "what", "is", "are", "about", "collection",
+          "item", "items", "product", "products", "designs", "wear", "cloth", "clothes"
+        ]);
+
+        const cleanQuery = lower.replace(/[^a-z0-9\s]/g, " ").trim();
+
+        // 1. Strict category matching: detect if the user clicked or inquired about a specific boutique category
+        const categorySynonyms = {
+          "sarees": ["saree", "sari", "sarees", "saris"],
+          "lehengas": ["lehenga", "lehengas", "choli", "ghagra"],
+          "kurtis": ["kurti", "kurtis", "kurta", "kurtas", "tunic"],
+          "tops": ["top", "tops", "blouse", "crop top"],
+          "western wear": ["western wear", "western", "western dress", "western dresses", "dress", "dresses", "gown", "gowns", "frock", "skirt"],
+          "accessories": ["accessories", "accessory", "jewellery", "jewelry", "necklace", "choker", "earring", "earrings", "bangle", "bangles"],
+          "footwear": ["footwear", "shoes", "sandals", "heels", "juttis", "slippers"]
+        };
+
+        let targetCat = null;
+        for (const cat of catNames) {
+          const cLow = cat.toLowerCase();
+          if (cleanQuery.includes(cLow)) {
+            targetCat = cat;
+            break;
+          }
         }
 
-        if (matchedProds.length > 0) {
-          botResponse = `✨ Here are matching items from our boutique collection! Click to view full details:`;
+        if (!targetCat) {
+          for (const cat of catNames) {
+            const cLow = cat.toLowerCase();
+            const syns = categorySynonyms[cLow] || [cLow];
+            const words = cleanQuery.split(/\s+/);
+            if (syns.some((syn) => cleanQuery.includes(syn) || words.includes(syn))) {
+              targetCat = cat;
+              break;
+            }
+          }
+        }
+
+        let catLink = null;
+
+        if (targetCat) {
+          catLink = targetCat;
+          const catLow = targetCat.toLowerCase();
+          const catMatches = (products || []).filter((p) => {
+            const pCat = (p.category || "").toLowerCase();
+            return pCat === catLow || pCat.includes(catLow) || catLow.includes(pCat);
+          });
+
+          if (catMatches.length > 0) {
+            matchedProds = catMatches.slice(0, 4);
+            botResponse = `✨ Here are our curated ${targetCat} pieces from our boutique collection! Click below to view details or inquire on WhatsApp:`;
+          } else {
+            matchedProds = [];
+            botResponse = `✨ We currently do not have items in stock under "${targetCat}". Our new collection is arriving soon! You can also chat directly with our stylist on WhatsApp at +91 8489943146 for custom orders or upcoming arrivals.`;
+          }
         } else {
-          matchedProds = (products || []).slice(0, 3);
-          botResponse = "✨ Thank you for reaching out! Here are some of our popular boutique designs. For custom requirements, sizing help, or specific designs, you can also chat with our specialist on WhatsApp at +91 8489943146.";
+          // 2. Keyword relevance search across catalog (excluding generic stop words)
+          const tokens = cleanQuery.split(/\s+/).filter((w) => w.length >= 3 && !fashionStopWords.has(w));
+
+          if (tokens.length > 0 && products && products.length > 0) {
+            const scored = products.map((p) => {
+              let score = 0;
+              const pName = (p.name || "").toLowerCase();
+              const pCat = (p.category || "").toLowerCase();
+              const pTag = (p.tag || "").toLowerCase();
+              const pDesc = (p.description || "").toLowerCase();
+              const pType = (p.productType || "").toLowerCase();
+              const pStyle = (p.style || "").toLowerCase();
+              const pColor = (p.color || "").toLowerCase();
+
+              // Exact phrase matches
+              if (pName.includes(cleanQuery)) score += 50;
+              if (pCat.includes(cleanQuery)) score += 40;
+
+              for (const tok of tokens) {
+                if (pName.includes(tok)) score += 25;
+                if (pCat.includes(tok)) score += 20;
+                if (pType.includes(tok)) score += 15;
+                if (pColor.includes(tok)) score += 12;
+                if (pTag.includes(tok)) score += 10;
+                if (pStyle.includes(tok)) score += 8;
+                if (pDesc.includes(tok)) score += 4;
+              }
+
+              return { product: p, score };
+            });
+
+            matchedProds = scored
+              .filter((item) => item.score > 0)
+              .sort((a, b) => b.score - a.score)
+              .map((item) => item.product)
+              .slice(0, 4);
+          }
+
+          if (matchedProds.length > 0) {
+            botResponse = `✨ Here are matching items from our boutique collection! Click to view full details:`;
+          } else {
+            matchedProds = [];
+            botResponse = `✨ We couldn't find any items matching "${msg}". You can explore our categories above or chat directly with our boutique stylist on WhatsApp at +91 8489943146!`;
+          }
         }
       }
 
       setChatMessages((prev) => [
         ...prev,
-        { sender: "bot", text: botResponse, products: matchedProds, isPhotoInquiry: isPhoto }
+        { sender: "bot", text: botResponse, products: matchedProds, isPhotoInquiry: isPhoto, categoryLink: catLink }
       ]);
     }, 400);
   };
@@ -1134,6 +1220,23 @@ function WhatsAppSupportWidget({ products = [], categories = [], openProduct, se
                             </div>
                           </div>
                         ))}
+                      </div>
+                    )}
+
+                    {/* Category quick shop link */}
+                    {m.categoryLink && setView && setCategoryFilter && (
+                      <div className="mt-2 pl-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCategoryFilter(m.categoryLink);
+                            setView("shop");
+                            setIsOpen(false);
+                          }}
+                          className="bg-amber-50 hover:bg-amber-100 text-stone-900 border border-amber-300 font-bold text-[11px] px-3 py-1.5 rounded-full transition-all shadow-xs flex items-center gap-1.5"
+                        >
+                          Explore all {m.categoryLink} in Shop <ChevronRight size={12} />
+                        </button>
                       </div>
                     )}
                   </div>
@@ -1338,15 +1441,12 @@ function ProductDetailView({ product, addToCart, setView, currentUser }) {
                   {pct > 0 && <span className="text-stone-400 text-sm line-through font-normal">{inr(product.mrp)}</span>}
                 </div>
               </div>
-              {pct > 0 ? (
+              {pct > 0 && (
                 <div className="text-right">
                   <span className="bg-rose-100 text-rose-800 text-xs font-bold px-3 py-1 rounded-full border border-rose-200 inline-block">
                     {pct}% OFF
                   </span>
-                  <div className="text-[10px] text-stone-500 mt-1">Inclusive of all taxes</div>
                 </div>
-              ) : (
-                <span className="text-xs text-stone-500 font-medium">Inclusive of all taxes</span>
               )}
             </div>
 
@@ -2666,7 +2766,7 @@ function downloadSingleInvoice(order) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
     doc.setTextColor(214, 211, 209); // #d6d3d1
-    doc.text("Official Store E-Bill & GST Invoice  |  GSTIN: 33AAAAA0000A1Z5", 14, 21);
+    doc.text("Official Store E-Bill & Invoice", 14, 21);
     doc.text("Customer Support Email: care@umasboutique.com", 14, 27);
 
     // E-Bill Tag & Invoice #
@@ -2810,8 +2910,7 @@ function downloadSingleInvoice(order) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7.5);
     doc.setTextColor(120, 113, 108);
-    doc.text("Authenticated electronic GST invoice issued by Uma's Boutique.", 14, finalY + 14);
-    doc.text("All taxes and GST included as applicable.", 14, finalY + 19);
+    doc.text("Authenticated electronic invoice issued by Uma's Boutique.", 14, finalY + 14);
 
     // Footer
     doc.setDrawColor(231, 229, 228);
@@ -2860,7 +2959,7 @@ function EBillInvoiceComponent({ order }) {
         <div>
           <h2 className="font-serif text-2xl text-stone-900 font-bold">Uma's Fashion &amp; Boutique</h2>
           <p className="text-xs text-stone-500 mt-1">123 Luxury Avenue, Fashion District, India</p>
-          <p className="text-xs text-stone-500">GSTIN: 33AAAAA0000A1Z5 | Support: care@umasboutique.com</p>
+          <p className="text-xs text-stone-500">Support: care@umasboutique.com</p>
         </div>
         <div className="text-right">
           <span className="inline-block bg-amber-500 text-stone-950 font-bold text-xs uppercase px-3 py-1 rounded">OFFICIAL E-BILL</span>
@@ -3013,7 +3112,7 @@ function AdminPurchaseBillModal({ order, onClose }) {
             <div>
               <h1 className="font-serif text-2xl sm:text-3xl text-stone-950 font-bold tracking-tight">Uma's Fashion &amp; Boutique</h1>
               <p className="text-xs text-stone-600 mt-1">Luxury Indian Handlooms, Designer Sarees, Lehengas &amp; Kurtis</p>
-              <p className="text-[11px] text-stone-500">GSTIN: 33AAAAA0000A1Z5 • Care: care@umasboutique.com • Ph: +91 8489943146</p>
+              <p className="text-[11px] text-stone-500">Care: care@umasboutique.com • Ph: +91 8489943146</p>
             </div>
           </div>
           <div className="sm:text-right bg-stone-50 sm:bg-transparent p-3 sm:p-0 rounded-lg border sm:border-none border-stone-200">
@@ -3309,7 +3408,7 @@ function ConfirmationView({ order, setView, orders = [] }) {
             <span>Important Note on Admin Verification &amp; E-Bill Invoice:</span>
           </div>
           <p className="text-stone-700 text-sm leading-relaxed mb-3">
-            Submit your Bank RRN no / Transaction ID below for verification. <strong>After admin verification, your official tax invoice will be issued.</strong> You can see and get your <strong>E-Bill</strong> anytime from your <strong>Profile page</strong>.
+            Submit your Bank RRN no / Transaction ID below for verification. <strong>After admin verification, your official E-Bill invoice will be issued.</strong> You can see and get your <strong>E-Bill</strong> anytime from your <strong>Profile page</strong>.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <button
@@ -7464,7 +7563,7 @@ export default function App() {
         )}
       </div>
 
-      {view !== "admin" && <WhatsAppSupportWidget products={products} categories={categories} openProduct={openProduct} setView={setView} />}
+      {view !== "admin" && <WhatsAppSupportWidget products={products} categories={categories} openProduct={openProduct} setView={setView} setCategoryFilter={setCategoryFilter} />}
       {view !== "admin" && <Footer />}
       {authOpen && <AuthModal onClose={() => { setAuthOpen(false); setAuthError(""); }} onLogin={handleLogin} onSignup={handleSignup} error={authError} />}
       <Toast message={toast} />
