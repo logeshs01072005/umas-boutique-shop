@@ -135,3 +135,29 @@ html {
     display: none !important;
   }
 }
+
+/* WhatsApp Quick FAQ scroll styling */
+.quick-faq-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #10b981 #f5f5f4;
+}
+
+.quick-faq-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.quick-faq-scroll::-webkit-scrollbar-track {
+  background: #f5f5f4;
+  border-radius: 9999px;
+}
+
+.quick-faq-scroll::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 9999px;
+}
+
+.quick-faq-scroll::-webkit-scrollbar-thumb:hover {
+  background: #059669;
+}

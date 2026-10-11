@@ -1,7 +1,7 @@
 import ImageCropModal from "./components/ImageCropModal";
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
-  ShoppingBag, Search, User, X, Plus, Minus, Trash2, ChevronRight,
+  ShoppingBag, Search, User, X, Plus, Minus, Trash2, ChevronRight, ChevronLeft,
   LogOut, LayoutDashboard, Package, BarChart3, Menu, Check,
   ArrowRight, Mail, Lock, Edit2, Upload, AlertCircle, Star,
   Clock, RotateCcw, Truck, ShieldCheck, Sliders, Calendar,
@@ -893,6 +893,16 @@ function WhatsAppSupportWidget({ products = [], categories = [], openProduct, se
   const [hasUnread, setHasUnread] = useState(false);
   const fileInputRef = useRef(null);
   const chatEndRef = useRef(null);
+  const faqScrollRef = useRef(null);
+
+  const scrollFaqs = (direction) => {
+    if (faqScrollRef.current) {
+      faqScrollRef.current.scrollBy({
+        left: direction === "left" ? -180 : 180,
+        behavior: "smooth"
+      });
+    }
+  };
 
   // Update welcome message when categories load from backend
   useEffect(() => {
@@ -1255,15 +1265,45 @@ function WhatsAppSupportWidget({ products = [], categories = [], openProduct, se
                 ))}
               </div>
 
-              {/* Quick AI FAQ Buttons */}
+              {/* Quick AI FAQ Buttons with Scroll Option */}
               <div className="p-2 border-t border-stone-200 bg-white space-y-1">
-                <div className="text-[10px] text-stone-500 font-semibold px-1 uppercase tracking-wider">Quick Suggestions:</div>
-                <div className="flex gap-1.5 overflow-x-auto pb-1 text-[11px] scrollbar-none">
+                <div className="flex items-center justify-between px-1">
+                  <div className="text-[10px] text-stone-500 font-semibold uppercase tracking-wider">Quick Suggestions:</div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => scrollFaqs("left")}
+                      className="p-1 rounded-full text-stone-600 hover:text-emerald-700 hover:bg-stone-100 transition-colors border border-stone-200 shadow-xs"
+                      title="Scroll Left"
+                      aria-label="Scroll suggestions left"
+                    >
+                      <ChevronLeft size={13} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => scrollFaqs("right")}
+                      className="p-1 rounded-full text-stone-600 hover:text-emerald-700 hover:bg-stone-100 transition-colors border border-stone-200 shadow-xs"
+                      title="Scroll Right"
+                      aria-label="Scroll suggestions right"
+                    >
+                      <ChevronRight size={13} />
+                    </button>
+                  </div>
+                </div>
+                <div
+                  ref={faqScrollRef}
+                  onWheel={(e) => {
+                    if (e.deltaY !== 0 && faqScrollRef.current) {
+                      faqScrollRef.current.scrollLeft += e.deltaY;
+                    }
+                  }}
+                  className="flex gap-1.5 overflow-x-auto pb-2 text-[11px] scroll-smooth quick-faq-scroll"
+                >
                   {FAQS.map((faq, i) => (
                     <button
                       key={i}
                       onClick={() => handleSendMessage(faq.query)}
-                      className="whitespace-nowrap bg-stone-100 hover:bg-emerald-50 text-stone-800 hover:text-emerald-800 border border-stone-200 px-2.5 py-1 rounded-full text-[11px] transition-colors"
+                      className="whitespace-nowrap bg-stone-100 hover:bg-emerald-50 text-stone-800 hover:text-emerald-800 border border-stone-200 px-2.5 py-1 rounded-full text-[11px] transition-colors shrink-0"
                     >
                       {faq.label}
                     </button>
