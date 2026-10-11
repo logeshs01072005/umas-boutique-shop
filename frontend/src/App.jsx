@@ -32,8 +32,7 @@ const SIZE_GUIDE_CM = {
   "Free Size": { bust: "81-112 cm (32-44 in)", waist: "66-102 cm (26-40 in)", hip: "89-124 cm (35-49 in)", shoulder: "36-42 cm", length: "Adjustable Margins" }
 };
 
-const DEFAULT_CATEGORIES = ["Sarees", "Lehengas", "Kurtis", "Tops", "Western Wear", "Accessories", "Footwear"];
-const CATEGORIES = DEFAULT_CATEGORIES;
+
 
 const CATEGORY_META = {
   Sarees: { icon: ShoppingBag, from: "from-rose-100", to: "to-orange-100" },
@@ -882,17 +881,32 @@ function WhatsAppSupportWidget({ products = [], categories = [], openProduct, se
     return `Hello! Welcome to Uma's Fashion Boutique. I am your AI assistant. How can I help you today? You can ask about ${catList}, Sizing (cm), or Delivery!`;
   }, [catNames]);
 
+  const makeMsg = (sender, text, extras = {}) => ({ sender, text, time: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }), ...extras });
+
   const [chatMessages, setChatMessages] = useState([
-    { sender: "bot", text: "Hello! Welcome to Uma's Fashion Boutique. I am your AI assistant. How can I help you today? You can ask about Sarees, Lehengas, Kurtis, Sizing (cm), or Delivery!" }
+    { sender: "bot", text: "Hello! Welcome to Uma's Fashion Boutique. I am your AI assistant. How can I help you today? You can ask about Sarees, Lehengas, Kurtis, Sizing (cm), or Delivery!", time: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }) }
   ]);
   const [inputMsg, setInputMsg] = useState("");
   const [attachedImage, setAttachedImage] = useState(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [hasUnread, setHasUnread] = useState(false);
   const fileInputRef = useRef(null);
+  const chatEndRef = useRef(null);
 
   // Update welcome message when categories load from backend
   useEffect(() => {
-    setChatMessages([{ sender: "bot", text: welcomeText }]);
+    setChatMessages([makeMsg("bot", welcomeText)]);
   }, [welcomeText]);
+
+  // Auto-scroll to latest message
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!isOpen) setHasUnread(true);
+  }, [chatMessages, isOpen]);
+
+  const handleClearChat = () => {
+    setChatMessages([makeMsg("bot", welcomeText)]);
+  };
 
   const handleImageAttach = (e) => {
     const file = e.target.files?.[0];
@@ -913,11 +927,16 @@ function WhatsAppSupportWidget({ products = [], categories = [], openProduct, se
     }));
     return [
       ...catFaqs,
-      { label: "🏷️ Offers & Coupons", query: "Any discount or coupon code?" },
-      { label: "💳 Payment Methods", query: "What payment types are accepted?" },
+      { label: "🆕 New Arrivals", query: "Show new arrivals" },
+      { label: "⭐ Bestsellers", query: "Show bestsellers" },
+      { label: "🎁 Gift Ideas", query: "Gift ideas" },
+      { label: "💰 Budget Picks", query: "Products under 1000" },
+      { label: "🏷️ Offers", query: "Any discount or coupon code?" },
+      { label: "💳 Payment", query: "What payment types are accepted?" },
       { label: "📦 Track Order", query: "Track my order status" },
-      { label: "📏 Size Guide (cm)", query: "Size guide measurements in cm" },
-      { label: "🚚 Delivery Info", query: "Delivery timeframe" },
+      { label: "📏 Size Guide", query: "Size guide measurements in cm" },
+      { label: "🚚 Delivery", query: "Delivery timeframe" },
+      { label: "🔄 Returns", query: "Return policy" },
     ];
   }, [catNames]);
 
@@ -936,6 +955,7 @@ function WhatsAppSupportWidget({ products = [], categories = [], openProduct, se
       let botResponse = "";
       let matchedProds = [];
       let isPhoto = Boolean(imgPayload);
+      let catLink = null;
 
       const lower = (msg || "").trim().toLowerCase();
 
@@ -1008,8 +1028,6 @@ function WhatsAppSupportWidget({ products = [], categories = [], openProduct, se
             }
           }
         }
-
-        let catLink = null;
 
         if (targetCat) {
           catLink = targetCat;
@@ -1100,15 +1118,8 @@ function WhatsAppSupportWidget({ products = [], categories = [], openProduct, se
     } else if (!text) {
       text = `Hi Uma's Fashion, I am inquiring about boutique products.`;
     }
-    const waUrl = `https://api.whatsapp.com/send?phone=91${WHATSAPP_NUMBER}&text=${encodeURIComponent(text)}`;
-    try {
-      const win = window.open(waUrl, "_blank");
-      if (!win || win.closed || typeof win.closed === "undefined") {
-        window.location.href = waUrl;
-      }
-    } catch (e) {
-      window.location.href = waUrl;
-    }
+    const waUrl = `https://wa.me/91${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+    window.open(waUrl, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -1555,15 +1566,8 @@ function ProductDetailView({ product, addToCart, setView, currentUser }) {
                       `💬 *Inquiry Letter:*`,
                       `Hi Uma's Fashion, I would like to inquire about this piece. Could you please confirm if size ${size || "Free Size"} is in stock, and share more details on fabric feel, border finish, and delivery time?`
                     ].filter(Boolean).join("\n");
-                    const waUrl = `https://api.whatsapp.com/send?phone=91${WHATSAPP_NUMBER}&text=${encodeURIComponent(lines)}`;
-                    try {
-                      const win = window.open(waUrl, "_blank");
-                      if (!win || win.closed || typeof win.closed === "undefined") {
-                        window.location.href = waUrl;
-                      }
-                    } catch (e) {
-                      window.location.href = waUrl;
-                    }
+                    const waUrl = `https://wa.me/91${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines)}`;
+                    window.open(waUrl, "_blank", "noopener,noreferrer");
                   }}
                   className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-full transition-colors shadow-sm flex items-center justify-center gap-2 text-center text-xs"
                   title="Inquire with Photo & Letter on WhatsApp (+91 8489943146)"
@@ -3273,15 +3277,8 @@ function AdminPurchaseBillModal({ order, onClose }) {
                   if (digits.startsWith("0")) digits = digits.replace(/^0+/, "");
                   const targetPhone = digits.length === 10 ? `91${digits}` : digits;
                   const text = `Hello ${customerName}, here is your purchase bill & shipping dispatch details for Order #${order.orderNumber || order.id?.slice(-8)} (Total: ${inr(order.total)}) from Uma's Fashion Boutique. Your parcel is ready for courier shipping!`;
-                  const waUrl = `https://api.whatsapp.com/send?phone=${targetPhone}&text=${encodeURIComponent(text)}`;
-                  try {
-                    const win = window.open(waUrl, "_blank");
-                    if (!win || win.closed || typeof win.closed === "undefined") {
-                      window.location.href = waUrl;
-                    }
-                  } catch (e) {
-                    window.location.href = waUrl;
-                  }
+                  const waUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(text)}`;
+                  window.open(waUrl, "_blank", "noopener,noreferrer");
                 }}
                 className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors"
                 title="Send Shipping Bill text to customer on WhatsApp"

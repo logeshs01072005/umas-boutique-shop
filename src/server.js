@@ -76,6 +76,8 @@ app.use(helmet({
         "https://www.google-analytics.com",
         "https://analytics.google.com",
         "https://fonts.googleapis.com",
+        "https://wa.me",
+        "https://api.whatsapp.com",
       ],
       frameSrc: [
         "'self'",
