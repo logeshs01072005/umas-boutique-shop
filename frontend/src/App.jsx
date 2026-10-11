@@ -32,7 +32,8 @@ const SIZE_GUIDE_CM = {
   "Free Size": { bust: "81-112 cm (32-44 in)", waist: "66-102 cm (26-40 in)", hip: "89-124 cm (35-49 in)", shoulder: "36-42 cm", length: "Adjustable Margins" }
 };
 
-
+const DEFAULT_CATEGORIES = ["Sarees", "Lehengas", "Kurtis", "Tops", "Western Wear", "Accessories", "Footwear"];
+const CATEGORIES = DEFAULT_CATEGORIES;
 
 const CATEGORY_META = {
   Sarees: { icon: ShoppingBag, from: "from-rose-100", to: "to-orange-100" },
