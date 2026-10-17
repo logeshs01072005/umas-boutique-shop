@@ -252,6 +252,7 @@ function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, newL
             <span className="font-serif text-2xl md:text-3xl text-amber-300 tracking-wide flex items-center gap-1.5 group-hover:text-amber-200 transition-colors">
               Uma's
               {seasonalTheme === "winter" && <span className="text-[10px] bg-sky-950 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded-full font-sans tracking-normal">❄️ Winter Edition</span>}
+              {seasonalTheme === "diwali" && <span className="text-[10px] bg-yellow-950 text-yellow-300 border border-yellow-500/40 px-2 py-0.5 rounded-full font-sans tracking-normal animate-pulse">🪔 Diwali Edition</span>}
             </span>
             <span className="text-[10px] md:text-xs tracking-[0.3em] uppercase text-stone-400 mt-0.5">Fashion &amp; Boutique</span>
           </div>
@@ -535,8 +536,344 @@ const SEASONAL_THEMES = {
     badgeClass: "bg-pink-500/20 text-pink-300 border-pink-500/30",
     btnPrimary: "bg-pink-400 hover:bg-pink-300 text-rose-950 shadow-pink-500/20",
     btnSecondary: "bg-rose-900 hover:bg-rose-800 text-pink-200 border-rose-500/30"
+  },
+  diwali: {
+    name: "Diwali Deepavali",
+    icon: "🪔",
+    announcement: "🪔 HAPPY DEEPAVALI • DIWALI SPECIAL — FLAT 25% OFF ALL ETHNIC WEAR & FESTIVE SAREES 🎆",
+    heroBadge: "✨ DIWALI FESTIVAL COLLECTION 2026 ✨",
+    heroTitle: "Light Up Your Festival Look",
+    heroDesc: "Celebrate the Festival of Lights with our curated Diwali collection — dazzling silk sarees, embroidered lehengas, and festive kurtis fit for every celebration.",
+    bgClass: "bg-yellow-950 text-yellow-50",
+    barClass: "bg-gradient-to-r from-orange-900 via-yellow-700 to-red-900 text-yellow-100 border-yellow-400/40",
+    heroClass: "bg-gradient-to-b from-yellow-950 via-orange-950 to-red-950 border-yellow-500/30",
+    badgeClass: "bg-yellow-500/20 text-yellow-300 border-yellow-500/40",
+    btnPrimary: "bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-300 hover:to-orange-300 text-stone-950 shadow-yellow-500/30",
+    btnSecondary: "bg-orange-950 hover:bg-orange-900 text-yellow-200 border-yellow-500/30"
   }
 };
+
+/* -------------------------------- Diwali Celebration Component -------------------------------- */
+
+function DiwaliCelebration({ onClose }) {
+  const canvasRef = useRef(null);
+  const animFrameRef = useRef(null);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Firework particle system
+    const particles = [];
+    const fireworks = [];
+    const COLORS = [
+      "#FFD700", "#FF6B00", "#FF1493", "#00E5FF", "#ADFF2F",
+      "#FF4500", "#FFB300", "#E040FB", "#00BCD4", "#FFEB3B",
+      "#F48FB1", "#76FF03", "#FF9100", "#EA80FC"
+    ];
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 6 + 2;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = Math.random() * 0.015 + 0.012;
+        this.size = Math.random() * 3.5 + 1.5;
+        this.gravity = 0.08;
+        this.trail = [];
+      }
+      update() {
+        this.trail.push({ x: this.x, y: this.y });
+        if (this.trail.length > 8) this.trail.shift();
+        this.vx *= 0.98;
+        this.vy += this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+      }
+      draw(c) {
+        this.trail.forEach((pt, i) => {
+          c.globalAlpha = (this.alpha * i) / this.trail.length * 0.5;
+          c.fillStyle = this.color;
+          c.beginPath();
+          c.arc(pt.x, pt.y, this.size * 0.6, 0, Math.PI * 2);
+          c.fill();
+        });
+        c.globalAlpha = this.alpha;
+        c.fillStyle = this.color;
+        c.shadowColor = this.color;
+        c.shadowBlur = 8;
+        c.beginPath();
+        c.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        c.fill();
+        c.shadowBlur = 0;
+        c.globalAlpha = 1;
+      }
+    }
+
+    class Firework {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height;
+        this.targetY = Math.random() * canvas.height * 0.55 + canvas.height * 0.05;
+        this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+        const speed = Math.random() * 5 + 12;
+        this.vy = -speed;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.exploded = false;
+        this.trail = [];
+      }
+      update(parts) {
+        this.trail.push({ x: this.x, y: this.y });
+        if (this.trail.length > 12) this.trail.shift();
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.25;
+        if (this.y <= this.targetY && !this.exploded) {
+          this.exploded = true;
+          const numParticles = Math.floor(Math.random() * 60) + 80;
+          for (let i = 0; i < numParticles; i++) {
+            parts.push(new Particle(this.x, this.y, this.color));
+          }
+          // Ring burst
+          const ringColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+          for (let i = 0; i < 20; i++) {
+            const p = new Particle(this.x, this.y, ringColor);
+            const a = (i / 20) * Math.PI * 2;
+            p.vx = Math.cos(a) * 4;
+            p.vy = Math.sin(a) * 4;
+            p.size = 2;
+            parts.push(p);
+          }
+        }
+      }
+      draw(c) {
+        this.trail.forEach((pt, i) => {
+          const alpha = (i / this.trail.length) * 0.7;
+          c.globalAlpha = alpha;
+          c.fillStyle = this.color;
+          c.shadowColor = this.color;
+          c.shadowBlur = 6;
+          c.beginPath();
+          c.arc(pt.x, pt.y, 2, 0, Math.PI * 2);
+          c.fill();
+        });
+        c.shadowBlur = 0;
+        c.globalAlpha = 1;
+      }
+    }
+
+    let frameCount = 0;
+    const launch = () => {
+      if (frameCount % 28 === 0) fireworks.push(new Firework());
+      if (frameCount % 55 === 0) {
+        // Double burst
+        fireworks.push(new Firework());
+        fireworks.push(new Firework());
+      }
+      frameCount++;
+    };
+
+    const animate = () => {
+      ctx.fillStyle = "rgba(10, 5, 2, 0.18)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      launch();
+      for (let i = fireworks.length - 1; i >= 0; i--) {
+        fireworks[i].update(particles);
+        fireworks[i].draw(ctx);
+        if (fireworks[i].exploded) fireworks.splice(i, 1);
+      }
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw(ctx);
+        if (particles[i].alpha <= 0) particles.splice(i, 1);
+      }
+      animFrameRef.current = requestAnimationFrame(animate);
+    };
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animFrameRef.current);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  const handleClose = () => {
+    setVisible(false);
+    if (onClose) onClose();
+  };
+
+  if (!visible) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed", inset: 0, zIndex: 9999,
+        background: "linear-gradient(135deg, rgba(10,5,2,0.97) 0%, rgba(30,12,0,0.98) 100%)",
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        overflow: "hidden",
+        fontFamily: "'Georgia', serif"
+      }}
+    >
+      {/* Fireworks Canvas */}
+      <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }} />
+
+      {/* Floating diya emojis */}
+      {[...Array(12)].map((_, i) => (
+        <div key={i} style={{
+          position: "absolute",
+          fontSize: `${Math.random() * 1.5 + 1}rem`,
+          left: `${(i * 8.5) % 100}%`,
+          bottom: `${Math.random() * 18}%`,
+          animation: `diwalifloat${i % 3} ${3 + i * 0.4}s ease-in-out infinite alternate`,
+          animationDelay: `${i * 0.3}s`,
+          filter: "drop-shadow(0 0 8px #ffb300)",
+          zIndex: 1,
+          pointerEvents: "none"
+        }}>🪔</div>
+      ))}
+
+      {/* Festive content card */}
+      <div style={{
+        position: "relative", zIndex: 10, textAlign: "center",
+        maxWidth: "700px", padding: "2.5rem 2rem",
+        background: "linear-gradient(135deg, rgba(120,40,0,0.45) 0%, rgba(60,20,0,0.55) 100%)",
+        border: "2px solid rgba(255,180,0,0.45)",
+        borderRadius: "24px",
+        backdropFilter: "blur(10px)",
+        boxShadow: "0 0 80px rgba(255,140,0,0.25), 0 0 30px rgba(255,200,0,0.15) inset"
+      }}>
+        {/* Top rangoli band */}
+        <div style={{ fontSize: "2rem", marginBottom: "0.5rem", letterSpacing: "0.5rem" }}
+          aria-hidden="true">✦ 🌸 ✦ 🌺 ✦ 🌸 ✦</div>
+
+        {/* Main greeting */}
+        <div style={{
+          fontSize: "clamp(2rem, 6vw, 4rem)",
+          fontWeight: "bold",
+          background: "linear-gradient(90deg, #FFD700, #FF8C00, #FFD700, #FF6B35, #FFD700)",
+          backgroundSize: "200%",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          animation: "diwalishine 3s linear infinite",
+          textShadow: "none",
+          lineHeight: 1.15,
+          marginBottom: "0.4rem"
+        }}>🪔 Happy Deepavali! 🪔</div>
+
+        <div style={{
+          fontSize: "clamp(1rem, 3vw, 1.6rem)",
+          color: "#FFD700",
+          fontWeight: "600",
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          marginBottom: "1rem",
+          textShadow: "0 0 20px rgba(255,200,0,0.6)"
+        }}>✨ Festival of Lights 2026 ✨</div>
+
+        {/* Tamil Deepavali text */}
+        <div style={{
+          fontSize: "clamp(0.9rem, 2vw, 1.2rem)",
+          color: "rgba(255,220,80,0.9)",
+          marginBottom: "0.8rem",
+          fontStyle: "italic",
+          letterSpacing: "0.05em"
+        }}>தீபாவளி நல் வாழ்த்துக்கள் • दीपावली की हार्दिक शुभकामनाएं</div>
+
+        {/* Offer badge */}
+        <div style={{
+          display: "inline-block",
+          background: "linear-gradient(135deg, #FF6B00, #FF1744)",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: "clamp(0.85rem, 2vw, 1.05rem)",
+          padding: "0.5rem 1.5rem",
+          borderRadius: "50px",
+          marginBottom: "1.2rem",
+          boxShadow: "0 4px 20px rgba(255,100,0,0.5)",
+          letterSpacing: "0.05em",
+          textTransform: "uppercase"
+        }}>🎁 Diwali Special — Flat 25% Off All Festive Wear 🎁</div>
+
+        {/* Festive quote */}
+        <div style={{
+          color: "rgba(255,220,120,0.85)",
+          fontSize: "clamp(0.75rem, 1.5vw, 0.95rem)",
+          marginBottom: "1.5rem",
+          lineHeight: 1.6,
+          maxWidth: "480px",
+          margin: "0 auto 1.5rem"
+        }}>"May the divine light of Diwali fill your home with joy, prosperity, and love. Dress beautifully for every celebration!"</div>
+
+        {/* Bottom band */}
+        <div style={{ fontSize: "1.5rem", marginBottom: "1.5rem", letterSpacing: "0.7rem" }}
+          aria-hidden="true">🎆 🎇 🧨 🎇 🎆</div>
+
+        {/* Close button */}
+        <button
+          onClick={handleClose}
+          style={{
+            background: "linear-gradient(135deg, #FFD700, #FF8C00)",
+            color: "#1a0800",
+            fontWeight: "800",
+            fontSize: "1rem",
+            padding: "0.85rem 2.5rem",
+            borderRadius: "50px",
+            border: "none",
+            cursor: "pointer",
+            boxShadow: "0 6px 30px rgba(255,160,0,0.5)",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            transition: "all 0.2s",
+            fontFamily: "inherit"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.06)"; e.currentTarget.style.boxShadow = "0 8px 40px rgba(255,180,0,0.7)"; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 6px 30px rgba(255,160,0,0.5)"; }}
+        >
+          🛍️ Explore Diwali Collection
+        </button>
+      </div>
+
+      {/* CSS keyframes injected via style tag */}
+      <style>{`
+        @keyframes diwalishine {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
+        }
+        @keyframes diwalifloat0 {
+          0% { transform: translateY(0px) rotate(-5deg); }
+          100% { transform: translateY(-18px) rotate(5deg); }
+        }
+        @keyframes diwalifloat1 {
+          0% { transform: translateY(0px) rotate(3deg); }
+          100% { transform: translateY(-22px) rotate(-8deg); }
+        }
+        @keyframes diwalifloat2 {
+          0% { transform: translateY(0px) rotate(-8deg); }
+          100% { transform: translateY(-14px) rotate(6deg); }
+        }
+        @keyframes diwaliglam {
+          0%, 100% { opacity: 0.85; text-shadow: 0 0 20px rgba(255,200,0,0.6); }
+          50% { opacity: 1; text-shadow: 0 0 40px rgba(255,200,0,0.9); }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 /* ----------------------------------- Home view ---------------------------------- */
 
@@ -550,13 +887,51 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
   }, [products]);
 
   const activeTheme = SEASONAL_THEMES[seasonalTheme] || SEASONAL_THEMES.summer;
+  const [showDiwali, setShowDiwali] = useState(seasonalTheme === "diwali");
+
+  // Re-show Diwali overlay if theme changes to diwali
+  React.useEffect(() => {
+    if (seasonalTheme === "diwali") setShowDiwali(true);
+    else setShowDiwali(false);
+  }, [seasonalTheme]);
 
   return (
     <div className={`transition-colors duration-500 ${activeTheme.bgClass}`}>
+      {/* Diwali Celebration Overlay */}
+      {seasonalTheme === "diwali" && showDiwali && (
+        <DiwaliCelebration onClose={() => setShowDiwali(false)} />
+      )}
+
+      {/* Diwali festive top bar (shown when overlay is closed) */}
+      {seasonalTheme === "diwali" && !showDiwali && (
+        <div
+          onClick={() => setShowDiwali(true)}
+          style={{
+            cursor: "pointer",
+            background: "linear-gradient(90deg, #7c2d12, #92400e, #b45309, #92400e, #7c2d12)",
+            backgroundSize: "200%",
+            animation: "diwalishine 4s linear infinite",
+            color: "#fde68a",
+            textAlign: "center",
+            padding: "0.6rem 1rem",
+            fontSize: "0.75rem",
+            fontWeight: "700",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            borderBottom: "1px solid rgba(251,191,36,0.4)"
+          }}
+          title="Click to view Diwali celebration"
+        >
+          🪔 Happy Deepavali 2026 • Click to Celebrate • 25% OFF All Festive Wear 🎆
+        </div>
+      )}
+
       {/* Top Announcement Bar - Pure clean promo banner without coupon code string */}
-      <div className={`text-xs font-semibold py-2.5 px-4 text-center tracking-wider uppercase flex items-center justify-center gap-2 border-b transition-colors duration-500 ${activeTheme.barClass}`}>
-        <span>{activeTheme.announcement}</span>
-      </div>
+      {seasonalTheme !== "diwali" && (
+        <div className={`text-xs font-semibold py-2.5 px-4 text-center tracking-wider uppercase flex items-center justify-center gap-2 border-b transition-colors duration-500 ${activeTheme.barClass}`}>
+          <span>{activeTheme.announcement}</span>
+        </div>
+      )}
 
       {banners && banners.length > 0 && <BannerSlider banners={banners} />}
 
@@ -4831,6 +5206,13 @@ function AdminThemeManager({ activeTheme, onThemeUpdated, showToast }) {
       icon: "🌸",
       desc: "Soft rose & pink tones — pastel organzas & floral celebration wear",
       preview: "bg-gradient-to-br from-rose-900 via-pink-800 to-purple-900",
+    },
+    {
+      key: "diwali",
+      name: "Diwali Deepavali",
+      icon: "🪔",
+      desc: "🎆 Festive gold & orange tones — shows fireworks cracker overlay & Diwali greeting to all visitors!",
+      preview: "bg-gradient-to-br from-orange-900 via-yellow-700 to-red-900",
     },
   ];
 
