@@ -7352,6 +7352,8 @@ export default function App() {
   const [authOpen, setAuthOpen] = useState(false);
   const [authError, setAuthError] = useState("");
   const [toast, setToast] = useState("");
+  const [loaded, setLoaded] = useState(false);
+  const [showNewLaunchesModal, setShowNewLaunchesModal] = useState(false);
   const [seasonalTheme, setSeasonalTheme] = useState(() => {
     const cached = typeof window !== "undefined" ? localStorage.getItem("umas:activeTheme") : null;
     if (!cached || cached === "summer") {
