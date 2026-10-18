@@ -161,3 +161,44 @@ html {
 .quick-faq-scroll::-webkit-scrollbar-thumb:hover {
   background: #059669;
 }
+
+/* Diwali Festival Animations */
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 40s linear infinite;
+}
+
+@keyframes diwaliPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3), inset 0 0 10px rgba(251, 191, 36, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(245, 158, 11, 0.6), inset 0 0 20px rgba(251, 191, 36, 0.4);
+  }
+}
+
+.diwali-card-glow {
+  animation: diwaliPulse 3s ease-in-out infinite;
+}
+
+@keyframes diwalishine {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.diwali-shimmer {
+  background-size: 200% 200%;
+  animation: diwalishine 4s linear infinite;
+}

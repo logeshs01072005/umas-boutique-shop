@@ -1,4 +1,10 @@
 import ImageCropModal from "./components/ImageCropModal";
+import { DiwaliCrackerCanvas } from "./components/diwali/DiwaliCrackerCanvas";
+import { DiwaliFestiveDock } from "./components/diwali/DiwaliFestiveDock";
+import { DiwaliHeroSection } from "./components/diwali/DiwaliHeroSection";
+import { DiwaliSpotlightSection } from "./components/diwali/DiwaliSpotlightSection";
+import { DiwaliInteractiveDiya } from "./components/diwali/DiwaliInteractiveDiya";
+import { diwaliAudio } from "./components/diwali/DiwaliAudio";
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   ShoppingBag, Search, User, X, Plus, Minus, Trash2, ChevronRight, ChevronLeft,
@@ -265,7 +271,25 @@ function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, newL
           {currentUser?.isAdmin && navLink("Admin Panel", "admin")}
         </nav>
 
-        <div className="flex items-center gap-1 md:gap-3">
+        <div className="flex items-center gap-1.5 md:gap-3">
+          {/* Diwali Festival Mode Switcher */}
+          <button
+            onClick={() => {
+              const next = seasonalTheme === "diwali" ? "summer" : "diwali";
+              setSeasonalTheme(next);
+              localStorage.setItem("umas:activeTheme", next);
+            }}
+            className={`px-2.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all border cursor-pointer ${
+              seasonalTheme === "diwali"
+                ? "bg-gradient-to-r from-yellow-500 to-amber-600 text-stone-950 border-yellow-300 shadow-md shadow-amber-500/30"
+                : "bg-stone-900 text-amber-300 border-amber-500/30 hover:border-amber-400"
+            }`}
+            title="Toggle Diwali Festive Theme"
+          >
+            <span className="text-sm">🪔</span>
+            <span className="hidden sm:inline">{seasonalTheme === "diwali" ? "Diwali Live" : "Diwali Mode"}</span>
+          </button>
+
           {/* New Product Launch Notification Bell */}
           <button
             onClick={onOpenNewLaunches}
@@ -411,23 +435,40 @@ function SwatchStrip({ onPick, categories = DEFAULT_CATEGORIES, activeCategory =
 
 /* --------------------------------- Product card -------------------------------- */
 
-function ProductCard({ product, onOpen }) {
+function ProductCard({ product, onOpen, isFestive = false }) {
   const pct = discountPct(product.price, product.mrp);
   return (
-    <button onClick={() => onOpen(product)} className="text-left group flex flex-col h-full bg-white border border-stone-200/80 rounded-md p-3 hover:shadow-md transition-shadow">
+    <button
+      onClick={() => onOpen(product)}
+      className={`text-left group flex flex-col h-full rounded-xl p-3.5 transition-all duration-300 transform hover:-translate-y-1 ${
+        isFestive
+          ? "bg-gradient-to-b from-stone-900 via-stone-900 to-amber-950/70 border border-amber-500/40 hover:border-amber-400 hover:shadow-2xl hover:shadow-amber-500/20 text-stone-100"
+          : "bg-white border border-stone-200/80 hover:shadow-md text-stone-900"
+      }`}
+    >
       <ProductArt category={product.category} tag={product.tag} status={product.status} imageUrl={product.imageUrl} />
       <div className="pt-3 flex-1 flex flex-col justify-between">
         <div>
-          <div className="text-[10px] tracking-widest uppercase text-stone-500">{product.category}</div>
-          <div className="font-serif text-base text-stone-900 group-hover:text-amber-700 transition-colors leading-snug font-medium line-clamp-1">{product.name}</div>
+          <div className={`text-[10px] tracking-widest uppercase font-semibold ${isFestive ? "text-amber-400" : "text-stone-500"}`}>
+            {product.category}
+          </div>
+          <div className={`font-serif text-base transition-colors leading-snug font-medium line-clamp-1 ${isFestive ? "text-stone-100 group-hover:text-amber-300" : "text-stone-900 group-hover:text-amber-700"}`}>
+            {product.name}
+          </div>
           <div className="mt-1">
             <RatingStars rating={product.avgRating || 0} numReviews={product.numReviews || 0} />
           </div>
         </div>
         <div className="flex items-baseline gap-2 mt-2">
-          <span className="text-stone-900 font-medium">{inr(product.price)}</span>
+          <span className={`font-bold ${isFestive ? "text-amber-300 font-serif text-base" : "text-stone-900 font-medium"}`}>
+            {inr(product.price)}
+          </span>
           {pct > 0 && <span className="text-stone-400 text-xs line-through">{inr(product.mrp)}</span>}
-          {pct > 0 && <span className="text-rose-700 text-xs font-medium">{pct}% off</span>}
+          {pct > 0 && (
+            <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${isFestive ? "bg-red-950 text-red-300 border border-red-500/40" : "text-rose-700 font-medium"}`}>
+              {pct}% off
+            </span>
+          )}
         </div>
       </div>
     </button>
@@ -886,24 +927,56 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
     return available.length > 0 ? available.slice(0, 8) : products.slice(0, 8);
   }, [products]);
 
-  const activeTheme = SEASONAL_THEMES[seasonalTheme] || SEASONAL_THEMES.summer;
-  const [showDiwali, setShowDiwali] = useState(seasonalTheme === "diwali");
+  const activeTheme = SEASONAL_THEMES[seasonalTheme] || SEASONAL_THEMES.diwali || SEASONAL_THEMES.summer;
+  const [showDiwali, setShowDiwali] = useState(false);
+  const crackerRef = useRef(null);
+  const [autoSkyShots, setAutoSkyShots] = useState(true);
+  const [sparklerActive, setSparklerActive] = useState(false);
 
-  // Re-show Diwali overlay if theme changes to diwali
-  React.useEffect(() => {
-    if (seasonalTheme === "diwali") setShowDiwali(true);
-    else setShowDiwali(false);
-  }, [seasonalTheme]);
+  // Allow clicking anywhere to shoot cracker when in diwali theme
+  const handlePageClick = (e) => {
+    if (seasonalTheme !== "diwali" || !crackerRef.current) return;
+    const target = e.target;
+    if (target.closest("button") || target.closest("a") || target.closest("input") || target.closest("select") || target.closest("[role='button']")) {
+      return;
+    }
+    crackerRef.current.launchSkyShot(e.clientX, e.clientY);
+  };
 
   return (
-    <div className={`transition-colors duration-500 ${activeTheme.bgClass}`}>
-      {/* Diwali Celebration Overlay */}
+    <div
+      onClick={handlePageClick}
+      className={`transition-colors duration-500 relative ${activeTheme.bgClass}`}
+    >
+      {/* Diwali Cracker Canvas & Interactive Festive Dock */}
+      {seasonalTheme === "diwali" && (
+        <>
+          <DiwaliCrackerCanvas
+            ref={crackerRef}
+            autoLaunch={autoSkyShots}
+            sparklerActive={sparklerActive}
+            allowClickToBurst={false}
+          />
+          <DiwaliFestiveDock
+            onLaunchSkyShot={() => crackerRef.current?.launchSkyShot()}
+            onLaunchAnar={() => crackerRef.current?.launchAnar()}
+            onLaunchChakra={() => crackerRef.current?.launchChakra()}
+            onLaunchLadi={() => crackerRef.current?.launchLadi()}
+            autoLaunch={autoSkyShots}
+            setAutoLaunch={setAutoSkyShots}
+            sparklerActive={sparklerActive}
+            setSparklerActive={setSparklerActive}
+          />
+        </>
+      )}
+
+      {/* Diwali Full-Screen Celebration Modal */}
       {seasonalTheme === "diwali" && showDiwali && (
         <DiwaliCelebration onClose={() => setShowDiwali(false)} />
       )}
 
-      {/* Diwali festive top bar (shown when overlay is closed) */}
-      {seasonalTheme === "diwali" && !showDiwali && (
+      {/* Diwali festive top bar */}
+      {seasonalTheme === "diwali" && (
         <div
           onClick={() => setShowDiwali(true)}
           style={{
@@ -920,13 +993,13 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
             textTransform: "uppercase",
             borderBottom: "1px solid rgba(251,191,36,0.4)"
           }}
-          title="Click to view Diwali celebration"
+          title="Click to view grand Diwali celebration greeting"
         >
-          🪔 Happy Deepavali 2026 • Click to Celebrate • 25% OFF All Festive Wear 🎆
+          🪔 Happy Deepavali 2026 • Tap to Celebrate • Flat 25% OFF Code: DIWALI2026 🎆
         </div>
       )}
 
-      {/* Top Announcement Bar - Pure clean promo banner without coupon code string */}
+      {/* Top Announcement Bar - Pure clean promo banner for non-Diwali */}
       {seasonalTheme !== "diwali" && (
         <div className={`text-xs font-semibold py-2.5 px-4 text-center tracking-wider uppercase flex items-center justify-center gap-2 border-b transition-colors duration-500 ${activeTheme.barClass}`}>
           <span>{activeTheme.announcement}</span>
@@ -935,86 +1008,114 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
 
       {banners && banners.length > 0 && <BannerSlider banners={banners} />}
 
-      {/* High-Impact Boutique Hero Banner */}
-      <section className={`relative overflow-hidden py-16 md:py-24 px-6 border-b transition-colors duration-500 ${activeTheme.heroClass}`}>
-        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none bg-amber-500/10" />
-        <div className="max-w-6xl mx-auto text-center relative z-10">
-          <span className={`inline-block text-xs tracking-[0.4em] uppercase px-4 py-1.5 rounded-full border mb-6 ${activeTheme.badgeClass}`}>
-            {activeTheme.heroBadge}
-          </span>
-          <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl text-stone-50 font-bold leading-tight max-w-4xl mx-auto">
-            {activeTheme.heroTitle}
-          </h1>
-          <p className="text-stone-300 max-w-2xl mx-auto mt-6 text-sm sm:text-base md:text-lg font-light leading-relaxed">
-            {activeTheme.heroDesc}
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <button
-              onClick={() => { setCategoryFilter("Sarees"); setView("shop"); }}
-              className={`font-bold tracking-wide px-8 py-3.5 rounded-full shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center gap-2 ${activeTheme.btnPrimary}`}
-            >
-              Shop Sarees <ArrowRight size={18} />
-            </button>
-            <button
-              onClick={() => { setCategoryFilter(null); setView("shop"); }}
-              className={`border font-semibold tracking-wide px-8 py-3.5 rounded-full transition-all ${activeTheme.btnSecondary}`}
-            >
-              Shop All Collections
-            </button>
+      {/* High-Impact Hero Banner */}
+      {seasonalTheme === "diwali" ? (
+        <DiwaliHeroSection
+          onShopSarees={() => { setCategoryFilter("Sarees"); setView("shop"); }}
+          onShopAll={() => { setCategoryFilter(null); setView("shop"); }}
+          onLaunchSkyShot={() => crackerRef.current?.launchSkyShot()}
+        />
+      ) : (
+        <section className={`relative overflow-hidden py-16 md:py-24 px-6 border-b transition-colors duration-500 ${activeTheme.heroClass}`}>
+          <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none bg-amber-500/10" />
+          <div className="max-w-6xl mx-auto text-center relative z-10">
+            <span className={`inline-block text-xs tracking-[0.4em] uppercase px-4 py-1.5 rounded-full border mb-6 ${activeTheme.badgeClass}`}>
+              {activeTheme.heroBadge}
+            </span>
+            <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl text-stone-50 font-bold leading-tight max-w-4xl mx-auto">
+              {activeTheme.heroTitle}
+            </h1>
+            <p className="text-stone-300 max-w-2xl mx-auto mt-6 text-sm sm:text-base md:text-lg font-light leading-relaxed">
+              {activeTheme.heroDesc}
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <button
+                onClick={() => { setCategoryFilter("Sarees"); setView("shop"); }}
+                className={`font-bold tracking-wide px-8 py-3.5 rounded-full shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center gap-2 ${activeTheme.btnPrimary}`}
+              >
+                Shop Sarees <ArrowRight size={18} />
+              </button>
+              <button
+                onClick={() => { setCategoryFilter(null); setView("shop"); }}
+                className={`border font-semibold tracking-wide px-8 py-3.5 rounded-full transition-all ${activeTheme.btnSecondary}`}
+              >
+                Shop All Collections
+              </button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Category Swatch Bar */}
       <section className="bg-stone-950 py-6 border-b border-stone-800">
         <SwatchStrip categories={categories} onPick={(cat) => { setCategoryFilter(cat); setView("shop"); }} />
       </section>
 
-      {/* Ajio Category Spotlight Cards */}
-      <section className="py-16 px-6 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <h2 className="font-serif text-2xl md:text-4xl text-amber-300 font-bold">Category Spotlight</h2>
-            <p className="text-stone-400 text-xs md:text-sm mt-1">Explore top trending fashion categories handpicked for you</p>
+      {/* Spotlight Cards */}
+      {seasonalTheme === "diwali" ? (
+        <>
+          <DiwaliSpotlightSection
+            onSelectCategory={(cat) => { setCategoryFilter(cat); setView("shop"); }}
+            onViewAll={() => { setCategoryFilter(null); setView("shop"); }}
+          />
+          <div className="py-8 px-4 md:px-6">
+            <DiwaliInteractiveDiya
+              onLightUp={() => crackerRef.current?.launchSkyShot()}
+            />
           </div>
-          <button onClick={() => { setCategoryFilter(null); setView("shop"); }} className="text-xs tracking-widest uppercase text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold">
-            View All Categories <ChevronRight size={16} />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {[
-            { name: "Sarees", catKey: "Sarees", tag: "Silk & Georgette", bg: "from-rose-900 to-amber-950" },
-            { name: "Tops", catKey: "Tops", tag: "Designer Fits", bg: "from-amber-950 to-stone-900" },
-            { name: "Kurtis", catKey: "Kurtis", tag: "Casual & Workwear", bg: "from-purple-950 to-stone-900" },
-            { name: "Bridal & Lehengas", catKey: "Lehengas", tag: "Royal Ethnic", bg: "from-rose-950 to-purple-900" },
-          ].map((cat) => (
-            <div
-              key={cat.name}
-              onClick={() => { setCategoryFilter(cat.catKey); setView("shop"); }}
-              className={`relative rounded-2xl p-6 bg-gradient-to-br ${cat.bg} border border-amber-500/30 hover:border-amber-400 cursor-pointer overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/10 text-left min-h-[160px] flex flex-col justify-end`}
-            >
-              <div className="absolute top-4 right-4 text-amber-400/40 group-hover:text-amber-300 transition-colors">
-                <ShoppingBag size={28} />
-              </div>
-              <span className="text-[10px] uppercase tracking-widest text-amber-300/80 font-semibold">{cat.tag}</span>
-              <h3 className="font-serif text-xl md:text-2xl text-stone-100 font-bold mt-1 group-hover:text-amber-300 transition-colors">{cat.name}</h3>
-              <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-amber-400 group-hover:translate-x-1 transition-transform">
-                <span>Explore Now</span>
-                <ChevronRight size={14} />
-              </div>
+        </>
+      ) : (
+        <section className="py-16 px-6 max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <h2 className="font-serif text-2xl md:text-4xl text-amber-300 font-bold">Category Spotlight</h2>
+              <p className="text-stone-400 text-xs md:text-sm mt-1">Explore top trending fashion categories handpicked for you</p>
             </div>
-          ))}
-        </div>
-      </section>
+            <button onClick={() => { setCategoryFilter(null); setView("shop"); }} className="text-xs tracking-widest uppercase text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold">
+              View All Categories <ChevronRight size={16} />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {[
+              { name: "Sarees", catKey: "Sarees", tag: "Silk & Georgette", bg: "from-rose-900 to-amber-950" },
+              { name: "Tops", catKey: "Tops", tag: "Designer Fits", bg: "from-amber-950 to-stone-900" },
+              { name: "Kurtis", catKey: "Kurtis", tag: "Casual & Workwear", bg: "from-purple-950 to-stone-900" },
+              { name: "Bridal & Lehengas", catKey: "Lehengas", tag: "Royal Ethnic", bg: "from-rose-950 to-purple-900" },
+            ].map((cat) => (
+              <div
+                key={cat.name}
+                onClick={() => { setCategoryFilter(cat.catKey); setView("shop"); }}
+                className={`relative rounded-2xl p-6 bg-gradient-to-br ${cat.bg} border border-amber-500/30 hover:border-amber-400 cursor-pointer overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/10 text-left min-h-[160px] flex flex-col justify-end`}
+              >
+                <div className="absolute top-4 right-4 text-amber-400/40 group-hover:text-amber-300 transition-colors">
+                  <ShoppingBag size={28} />
+                </div>
+                <span className="text-[10px] uppercase tracking-widest text-amber-300/80 font-semibold">{cat.tag}</span>
+                <h3 className="font-serif text-xl md:text-2xl text-stone-100 font-bold mt-1 group-hover:text-amber-300 transition-colors">{cat.name}</h3>
+                <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-amber-400 group-hover:translate-x-1 transition-transform">
+                  <span>Explore Now</span>
+                  <ChevronRight size={14} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Featured Collection Grid */}
       <section className="bg-stone-900 py-16 px-6 border-t border-b border-amber-500/20">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-10">
             <div>
-              <h2 className="font-serif text-2xl md:text-4xl text-amber-300 font-bold">Trending & Bestsellers</h2>
-              <p className="text-stone-400 text-xs md:text-sm mt-1">Our most loved saree and apparel collections</p>
+              <h2 className="font-serif text-2xl md:text-4xl text-amber-300 font-bold">
+                {seasonalTheme === "diwali" ? "✨ Diwali Bestsellers & Festive Sarees" : "Trending & Bestsellers"}
+              </h2>
+              <p className="text-stone-400 text-xs md:text-sm mt-1">
+                {seasonalTheme === "diwali"
+                  ? "Handcrafted festive sarees, royal lehengas and party fits curated for Diwali 2026"
+                  : "Our most loved saree and apparel collections"}
+              </p>
             </div>
             <button onClick={() => setView("shop")} className="text-xs tracking-widest uppercase text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold">
               View Collection <ChevronRight size={16} />
@@ -1025,7 +1126,7 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {featured.map((p) => (
-                <ProductCard key={p.id} product={p} onOpen={openProduct} />
+                <ProductCard key={p.id} product={p} onOpen={openProduct} isFestive={seasonalTheme === "diwali"} />
               ))}
             </div>
           )}
@@ -7226,9 +7327,14 @@ export default function App() {
   const [authOpen, setAuthOpen] = useState(false);
   const [authError, setAuthError] = useState("");
   const [toast, setToast] = useState("");
-  const [loaded, setLoaded] = useState(false);
-  const [seasonalTheme, setSeasonalTheme] = useState(() => localStorage.getItem("umas:activeTheme") || "summer");
-  const [showNewLaunchesModal, setShowNewLaunchesModal] = useState(false);
+  const [seasonalTheme, setSeasonalTheme] = useState(() => {
+    const cached = typeof window !== "undefined" ? localStorage.getItem("umas:activeTheme") : null;
+    if (!cached || cached === "summer") {
+      if (typeof window !== "undefined") localStorage.setItem("umas:activeTheme", "diwali");
+      return "diwali";
+    }
+    return cached;
+  });
 
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
 
@@ -7332,8 +7438,9 @@ export default function App() {
       const res = await fetch(`${API_BASE}/settings/active-theme`);
       const data = await res.json();
       if (res.ok && data.activeTheme) {
-        setSeasonalTheme(data.activeTheme);
-        localStorage.setItem("umas:activeTheme", data.activeTheme);
+        const theme = data.activeTheme === "summer" ? "diwali" : data.activeTheme;
+        setSeasonalTheme(theme);
+        localStorage.setItem("umas:activeTheme", theme);
       }
     } catch (e) {
       console.error("Error fetching active theme:", e);
