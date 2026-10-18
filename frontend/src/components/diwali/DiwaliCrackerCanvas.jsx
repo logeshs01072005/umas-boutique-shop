@@ -421,13 +421,13 @@ export const DiwaliCrackerCanvas = forwardRef(function DiwaliCrackerCanvas(
       ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
 
-      eng.animId = requestAnimationFrame(loop);
+      engineRef.current.animId = requestAnimationFrame(loop);
     };
 
-    eng.animId = requestAnimationFrame(loop);
+    engineRef.current.animId = requestAnimationFrame(loop);
 
     return () => {
-      if (eng.animId) cancelAnimationFrame(eng.animId);
+      if (engineRef.current.animId) cancelAnimationFrame(engineRef.current.animId);
       window.removeEventListener("resize", handleResize);
     };
   }, [autoLaunch, sparklerActive]);
