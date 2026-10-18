@@ -202,3 +202,29 @@ html {
   background-size: 200% 200%;
   animation: diwalishine 4s linear infinite;
 }
+
+@keyframes swayLeft {
+  0%, 100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+.animate-sway-left {
+  animation: swayLeft 4.2s ease-in-out infinite;
+}
+
+@keyframes swayRight {
+  0%, 100% {
+    transform: rotate(5deg);
+  }
+  50% {
+    transform: rotate(-6deg);
+  }
+}
+
+.animate-sway-right {
+  animation: swayRight 4.8s ease-in-out infinite;
+}

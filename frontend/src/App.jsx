@@ -928,7 +928,22 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
   }, [products]);
 
   const activeTheme = SEASONAL_THEMES[seasonalTheme] || SEASONAL_THEMES.diwali || SEASONAL_THEMES.summer;
-  const [showDiwali, setShowDiwali] = useState(false);
+  // Only show the grand Diwali celebration overlay ONCE upon first opening the site, NOT on navigation back
+  const [showDiwaliIntro, setShowDiwaliIntro] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const hasSeen = sessionStorage.getItem("umas:diwali_intro_seen");
+    if (!hasSeen && seasonalTheme === "diwali") {
+      sessionStorage.setItem("umas:diwali_intro_seen", "true");
+      return true;
+    }
+    return false;
+  });
+
+  const [bannerDismissed, setBannerDismissed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem("umas:diwali_banner_dismissed") === "true";
+  });
+
   const crackerRef = useRef(null);
   const [autoSkyShots, setAutoSkyShots] = useState(true);
   const [sparklerActive, setSparklerActive] = useState(false);
@@ -970,32 +985,42 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
         </>
       )}
 
-      {/* Diwali Full-Screen Celebration Modal */}
-      {seasonalTheme === "diwali" && showDiwali && (
-        <DiwaliCelebration onClose={() => setShowDiwali(false)} />
+      {/* Diwali Full-Screen Celebration Modal (Only on first site open or when clicked) */}
+      {seasonalTheme === "diwali" && showDiwaliIntro && (
+        <DiwaliCelebration onClose={() => setShowDiwaliIntro(false)} />
       )}
 
-      {/* Diwali festive top bar */}
-      {seasonalTheme === "diwali" && (
+      {/* Diwali festive top bar - dismissible so it never annoys the user */}
+      {seasonalTheme === "diwali" && !bannerDismissed && (
         <div
-          onClick={() => setShowDiwali(true)}
+          className="relative py-2 px-4 text-xs font-bold tracking-wider text-center flex items-center justify-between border-b border-amber-400/40 shadow-md transition-all"
           style={{
-            cursor: "pointer",
             background: "linear-gradient(90deg, #7c2d12, #92400e, #b45309, #92400e, #7c2d12)",
             backgroundSize: "200%",
             animation: "diwalishine 4s linear infinite",
             color: "#fde68a",
-            textAlign: "center",
-            padding: "0.6rem 1rem",
-            fontSize: "0.75rem",
-            fontWeight: "700",
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            borderBottom: "1px solid rgba(251,191,36,0.4)"
           }}
-          title="Click to view grand Diwali celebration greeting"
         >
-          🪔 Happy Deepavali 2026 • Tap to Celebrate • Flat 25% OFF Code: DIWALI2026 🎆
+          <div
+            className="flex-1 flex items-center justify-center gap-2 cursor-pointer select-none"
+            onClick={() => setShowDiwaliIntro(true)}
+            title="Click to view full celebration greeting"
+          >
+            <span className="text-sm">🪔</span>
+            <span>HAPPY DEEPAVALI 2026 • FLAT 25% OFF FESTIVE WEAR • CODE: <strong className="text-yellow-300 font-mono">DIWALI2026</strong></span>
+            <span className="text-[10px] uppercase underline text-amber-200 hover:text-white hidden sm:inline ml-1">(View Greeting 🎆)</span>
+          </div>
+
+          <button
+            onClick={() => {
+              setBannerDismissed(true);
+              sessionStorage.setItem("umas:diwali_banner_dismissed", "true");
+            }}
+            className="p-1 text-amber-300/80 hover:text-white rounded-full transition-colors ml-2"
+            title="Dismiss Announcement"
+          >
+            <X size={14} />
+          </button>
         </div>
       )}
 
