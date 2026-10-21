@@ -743,6 +743,7 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
         <DiwaliHeroSection
           onShopSarees={() => { setCategoryFilter("Sarees"); setView("shop"); }}
           onShopAll={() => { setCategoryFilter(null); setView("shop"); }}
+          saleEndDate={promoSettings?.saleEndDate}
         />
       ) : (
         <section className={`relative overflow-hidden py-16 md:py-24 px-6 border-b transition-colors duration-500 ${activeTheme.heroClass}`}>

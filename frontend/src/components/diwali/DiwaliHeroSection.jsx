@@ -1,35 +1,63 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { ArrowRight, Gift } from "lucide-react";
+
+// Calculate remaining time against a real target timestamp
+function getFlashSaleTarget() {
+  const STORAGE_KEY = "umas:diwali_flash_sale_end";
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = parseInt(stored, 10);
+      // If valid future timestamp, keep it so it persists across reloads & page navigations
+      if (!isNaN(parsed) && parsed > Date.now()) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // Default to 15 days timeline from first visit, synchronized with actual real clock
+  const newTarget = Date.now() + 15 * 24 * 60 * 60 * 1000;
+  try {
+    localStorage.setItem(STORAGE_KEY, String(newTarget));
+  } catch (e) {
+    // ignore
+  }
+  return newTarget;
+}
+
+function calculateRemaining(targetTimestamp) {
+  const diff = Math.max(0, targetTimestamp - Date.now());
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  return { days, hours, minutes, seconds };
+}
 
 export function DiwaliHeroSection({
   onShopSarees,
   onShopAll,
+  saleEndDate,
 }) {
-  // 15 days timeline as requested
-  const [timeLeft, setTimeLeft] = useState({
-    days: 15,
-    hours: 12,
-    minutes: 45,
-    seconds: 30,
-  });
+  const targetTime = useMemo(() => {
+    if (saleEndDate) {
+      const parsed = new Date(saleEndDate).getTime();
+      if (!isNaN(parsed) && parsed > Date.now()) return parsed;
+    }
+    return getFlashSaleTarget();
+  }, [saleEndDate]);
+
+  const [timeLeft, setTimeLeft] = useState(() => calculateRemaining(targetTime));
 
   useEffect(() => {
+    setTimeLeft(calculateRemaining(targetTime));
     const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: 59, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        } else if (prev.days > 0) {
-          return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
-        }
-        return prev;
-      });
+      setTimeLeft(calculateRemaining(targetTime));
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [targetTime]);
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-[#1a0505] via-[#2a0b0b] to-stone-950 border-b border-amber-500/40 text-stone-100 selection:bg-amber-500 selection:text-stone-950">
