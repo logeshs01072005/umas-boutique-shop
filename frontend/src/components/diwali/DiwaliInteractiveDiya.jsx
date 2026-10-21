@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { Sparkles, Check, Copy, Flame, Heart } from "lucide-react";
+import { Sparkles, Flame, Heart } from "lucide-react";
 import { diwaliAudio } from "./DiwaliAudio";
 
 export function DiwaliInteractiveDiya({ onLightUp }) {
   const [isLit, setIsLit] = useState(true);
   const [litCount, setLitCount] = useState(2847);
-  const [copied, setCopied] = useState(false);
 
   const handleToggleLight = () => {
     if (!isLit) {
@@ -16,13 +15,6 @@ export function DiwaliInteractiveDiya({ onLightUp }) {
     } else {
       setIsLit(false);
     }
-  };
-
-  const handleCopyCode = (e) => {
-    e.stopPropagation();
-    navigator.clipboard?.writeText("DIWALI2026");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -170,38 +162,17 @@ export function DiwaliInteractiveDiya({ onLightUp }) {
         </span>
       </div>
 
-      {/* Exclusive Festive Coupon Box */}
-      <div className="p-4 md:p-5 rounded-2xl bg-amber-500/10 border border-amber-400/40 max-w-lg mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-left">
-          <span className="text-[10px] uppercase tracking-widest text-amber-400 font-bold block">
-            Exclusive Diwali Blessing Code
-          </span>
-          <span className="text-sm font-semibold text-stone-100">
-            Flat 25% Off + Free Festive Gift Box
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="px-3.5 py-1.5 bg-stone-950 border border-amber-400 rounded-lg text-amber-300 font-mono font-bold text-sm tracking-wider shadow-inner">
-            DIWALI2026
-          </div>
-          <button
-            onClick={handleCopyCode}
-            className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-stone-950 font-bold text-xs rounded-lg transition-all flex items-center gap-1 shadow-md shadow-amber-500/20"
-          >
-            {copied ? (
-              <>
-                <Check size={13} />
-                <span>Copied!</span>
-              </>
-            ) : (
-              <>
-                <Copy size={13} />
-                <span>Copy</span>
-              </>
-            )}
-          </button>
-        </div>
+      {/* Auspicious Diwali Blessing Card */}
+      <div className="p-4 md:p-5 rounded-2xl bg-amber-500/10 border border-amber-400/40 max-w-xl mx-auto text-center">
+        <span className="text-[11px] uppercase tracking-widest text-amber-300 font-bold block mb-1">
+          🪔 Deepavali Divine Blessings 🪔
+        </span>
+        <p className="text-stone-200 text-xs sm:text-sm font-light italic leading-relaxed">
+          "தீபாவளி திருநாள் நல்வாழ்த்துக்கள்! May Goddess Lakshmi shower your home with everlasting happiness, good health, and prosperity."
+        </p>
+        <span className="inline-block mt-2 text-[11px] font-semibold text-yellow-400">
+          ✨ Special Festive Markdowns Applied Automatically Across All Collections ✨
+        </span>
       </div>
     </div>
   );

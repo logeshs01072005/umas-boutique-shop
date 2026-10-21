@@ -1007,7 +1007,7 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
             title="Click to view full celebration greeting"
           >
             <span className="text-sm">🪔</span>
-            <span>HAPPY DEEPAVALI 2026 • FLAT 25% OFF FESTIVE WEAR • CODE: <strong className="text-yellow-300 font-mono">DIWALI2026</strong></span>
+            <span>HAPPY DEEPAVALI 2026 • FLAT 25% OFF ALL ETHNIC WEAR & FESTIVE SAREES 🎆</span>
             <span className="text-[10px] uppercase underline text-amber-200 hover:text-white hidden sm:inline ml-1">(View Greeting 🎆)</span>
           </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowRight, Sparkles, Rocket, Gift, ShieldCheck, Truck, Clock, Copy, Check } from "lucide-react";
+import { ArrowRight, Sparkles, Rocket, Gift, ShieldCheck, Truck, Clock } from "lucide-react";
 
 export function DiwaliHeroSection({
   onShopSarees,
@@ -12,7 +12,6 @@ export function DiwaliHeroSection({
     minutes: 45,
     seconds: 30,
   });
-  const [codeCopied, setCodeCopied] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -31,12 +30,6 @@ export function DiwaliHeroSection({
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
-  const handleCopyCode = () => {
-    navigator.clipboard?.writeText("DIWALI2026");
-    setCodeCopied(true);
-    setTimeout(() => setCodeCopied(false), 2200);
-  };
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-stone-950 via-[#260c0c] to-stone-950 border-b border-amber-500/40 text-stone-100">
@@ -135,38 +128,20 @@ export function DiwaliHeroSection({
           Welcome the Festival of Lights draped in eternal grace. Explore authentic Kanchipuram bridal silks, Banarasi brocades, royal designer lehengas, and festive kurtis woven for auspicious moments.
         </p>
 
-        {/* High-Impact Diwali Dhamaka Offer Box with Coupon & Live Timer */}
+        {/* High-Impact Diwali Dhamaka Offer Box & Live Timer */}
         <div className="mt-8 max-w-3xl mx-auto p-4 md:p-6 rounded-3xl bg-gradient-to-r from-stone-950/90 via-[#330f0f]/90 to-stone-950/90 border-2 border-amber-400/60 shadow-2xl shadow-amber-500/20 backdrop-blur-md">
           <div className="flex flex-col md:flex-row items-center justify-between gap-5">
-            {/* Offer details & coupon */}
+            {/* Offer details */}
             <div className="text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-bold text-amber-300 uppercase tracking-widest">
                 <Gift size={16} />
                 <span>Diwali Dhamaka • Flat 25% Off Everything</span>
               </div>
-              <div className="text-stone-300 text-xs mt-1">
-                Use festive coupon code at checkout:
+              <div className="text-stone-200 text-sm font-semibold mt-1.5 flex items-center justify-center md:justify-start gap-2">
+                <span>🎁 Free Festive Sweets &amp; Gift Hamper on orders above ₹1,499</span>
               </div>
-              <div className="mt-2 inline-flex items-center gap-2">
-                <div className="px-3.5 py-1.5 bg-stone-950 border border-amber-400 rounded-lg text-amber-300 font-mono font-bold text-sm tracking-wider shadow-inner">
-                  DIWALI2026
-                </div>
-                <button
-                  onClick={handleCopyCode}
-                  className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-stone-950 font-bold text-xs rounded-lg transition-all flex items-center gap-1 shadow-md shadow-amber-500/20"
-                >
-                  {codeCopied ? (
-                    <>
-                      <Check size={13} />
-                      <span>Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={13} />
-                      <span>Copy Code</span>
-                    </>
-                  )}
-                </button>
+              <div className="text-amber-400/90 text-xs mt-1 font-medium">
+                Direct Festive Discount applied automatically across all collections
               </div>
             </div>
 
