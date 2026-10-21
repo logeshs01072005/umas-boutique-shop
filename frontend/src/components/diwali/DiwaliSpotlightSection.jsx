@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronRight, Sparkles, Tag, ShoppingBag } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 
 export function DiwaliSpotlightSection({ onSelectCategory, onViewAll }) {
   const festiveCards = [
@@ -54,18 +54,18 @@ export function DiwaliSpotlightSection({ onSelectCategory, onViewAll }) {
   ];
 
   return (
-    <section className="py-16 px-6 max-w-7xl mx-auto">
+    <section className="py-12 sm:py-16 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 gap-4">
         <div>
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-amber-400 mb-1">
             <Sparkles size={14} />
             <span>Curated Festival Collections</span>
           </div>
-          <h2 className="font-serif text-3xl md:text-4xl text-stone-100 font-bold">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-stone-100 font-bold">
             Diwali Dhamaka Spotlight
           </h2>
-          <p className="text-stone-300 text-xs md:text-sm mt-1 max-w-xl font-light">
+          <p className="text-stone-300 text-xs sm:text-sm mt-1 max-w-xl font-light">
             Handpicked festive collections woven with celebratory spirit, pure fabrics, and rich tradition.
           </p>
         </div>
@@ -79,13 +79,13 @@ export function DiwaliSpotlightSection({ onSelectCategory, onViewAll }) {
         </button>
       </div>
 
-      {/* Grid of Festive Spotlight Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Grid of Festive Spotlight Cards - responsive from mobile 1-col to 4-col desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {festiveCards.map((card) => (
           <div
             key={card.title}
             onClick={() => onSelectCategory(card.category)}
-            className={`group relative rounded-2xl p-6 bg-gradient-to-br ${card.gradient} border ${card.border} cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/15 flex flex-col justify-between min-h-[260px] text-left transform hover:-translate-y-1`}
+            className={`group relative rounded-2xl p-5 sm:p-6 bg-gradient-to-br ${card.gradient} border ${card.border} cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/15 flex flex-col justify-between min-h-[240px] sm:min-h-[260px] text-left transform hover:-translate-y-1`}
           >
             {/* Top decorative glow */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/5 rounded-full blur-2xl group-hover:bg-amber-400/10 transition-all pointer-events-none" />
@@ -102,7 +102,7 @@ export function DiwaliSpotlightSection({ onSelectCategory, onViewAll }) {
                 {card.tag}
               </span>
 
-              <h3 className="font-serif text-xl font-bold text-stone-100 mt-1 group-hover:text-amber-300 transition-colors">
+              <h3 className="font-serif text-lg sm:text-xl font-bold text-stone-100 mt-1 group-hover:text-amber-300 transition-colors">
                 {card.title}
               </h3>
 

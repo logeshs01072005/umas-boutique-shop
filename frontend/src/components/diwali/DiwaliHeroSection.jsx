@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowRight, Gift, ShieldCheck, Truck, Sparkles, Heart } from "lucide-react";
+import { ArrowRight, Gift } from "lucide-react";
 
 export function DiwaliHeroSection({
   onShopSarees,

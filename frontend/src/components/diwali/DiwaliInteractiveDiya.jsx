@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Sparkles, Flame, Heart } from "lucide-react";
+import { Flame, Heart } from "lucide-react";
 import { diwaliAudio } from "./DiwaliAudio";
 
 export function DiwaliInteractiveDiya({ onLightUp }) {
