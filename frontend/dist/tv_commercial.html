@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uma's Boutique - Broadcast TV Commercial Generator</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+    .custom-scroll::-webkit-scrollbar { height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(245,158,11,0.5); border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-stone-950 text-stone-100 min-h-screen p-4 sm:p-6 antialiased flex flex-col items-center justify-center">
+
+  <div class="w-full max-w-5xl bg-stone-900/90 border border-amber-500/30 rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-xl">
+    
+    <!-- Top Studio Header -->
+    <div class="flex flex-col sm:flex-row items-center justify-between pb-4 mb-4 border-b border-amber-500/20 gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-600 to-yellow-400 flex items-center justify-center text-xl shadow-lg shadow-amber-500/30">
+          📺
+        </div>
+        <div>
+          <h1 class="font-serif text-lg sm:text-xl font-bold text-amber-300">
+            TV Channel Commercial Generator (30s • 16:9)
+          </h1>
+          <p class="text-xs text-stone-400">
+            Uma's Fashion & Boutique • Diwali Grand Festive Dhamaka
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-1 rounded-full bg-red-950 border border-red-500/40 text-red-300 text-xs font-bold flex items-center gap-1.5 animate-pulse">
+          <span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span>
+          BROADCAST HD 1080p
+        </span>
+        <button
+          id="recordBtn"
+          onclick="toggleRecordVideo()"
+          class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-xs tracking-wider flex items-center gap-1.5 shadow-lg shadow-red-500/30 transition-all cursor-pointer"
+        >
+          <span>🎬 Record & Download Video</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 16:9 Video Canvas Container -->
+    <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-black border-2 border-amber-400/50 shadow-2xl group select-none">
+      <canvas id="tvCanvas" width="1280" height="720" class="w-full h-full block object-contain"></canvas>
+
+      <!-- Watermark / Channel Live Bug (Top Right) -->
+      <div class="absolute top-4 right-5 pointer-events-none flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/20">
+        <span class="text-[11px] font-bold tracking-widest text-amber-300 uppercase">UMA'S TV</span>
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+      </div>
+
+      <!-- Live Scene Tag (Top Left) -->
+      <div class="absolute top-4 left-5 pointer-events-none bg-stone-900/80 backdrop-blur-md px-3 py-1 rounded-full border border-amber-400/30">
+        <span id="sceneTag" class="text-[11px] font-bold text-yellow-300 uppercase tracking-widest">
+          Scene 1: Royal Dawn & Auspicious Diya
+        </span>
+      </div>
+
+      <!-- Tamil Subtitle / Audio Voiceover Caption Strip (Bottom Center) -->
+      <div class="absolute bottom-4 inset-x-6 text-center pointer-events-none">
+        <div id="captionBox" class="inline-block bg-black/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-amber-400/40 text-xs sm:text-sm text-yellow-200 font-medium tracking-wide shadow-lg">
+          "Every celebration begins with tradition... but true elegance begins with Uma's."
+        </div>
+      </div>
+    </div>
+
+    <!-- Video Controls & Timeline Bar -->
+    <div class="mt-4 p-3 sm:p-4 rounded-2xl bg-stone-950/80 border border-stone-800 flex flex-col gap-3">
+      
+      <!-- Progress Bar with Scene Markers -->
+      <div class="relative w-full flex items-center">
+        <input
+          id="scrubber"
+          type="range"
+          min="0"
+          max="30"
+          step="0.05"
+          value="0"
+          oninput="seekVideo(this.value)"
+          class="w-full h-2 bg-stone-800 rounded-lg appearance-none cursor-pointer accent-amber-400"
+        />
+      </div>
+
+      <!-- Playback Buttons, Timer & Scene Navigation -->
+      <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+        
+        <div class="flex items-center gap-2">
+          <button
+            id="playBtn"
+            onclick="togglePlay()"
+            class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-stone-950 font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+          >
+            <span id="playIcon">▶ Play Ad</span>
+          </button>
+
+          <button
+            onclick="restartVideo()"
+            class="px-3 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 hover:text-amber-300 transition-colors cursor-pointer"
+            title="Restart Ad"
+          >
+            ↺ Restart
+          </button>
+
+          <span id="timeDisplay" class="font-mono text-amber-300 font-bold px-2 py-1 rounded bg-stone-900 border border-stone-800">
+            00:00 / 00:30
+          </span>
+        </div>
+
+        <!-- Quick Scene Buttons -->
+        <div class="flex items-center gap-1.5 overflow-x-auto custom-scroll pb-1">
+          <button onclick="jumpTo(0)" class="px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-amber-500/20 text-stone-300 hover:text-amber-300 border border-stone-800">1. Dawn</button>
+          <button onclick="jumpTo(6)" class="px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-amber-500/20 text-stone-300 hover:text-amber-300 border border-stone-800">2. Silks</button>
+          <button onclick="jumpTo(13)" class="px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-amber-500/20 text-stone-300 hover:text-amber-300 border border-stone-800">3. Lehengas</button>
+          <button onclick="jumpTo(19)" class="px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-amber-500/20 text-stone-300 hover:text-amber-300 border border-stone-800">4. Dhamaka</button>
+          <button onclick="jumpTo(25)" class="px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-amber-500/20 text-stone-300 hover:text-amber-300 border border-stone-800">5. Outro</button>
+        </div>
+
+        <!-- Voiceover & Audio Options -->
+        <div class="flex items-center gap-2">
+          <label class="flex items-center gap-1.5 cursor-pointer text-stone-300 hover:text-amber-300">
+            <input type="checkbox" id="voToggle" checked class="accent-amber-400">
+            <span>Voiceover</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer text-stone-300 hover:text-amber-300">
+            <input type="checkbox" id="bgmToggle" checked class="accent-amber-400">
+            <span>Festive BGM</span>
+          </label>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Commercial Storyboard Overview & Specifications -->
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+      <div class="p-3.5 rounded-2xl bg-stone-950/60 border border-amber-500/20">
+        <div class="font-bold text-amber-300 mb-1">📡 Broadcast Compatibility</div>
+        <div class="text-stone-300 leading-relaxed">
+          Standard 16:9 widescreen format, 1080p full resolution, compliant with Indian satellite TV channels (Sun TV, Vijay TV, Zee Tamil, etc.).
+        </div>
+      </div>
+      <div class="p-3.5 rounded-2xl bg-stone-950/60 border border-amber-500/20">
+        <div class="font-bold text-amber-300 mb-1">🎙️ Bilingual Voiceover</div>
+        <div class="text-stone-300 leading-relaxed">
+          Dynamic subtitle and audio narration covering both Tamil blessings and English commercial call-outs with instant 25% OFF messaging.
+        </div>
+      </div>
+      <div class="p-3.5 rounded-2xl bg-stone-950/60 border border-amber-500/20">
+        <div class="font-bold text-amber-300 mb-1">⚡ 1-Click Video Export</div>
+        <div class="text-stone-300 leading-relaxed">
+          Click <strong>"Record & Download Video"</strong> above to capture the canvas into an actual video file (.webm) ready for editing or direct TV broadcast!
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const canvas = document.getElementById("tvCanvas");
+    const ctx = canvas.getContext("2d");
+    const scrubber = document.getElementById("scrubber");
+    const timeDisplay = document.getElementById("timeDisplay");
+    const playIcon = document.getElementById("playIcon");
+    const sceneTag = document.getElementById("sceneTag");
+    const captionBox = document.getElementById("captionBox");
+    const recordBtn = document.getElementById("recordBtn");
+
+    let isPlaying = false;
+    let currentTime = 0;
+    const DURATION = 30; // 30 seconds
+    let lastTimestamp = 0;
+    let animId = null;
+
+    // Recording variables
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+
+    // Web Audio Synthesizer for Festive Carnatic Fusion BGM
+    class FestiveBGMEngine {
+      constructor() {
+        this.ctx = null;
+        this.isPlaying = false;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === "suspended") {
+          this.ctx.resume();
+        }
+      }
+      playNote(freq, time, dur = 0.35, type = "triangle", vol = 0.15) {
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, time);
+          gain.gain.setValueAtTime(vol, time);
+          gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(time);
+          osc.stop(time + dur);
+        } catch(e){}
+      }
+      triggerFestiveBeats(time) {
+        if (!document.getElementById("bgmToggle").checked) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        // Melodic Tanpura & Bell Chimes based on scene
+        const notes = [293.66, 329.63, 369.99, 440.00, 493.88, 587.33]; // D major scale
+        const note = notes[Math.floor((time * 2) % notes.length)];
+        this.playNote(note, now, 0.45, "sine", 0.08);
+        this.playNote(note * 1.5, now + 0.15, 0.25, "triangle", 0.04);
+      }
+    }
+    const bgmEngine = new FestiveBGMEngine();
+
+    // Voiceover Synthesis Engine
+    const scenes = [
+      {
+        start: 0, end: 6,
+        tag: "Scene 1: Royal Dawn & Auspicious Diya",
+        caption: "“Every celebration begins with tradition... but true elegance begins with Uma’s.”",
+        voText: "Every celebration begins with tradition. But true elegance begins with Uma's Fashion and Boutique."
+      },
+      {
+        start: 6, end: 13,
+        tag: "Scene 2: Pure Silks & Bridal Heritage",
+        caption: "“100% Silk Mark Certified Kanchipuram & Banarasi Silks woven for royalty.”",
+        voText: "Pure Kanchipuram Silks, Silk Mark certified, woven with authentic zari for your divine festive glow."
+      },
+      {
+        start: 13, end: 19,
+        tag: "Scene 3: Royal Lehengas & Designer Edit",
+        caption: "“Dazzle every evening party with handcrafted festive lehengas and regal kurtis.”",
+        voText: "Dazzle every evening with opulent designer lehengas and contemporary festive kurtis."
+      },
+      {
+        start: 19, end: 25,
+        tag: "Scene 4: Grand Diwali Dhamaka • Flat 25% Off",
+        caption: "“Flat 25% OFF Site-Wide + Free Festive Gift Hamper on orders above ₹1,499!”",
+        voText: "Enjoy the Grand Diwali Dhamaka! Flat 25% off everything, plus a free festive gift hamper above fourteen ninety-nine!"
+      },
+      {
+        start: 25, end: 30,
+        tag: "Scene 5: Grand Outro & Call To Action",
+        caption: "“Celebrate royally. Order online today at Uma’s Boutique!”",
+        voText: "Celebrate royally this Deepavali. Order online today at Uma's Boutique!"
+      }
+    ];
+
+    let lastSpokenScene = -1;
+    function checkVoiceover(time) {
+      if (!document.getElementById("voToggle").checked) return;
+      if (!('speechSynthesis' in window)) return;
+
+      const sceneIdx = scenes.findIndex(s => time >= s.start && time < s.end);
+      if (sceneIdx !== -1 && sceneIdx !== lastSpokenScene) {
+        lastSpokenScene = sceneIdx;
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(scenes[sceneIdx].voText);
+        utter.rate = 1.05;
+        utter.pitch = 1.0;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    // ---------------- Drawing Engine ----------------
+    function drawScene(t) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Identify Current Scene
+      const sceneIdx = Math.min(scenes.length - 1, Math.max(0, scenes.findIndex(s => t >= s.start && t < s.end)));
+      const activeScene = scenes[sceneIdx];
+
+      // Update HTML UI Info
+      sceneTag.textContent = activeScene.tag;
+      captionBox.textContent = activeScene.caption;
+
+      const localT = t - activeScene.start;
+      const progress = localT / (activeScene.end - activeScene.start);
+
+      // Render Scene visuals
+      switch(sceneIdx) {
+        case 0:
+          drawScene1_Dawn(progress, t);
+          break;
+        case 1:
+          drawScene2_Silks(progress, t);
+          break;
+        case 2:
+          drawScene3_Lehengas(progress, t);
+          break;
+        case 3:
+          drawScene4_Dhamaka(progress, t);
+          break;
+        case 4:
+          drawScene5_Outro(progress, t);
+          break;
+      }
+
+      // Draw Broadcast Overlays (Framing, Vignette, Sparkles)
+      drawVignette();
+      drawSparkleParticles(t);
+    }
+
+    // Scene 1: Dawn & Diya
+    function drawScene1_Dawn(p, t) {
+      // Golden sunrise radial gradient
+      const grad = ctx.createRadialGradient(640, 400, 20, 640, 400, 800);
+      grad.addColorStop(0, "#ffb300");
+      grad.addColorStop(0.3, "#b71c1c");
+      grad.addColorStop(0.8, "#3e0b0b");
+      grad.addColorStop(1, "#0a0302");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1280, 720);
+
+      // Rotating Sacred Rangoli in Background
+      ctx.save();
+      ctx.translate(640, 360);
+      ctx.rotate(t * 0.15);
+      ctx.strokeStyle = "rgba(255, 215, 0, 0.25)";
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 16; i++) {
+        ctx.rotate(Math.PI / 8);
+        ctx.strokeRect(-180, -180, 360, 360);
+      }
+      ctx.restore();
+
+      // Glowing Center Brass Diya
+      const diyaY = 380 - Math.sin(p * Math.PI) * 15;
+      drawGrandDiya(640, diyaY, 1.3);
+
+      // Text Overlays
+      ctx.save();
+      ctx.textAlign = "center";
+      
+      // Top Tag
+      ctx.fillStyle = "#fef08a";
+      ctx.font = "bold 20px serif";
+      ctx.letterSpacing = "6px";
+      ctx.fillText("✦ UMA'S FASHION & BOUTIQUE ✦", 640, 140);
+
+      // Main Cinematic Headline
+      ctx.font = "900 52px serif";
+      const headlineGrad = ctx.createLinearGradient(300, 0, 980, 0);
+      headlineGrad.addColorStop(0, "#ffffff");
+      headlineGrad.addColorStop(0.5, "#fde047");
+      headlineGrad.addColorStop(1, "#f59e0b");
+      ctx.fillStyle = headlineGrad;
+      ctx.shadowColor = "rgba(251, 191, 36, 0.8)";
+      ctx.shadowBlur = 25;
+      ctx.fillText("Illuminate Your Celebrations", 640, 210);
+
+      // Tamil Callout
+      ctx.font = "italic 26px sans-serif";
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#fef3c7";
+      ctx.fillText("பாரம்பரியத்தின் நேர்த்தி • தீபாவளி சிறப்பு தொகுப்பு 2026", 640, 580);
+
+      ctx.restore();
+    }
+
+    // Scene 2: Royal Silk Sarees
+    function drawScene2_Silks(p, t) {
+      // Rich Royal Crimson & Gold Zari Theme
+      const grad = ctx.createLinearGradient(0, 0, 1280, 720);
+      grad.addColorStop(0, "#5b0606");
+      grad.addColorStop(0.5, "#881337");
+      grad.addColorStop(1, "#1c0404");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1280, 720);
+
+      // Silk Fabric Flow / Wave Simulation
+      ctx.save();
+      for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, 200 + i * 80);
+        for (let x = 0; x <= 1280; x += 40) {
+          const y = 200 + i * 80 + Math.sin(x * 0.005 + t * 2 + i) * 35;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(1280, 720);
+        ctx.lineTo(0, 720);
+        ctx.closePath();
+        ctx.fillStyle = i % 2 === 0 ? "rgba(185, 28, 28, 0.25)" : "rgba(217, 119, 6, 0.2)";
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Saree Presentation Card (Left Side)
+      ctx.save();
+      ctx.translate(280, 360);
+      ctx.fillStyle = "rgba(20, 8, 4, 0.75)";
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(-180, -200, 360, 400, 24);
+      ctx.fill();
+      ctx.stroke();
+
+      // Saree Illustration / Graphic
+      ctx.font = "80px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("🥻", 0, -50);
+
+      ctx.font = "bold 26px serif";
+      ctx.fillStyle = "#fef08a";
+      ctx.fillText("Pure Kanchipuram", 0, 40);
+
+      ctx.font = "18px sans-serif";
+      ctx.fillStyle = "#fed7aa";
+      ctx.fillText("Bridal Zari & Pure Weaves", 0, 75);
+
+      ctx.font = "bold 20px sans-serif";
+      ctx.fillStyle = "#4ade80";
+      ctx.fillText("✓ 100% Silk Mark Certified", 0, 125);
+      ctx.restore();
+
+      // Right Side Typography
+      ctx.save();
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#fde047";
+      ctx.font = "bold 22px sans-serif";
+      ctx.fillText("✨ THE ROYAL SILK EDIT", 530, 220);
+
+      ctx.font = "900 48px serif";
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "#f59e0b";
+      ctx.shadowBlur = 20;
+      ctx.fillText("Woven With Heritage.", 530, 285);
+      ctx.fillText("Crafted for Royalty.", 530, 345);
+
+      ctx.shadowBlur = 0;
+      ctx.font = "20px sans-serif";
+      ctx.fillStyle = "#fed7aa";
+      ctx.fillText("• Authentic Kanjeevarams with Pure Gold Zari Pallu", 530, 410);
+      ctx.fillText("• Banarasi Brocades & Rich Muhurat Sarees", 530, 450);
+      ctx.fillText("• Available in Divine Temple Red, Peacock Blue & Mango Gold", 530, 490);
+
+      ctx.font = "bold 22px sans-serif";
+      ctx.fillStyle = "#fef08a";
+      ctx.fillText("🏷️ Festive Markdowns: FLAT 25% OFF", 530, 560);
+      ctx.restore();
+    }
+
+    // Scene 3: Royal Lehengas & Designer Edit
+    function drawScene3_Lehengas(p, t) {
+      // Midnight Velvet Navy & Ruby Theme
+      const grad = ctx.createLinearGradient(0, 0, 1280, 720);
+      grad.addColorStop(0, "#0f172a");
+      grad.addColorStop(0.5, "#4c0519");
+      grad.addColorStop(1, "#030712");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1280, 720);
+
+      // Twirling Mandala Animation
+      ctx.save();
+      ctx.translate(640, 360);
+      ctx.rotate(-t * 0.2);
+      ctx.strokeStyle = "rgba(244, 63, 94, 0.25)";
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < 12; i++) {
+        ctx.rotate(Math.PI / 6);
+        ctx.strokeRect(-250, -250, 500, 500);
+      }
+      ctx.restore();
+
+      // Centered Showcase Card
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#f43f5e";
+      ctx.font = "bold 22px sans-serif";
+      ctx.letterSpacing = "4px";
+      ctx.fillText("👗 DIWALI PARTY & MUHURAT EDIT", 640, 140);
+
+      ctx.font = "900 52px serif";
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "#f43f5e";
+      ctx.shadowBlur = 20;
+      ctx.fillText("Designer Lehengas & Festive Kurtis", 640, 215);
+
+      // 3 Card Columns (Lehengas, Kurtis, Fusion Tops)
+      const categories = [
+        { icon: "👗", name: "Velvet Lehengas", desc: "Heavy Zari & Sequins", off: "Up to 30% Off" },
+        { icon: "👘", name: "Chanderi Kurtis", desc: "Fine Gota-Patti & Anarkalis", off: "Flat 20% Off" },
+        { icon: "👚", name: "Festive Fusion", desc: "Contemporary Party Tops", off: "Buy 2 Get 10% Extra" }
+      ];
+
+      categories.forEach((cat, idx) => {
+        const x = 320 + idx * 320;
+        const y = 410;
+        ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+        ctx.strokeStyle = "#fb7185";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(x - 140, y - 140, 280, 260, 20);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "60px sans-serif";
+        ctx.fillText(cat.icon, x, y - 50);
+
+        ctx.font = "bold 22px serif";
+        ctx.fillStyle = "#fef08a";
+        ctx.fillText(cat.name, x, y + 10);
+
+        ctx.font = "14px sans-serif";
+        ctx.fillStyle = "#fda4af";
+        ctx.fillText(cat.desc, x, y + 40);
+
+        ctx.font = "bold 16px sans-serif";
+        ctx.fillStyle = "#38bdf8";
+        ctx.fillText(cat.off, x, y + 80);
+      });
+
+      ctx.restore();
+    }
+
+    // Scene 4: Diwali Dhamaka Offer & Hamper
+    function drawScene4_Dhamaka(p, t) {
+      // Golden Amber Radiance
+      const grad = ctx.createRadialGradient(640, 360, 10, 640, 360, 700);
+      grad.addColorStop(0, "#78350f");
+      grad.addColorStop(0.4, "#451a03");
+      grad.addColorStop(1, "#0a0301");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1280, 720);
+
+      // Shimmering Golden Burst
+      ctx.save();
+      ctx.translate(640, 360);
+      for (let i = 0; i < 24; i++) {
+        ctx.rotate(Math.PI / 12);
+        ctx.strokeStyle = "rgba(251, 191, 36, 0.12)";
+        ctx.lineWidth = 14;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(800, 0);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Huge Offer Banner
+      ctx.save();
+      ctx.textAlign = "center";
+
+      ctx.font = "bold 26px sans-serif";
+      ctx.fillStyle = "#fde047";
+      ctx.letterSpacing = "6px";
+      ctx.fillText("💥 GRAND FESTIVE OFFER 💥", 640, 130);
+
+      // 25% OFF
+      ctx.font = "900 84px serif";
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "#f59e0b";
+      ctx.shadowBlur = 35;
+      ctx.fillText("FLAT 25% OFF", 640, 230);
+
+      ctx.font = "bold 32px sans-serif";
+      ctx.fillStyle = "#fef08a";
+      ctx.shadowBlur = 10;
+      ctx.fillText("ON ALL FESTIVE COLLECTIONS SITE-WIDE", 640, 290);
+
+      // Gift Box Card
+      ctx.fillStyle = "rgba(20, 8, 4, 0.9)";
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(240, 360, 800, 170, 24);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = "70px sans-serif";
+      ctx.fillText("🎁", 340, 465);
+
+      ctx.textAlign = "left";
+      ctx.font = "bold 28px serif";
+      ctx.fillStyle = "#fef08a";
+      ctx.fillText("FREE Festive Hamper & Sweets Box", 420, 425);
+
+      ctx.font = "20px sans-serif";
+      ctx.fillStyle = "#fde68a";
+      ctx.fillText("Guaranteed on all orders over ₹1,499! • No Coupon Required", 420, 465);
+
+      ctx.font = "bold 18px sans-serif";
+      ctx.fillStyle = "#4ade80";
+      ctx.fillText("⚡ Direct Instant Markdown applied at Checkout", 420, 500);
+
+      ctx.restore();
+    }
+
+    // Scene 5: Outro & Call to Action
+    function drawScene5_Outro(p, t) {
+      // Midnight Luxury Black & Gold Gradient
+      const grad = ctx.createLinearGradient(0, 0, 1280, 720);
+      grad.addColorStop(0, "#1c0a00");
+      grad.addColorStop(0.5, "#2a0f00");
+      grad.addColorStop(1, "#0a0300");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1280, 720);
+
+      // Center Brand Crest & Diya
+      drawGrandDiya(640, 240, 1.4);
+
+      ctx.save();
+      ctx.textAlign = "center";
+
+      // Brand Name
+      ctx.font = "900 58px serif";
+      ctx.fillStyle = "#fde047";
+      ctx.shadowColor = "#f59e0b";
+      ctx.shadowBlur = 30;
+      ctx.fillText("Uma's Fashion & Boutique", 640, 370);
+
+      ctx.shadowBlur = 0;
+      ctx.font = "bold 20px sans-serif";
+      ctx.letterSpacing = "6px";
+      ctx.fillStyle = "#fed7aa";
+      ctx.fillText("WHERE HERITAGE MEETS HAUTE COUTURE", 640, 415);
+
+      // Shop URL Button
+      ctx.fillStyle = "#f59e0b";
+      ctx.beginPath();
+      ctx.roundRect(380, 460, 520, 75, 40);
+      ctx.fill();
+
+      ctx.font = "900 28px sans-serif";
+      ctx.fillStyle = "#0c0a09";
+      ctx.fillText("🛍️ SHOP ONLINE NOW", 640, 510);
+
+      // Trust Footer
+      ctx.font = "bold 20px sans-serif";
+      ctx.fillStyle = "#fef08a";
+      ctx.fillText("⚡ Guaranteed Pre-Diwali Express Delivery Across India", 640, 600);
+
+      ctx.font = "16px sans-serif";
+      ctx.fillStyle = "#fed7aa";
+      ctx.fillText("தீபாவளி திருநாள் நல்வாழ்த்துக்கள் • Happy Deepavali 2026", 640, 635);
+
+      ctx.restore();
+    }
+
+    // Helper: Draw Grand Traditional Diya
+    function drawGrandDiya(x, y, scale = 1.0) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+
+      // Flame Halo Glow
+      const haloGrad = ctx.createRadialGradient(0, -35, 5, 0, -35, 75);
+      haloGrad.addColorStop(0, "rgba(255, 235, 59, 0.9)");
+      haloGrad.addColorStop(0.4, "rgba(255, 152, 0, 0.6)");
+      haloGrad.addColorStop(1, "rgba(255, 87, 34, 0)");
+      ctx.fillStyle = haloGrad;
+      ctx.beginPath();
+      ctx.arc(0, -35, 75, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Flame Shape
+      ctx.fillStyle = "#fff59d";
+      ctx.beginPath();
+      ctx.moveTo(0, -70);
+      ctx.bezierCurveTo(20, -45, 18, -15, 0, -10);
+      ctx.bezierCurveTo(-18, -15, -20, -45, 0, -70);
+      ctx.fill();
+
+      // Brass Diya Body
+      ctx.fillStyle = "#b45309";
+      ctx.strokeStyle = "#fbbf24";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-60, -10);
+      ctx.bezierCurveTo(-50, 35, 50, 35, 60, -10);
+      ctx.bezierCurveTo(40, -5, -40, -5, -60, -10);
+      ctx.fill();
+      ctx.stroke();
+
+      // Brass Stand
+      ctx.fillStyle = "#78350f";
+      ctx.beginPath();
+      ctx.moveTo(-25, 30);
+      ctx.lineTo(25, 30);
+      ctx.lineTo(35, 45);
+      ctx.lineTo(-35, 45);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Helper: Screen Vignette
+    function drawVignette() {
+      const grad = ctx.createRadialGradient(640, 360, 450, 640, 360, 750);
+      grad.addColorStop(0, "rgba(0,0,0,0)");
+      grad.addColorStop(1, "rgba(0,0,0,0.75)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1280, 720);
+    }
+
+    // Helper: Golden Sparkle Particles
+    const sparkles = Array.from({ length: 45 }, () => ({
+      x: Math.random() * 1280,
+      y: Math.random() * 720,
+      size: Math.random() * 3 + 1,
+      speed: Math.random() * 0.8 + 0.3
+    }));
+
+    function drawSparkleParticles(t) {
+      ctx.fillStyle = "rgba(255, 235, 59, 0.7)";
+      sparkles.forEach((s, idx) => {
+        s.y -= s.speed;
+        if (s.y < 0) s.y = 720;
+        const pulse = Math.sin(t * 3 + idx) * 1.5;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, Math.max(0.5, s.size + pulse), 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    // ---------------- Playback Loop ----------------
+    function loop(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const delta = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      if (isPlaying) {
+        currentTime += delta;
+        if (currentTime >= DURATION) {
+          currentTime = DURATION;
+          pauseVideo();
+        }
+        scrubber.value = currentTime;
+        updateTimerDisplay();
+        bgmEngine.triggerFestiveBeats(currentTime);
+        checkVoiceover(currentTime);
+      }
+
+      drawScene(currentTime);
+
+      if (isPlaying) {
+        animId = requestAnimationFrame(loop);
+      }
+    }
+
+    function togglePlay() {
+      if (isPlaying) {
+        pauseVideo();
+      } else {
+        if (currentTime >= DURATION) currentTime = 0;
+        playVideo();
+      }
+    }
+
+    function playVideo() {
+      isPlaying = true;
+      playIcon.textContent = "⏸ Pause";
+      lastTimestamp = 0;
+      animId = requestAnimationFrame(loop);
+    }
+
+    function pauseVideo() {
+      isPlaying = false;
+      playIcon.textContent = "▶ Play Ad";
+      if (animId) cancelAnimationFrame(animId);
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+
+    function restartVideo() {
+      pauseVideo();
+      currentTime = 0;
+      lastSpokenScene = -1;
+      scrubber.value = 0;
+      updateTimerDisplay();
+      drawScene(0);
+      playVideo();
+    }
+
+    function seekVideo(val) {
+      currentTime = parseFloat(val);
+      lastSpokenScene = -1;
+      updateTimerDisplay();
+      drawScene(currentTime);
+    }
+
+    function jumpTo(sec) {
+      seekVideo(sec);
+      scrubber.value = sec;
+      if (!isPlaying) playVideo();
+    }
+
+    function updateTimerDisplay() {
+      const cur = Math.floor(currentTime);
+      const curSec = String(cur % 60).padStart(2, "0");
+      const curMin = String(Math.floor(cur / 60)).padStart(2, "0");
+      timeDisplay.textContent = `${curMin}:${curSec} / 00:30`;
+    }
+
+    // ---------------- Video Recording & Download (.webm / .mp4) ----------------
+    function toggleRecordVideo() {
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    }
+
+    function startRecording() {
+      isRecording = true;
+      recordedChunks = [];
+      recordBtn.innerHTML = "<span>⏹ Recording (Please Wait)...</span>";
+      recordBtn.classList.replace("from-red-600", "from-yellow-600");
+      recordBtn.classList.replace("to-rose-600", "to-amber-600");
+
+      restartVideo();
+
+      try {
+        const stream = canvas.captureStream(30); // 30 FPS HD video capture
+        const options = { mimeType: "video/webm; codecs=vp9" };
+        mediaRecorder = new MediaRecorder(stream, options);
+      } catch (e) {
+        const stream = canvas.captureStream(30);
+        mediaRecorder = new MediaRecorder(stream);
+      }
+
+      mediaRecorder.ondataavailable = function(e) {
+        if (e.data.size > 0) recordedChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = function() {
+        const blob = new Blob(recordedChunks, { type: "video/webm" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Umas_Boutique_Diwali_TV_Commercial_30s.webm";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        recordBtn.innerHTML = "<span>🎬 Record & Download Video</span>";
+        recordBtn.classList.replace("from-yellow-600", "from-red-600");
+        recordBtn.classList.replace("to-amber-600", "to-rose-600");
+        isRecording = false;
+        alert("🎉 Video Recording Complete! File downloaded: Umas_Boutique_Diwali_TV_Commercial_30s.webm");
+      };
+
+      mediaRecorder.start();
+
+      // Automatically stop recording when ad finishes
+      const checkEnd = setInterval(() => {
+        if (currentTime >= DURATION || !isRecording) {
+          clearInterval(checkEnd);
+          if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+          }
+        }
+      }, 500);
+    }
+
+    // Initial first-frame render
+    drawScene(0);
+  </script>
+</body>
+</html>
