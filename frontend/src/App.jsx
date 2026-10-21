@@ -1,10 +1,7 @@
 import ImageCropModal from "./components/ImageCropModal";
-import { DiwaliCrackerCanvas } from "./components/diwali/DiwaliCrackerCanvas";
-import { DiwaliFestiveDock } from "./components/diwali/DiwaliFestiveDock";
 import { DiwaliHeroSection } from "./components/diwali/DiwaliHeroSection";
 import { DiwaliSpotlightSection } from "./components/diwali/DiwaliSpotlightSection";
 import { DiwaliInteractiveDiya } from "./components/diwali/DiwaliInteractiveDiya";
-import { diwaliAudio } from "./components/diwali/DiwaliAudio";
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   ShoppingBag, Search, User, X, Plus, Minus, Trash2, ChevronRight, ChevronLeft,
@@ -272,25 +269,7 @@ function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, newL
         </nav>
 
         <div className="flex items-center gap-1.5 md:gap-3">
-          {/* Diwali Festival Mode Switcher */}
-          <button
-            onClick={() => {
-              const next = seasonalTheme === "diwali" ? "summer" : "diwali";
-              setSeasonalTheme(next);
-              localStorage.setItem("umas:activeTheme", next);
-            }}
-            className={`px-2.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all border cursor-pointer ${
-              seasonalTheme === "diwali"
-                ? "bg-gradient-to-r from-yellow-500 to-amber-600 text-stone-950 border-yellow-300 shadow-md shadow-amber-500/30"
-                : "bg-stone-900 text-amber-300 border-amber-500/30 hover:border-amber-400"
-            }`}
-            title="Toggle Diwali Festive Theme"
-          >
-            <span className="text-sm">🪔</span>
-            <span className="hidden sm:inline">{seasonalTheme === "diwali" ? "Diwali Live" : "Diwali Mode"}</span>
-          </button>
-
-          {/* New Product Launch Notification Bell */}
+                    {/* New Product Launch Notification Bell */}
           <button
             onClick={onOpenNewLaunches}
             className="relative p-2 text-stone-300 hover:text-amber-300 transition-colors"
@@ -944,46 +923,11 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
     return sessionStorage.getItem("umas:diwali_banner_dismissed") === "true";
   });
 
-  const crackerRef = useRef(null);
-  const [autoSkyShots, setAutoSkyShots] = useState(true);
-  const [sparklerActive, setSparklerActive] = useState(false);
-
-  // Allow clicking anywhere to shoot cracker when in diwali theme
-  const handlePageClick = (e) => {
-    if (seasonalTheme !== "diwali" || !crackerRef.current) return;
-    const target = e.target;
-    if (target.closest("button") || target.closest("a") || target.closest("input") || target.closest("select") || target.closest("[role='button']")) {
-      return;
-    }
-    crackerRef.current.launchSkyShot(e.clientX, e.clientY);
-  };
-
+  
   return (
     <div
-      onClick={handlePageClick}
       className={`transition-colors duration-500 relative ${activeTheme.bgClass}`}
     >
-      {/* Diwali Cracker Canvas & Interactive Festive Dock */}
-      {seasonalTheme === "diwali" && (
-        <>
-          <DiwaliCrackerCanvas
-            ref={crackerRef}
-            autoLaunch={autoSkyShots}
-            sparklerActive={sparklerActive}
-            allowClickToBurst={false}
-          />
-          <DiwaliFestiveDock
-            onLaunchSkyShot={() => crackerRef.current?.launchSkyShot()}
-            onLaunchAnar={() => crackerRef.current?.launchAnar()}
-            onLaunchChakra={() => crackerRef.current?.launchChakra()}
-            onLaunchLadi={() => crackerRef.current?.launchLadi()}
-            autoLaunch={autoSkyShots}
-            setAutoLaunch={setAutoSkyShots}
-            sparklerActive={sparklerActive}
-            setSparklerActive={setSparklerActive}
-          />
-        </>
-      )}
 
       {/* Diwali Full-Screen Celebration Modal (Only on first site open or when clicked) */}
       {seasonalTheme === "diwali" && showDiwaliIntro && (
@@ -1038,7 +982,6 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
         <DiwaliHeroSection
           onShopSarees={() => { setCategoryFilter("Sarees"); setView("shop"); }}
           onShopAll={() => { setCategoryFilter(null); setView("shop"); }}
-          onLaunchSkyShot={() => crackerRef.current?.launchSkyShot()}
         />
       ) : (
         <section className={`relative overflow-hidden py-16 md:py-24 px-6 border-b transition-colors duration-500 ${activeTheme.heroClass}`}>
@@ -1085,7 +1028,6 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
           />
           <div className="py-8 px-4 md:px-6">
             <DiwaliInteractiveDiya
-              onLightUp={() => crackerRef.current?.launchSkyShot()}
             />
           </div>
         </>
