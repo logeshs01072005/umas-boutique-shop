@@ -1,34 +1,13 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowRight, Gift } from "lucide-react";
 
-// Calculate remaining time against a real target timestamp
-function getFlashSaleTarget() {
-  const STORAGE_KEY = "umas:diwali_flash_sale_end";
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = parseInt(stored, 10);
-      // If valid future timestamp, keep it so it persists across reloads & page navigations
-      if (!isNaN(parsed) && parsed > Date.now()) {
-        return parsed;
-      }
-    }
-  } catch (e) {
-    // ignore
-  }
+// ✅ Fixed Diwali 2026 Pre-Sale End: 7 Nov 2026, 23:59:59 IST (UTC+5:30)
+// IST = UTC+5:30, so 7 Nov 23:59:59 IST = 7 Nov 18:29:59 UTC
+const SALE_END_TIMESTAMP = new Date("2026-11-07T18:29:59Z").getTime();
 
-  // Default to 15 days timeline from first visit, synchronized with actual real clock
-  const newTarget = Date.now() + 15 * 24 * 60 * 60 * 1000;
-  try {
-    localStorage.setItem(STORAGE_KEY, String(newTarget));
-  } catch (e) {
-    // ignore
-  }
-  return newTarget;
-}
-
-function calculateRemaining(targetTimestamp) {
-  const diff = Math.max(0, targetTimestamp - Date.now());
+function calculateRemaining() {
+  const diff = SALE_END_TIMESTAMP - Date.now();
+  if (diff <= 0) return null; // Sale ended
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -39,25 +18,28 @@ function calculateRemaining(targetTimestamp) {
 export function DiwaliHeroSection({
   onShopSarees,
   onShopAll,
-  saleEndDate,
 }) {
-  const targetTime = useMemo(() => {
-    if (saleEndDate) {
-      const parsed = new Date(saleEndDate).getTime();
-      if (!isNaN(parsed) && parsed > Date.now()) return parsed;
-    }
-    return getFlashSaleTarget();
-  }, [saleEndDate]);
-
-  const [timeLeft, setTimeLeft] = useState(() => calculateRemaining(targetTime));
+  const [timeLeft, setTimeLeft] = useState(() => calculateRemaining());
+  const [saleEnded, setSaleEnded] = useState(() => calculateRemaining() === null);
 
   useEffect(() => {
-    setTimeLeft(calculateRemaining(targetTime));
+    // If already ended on mount, stop immediately
+    if (calculateRemaining() === null) {
+      setSaleEnded(true);
+      return;
+    }
     const timer = setInterval(() => {
-      setTimeLeft(calculateRemaining(targetTime));
+      const remaining = calculateRemaining();
+      if (remaining === null) {
+        setSaleEnded(true);
+        setTimeLeft(null);
+        clearInterval(timer);
+      } else {
+        setTimeLeft(remaining);
+      }
     }, 1000);
     return () => clearInterval(timer);
-  }, [targetTime]);
+  }, []);
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-[#1a0505] via-[#2a0b0b] to-stone-950 border-b border-amber-500/40 text-stone-100 selection:bg-amber-500 selection:text-stone-950">
@@ -179,7 +161,7 @@ export function DiwaliHeroSection({
           Welcome the Festival of Lights draped in eternal grace. Explore authentic Kanchipuram bridal silks, Banarasi brocades, royal designer lehengas, and festive kurtis woven for auspicious celebrations.
         </p>
 
-        {/* 15 Days Festive Flash Sale Timer & Offer Card */}
+        {/* Diwali Flash Sale Timer & Offer Card */}
         <div className="mt-7 sm:mt-9 max-w-3xl mx-auto p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-stone-950/95 via-[#2b0c0c]/90 to-stone-950/95 border-2 border-amber-400/60 shadow-2xl shadow-amber-500/20 backdrop-blur-md">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-5">
             {/* Offer Details */}
@@ -196,31 +178,51 @@ export function DiwaliHeroSection({
               </div>
             </div>
 
-            {/* 15 Days Live Flash Countdown */}
+            {/* Countdown or Sale Ended */}
             <div className="text-center md:text-right w-full md:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-amber-500/20">
-              <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest text-amber-300 block mb-1.5">
-                ⏳ Festive Flash Sale Ends In:
-              </span>
-              <div className="flex items-center justify-center md:justify-end gap-1.5 sm:gap-2">
-                {[
-                  { label: "Days", val: timeLeft.days },
-                  { label: "Hours", val: timeLeft.hours },
-                  { label: "Mins", val: timeLeft.minutes },
-                  { label: "Secs", val: timeLeft.seconds },
-                ].map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="flex flex-col items-center justify-center w-12 sm:w-14 h-14 sm:h-16 rounded-xl bg-stone-950 border border-amber-500/50 shadow-inner"
-                  >
-                    <span className="font-mono text-amber-300 font-bold text-base sm:text-lg leading-none">
-                      {String(item.val).padStart(2, "0")}
-                    </span>
-                    <span className="text-[9px] uppercase tracking-wider text-stone-400 mt-1">
-                      {item.label}
+              {saleEnded ? (
+                /* Sale Ended State */
+                <div className="flex flex-col items-center md:items-end gap-1.5">
+                  <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest text-rose-400 block">
+                    🛑 Festive Flash Sale Has Ended
+                  </span>
+                  <div className="px-4 py-2 rounded-xl bg-rose-950/60 border border-rose-500/40">
+                    <span className="text-rose-300 font-bold text-xs sm:text-sm tracking-wide">
+                      Sale closed on 7 Nov 2026 • Thank you! 🪔
                     </span>
                   </div>
-                ))}
-              </div>
+                </div>
+              ) : (
+                /* Live Countdown */
+                <>
+                  <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest text-amber-300 block mb-1.5">
+                    ⏳ Festive Flash Sale Ends In:
+                  </span>
+                  <div className="flex items-center justify-center md:justify-end gap-1.5 sm:gap-2">
+                    {[
+                      { label: "Days", val: timeLeft?.days ?? 0 },
+                      { label: "Hours", val: timeLeft?.hours ?? 0 },
+                      { label: "Mins", val: timeLeft?.minutes ?? 0 },
+                      { label: "Secs", val: timeLeft?.seconds ?? 0 },
+                    ].map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex flex-col items-center justify-center w-12 sm:w-14 h-14 sm:h-16 rounded-xl bg-stone-950 border border-amber-500/50 shadow-inner"
+                      >
+                        <span className="font-mono text-amber-300 font-bold text-base sm:text-lg leading-none">
+                          {String(item.val).padStart(2, "0")}
+                        </span>
+                        <span className="text-[9px] uppercase tracking-wider text-stone-400 mt-1">
+                          {item.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-amber-400/70 mt-1.5 tracking-wider">
+                    🗓️ Sale ends 7 Nov 2026 midnight • Before Diwali!
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
