@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowRight, Sparkles, Clock, Compass, ShieldCheck, Truck, RefreshCw, Star } from "lucide-react";
+import { ArrowRight, Sparkles, Clock, Gift, Star } from "lucide-react";
 
 // Countdown to New Year 2027
 const TARGET_NEW_YEAR = new Date("2027-01-01T00:00:00+05:30").getTime();
@@ -25,132 +25,216 @@ export function ChristmasNewYearHero({ onShopSarees, onShopAll }) {
   }, []);
 
   return (
-    <div className="relative overflow-hidden bg-[#070709] text-stone-100 border-b border-amber-500/20 selection:bg-amber-400 selection:text-stone-950">
-      {/* Subtle Luxury Radial Glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-amber-500/10 via-rose-500/5 to-transparent blur-[140px]" />
+    <div className="relative overflow-hidden bg-gradient-to-b from-[#1c0812] via-[#0d1620] to-[#08120d] text-stone-100 border-b border-amber-400/40 selection:bg-rose-500 selection:text-white">
+      {/* Festive Holiday Lighting Backdrops */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-rose-600/30 to-pink-600/10 blur-[130px]" />
+        <div className="absolute top-1/4 -right-32 w-[550px] h-[550px] rounded-full bg-gradient-to-bl from-amber-400/25 via-yellow-500/10 to-transparent blur-[140px]" />
+        <div className="absolute -bottom-32 left-1/3 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-emerald-600/25 to-teal-500/10 blur-[130px]" />
       </div>
 
-      {/* Top Editorial Ribbon */}
-      <div className="w-full relative z-20 py-2 sm:py-2.5 bg-gradient-to-r from-stone-950 via-[#18151c] to-stone-950 border-b border-amber-500/20">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-8 text-xs font-serif tracking-widest text-amber-200/90 select-none">
-          <span className="hidden md:inline text-[11px] uppercase tracking-[0.25em] text-stone-400">
-            Hautes Fêtes • Winter 2026/27
-          </span>
-          <div className="mx-auto md:mx-0 flex items-center gap-2 text-[11px] sm:text-xs tracking-[0.2em] uppercase font-sans text-amber-300 font-medium">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-            <span className="truncate max-w-[320px] sm:max-w-none">
-              Christmas &amp; New Year Gala • Privileged 25% Courtesy Markdowns
+      {/* Decorative Hanging Christmas Baubles / Ornaments on Desktop & Laptops */}
+      <div className="absolute top-8 left-4 sm:left-8 md:left-12 lg:left-16 z-10 pointer-events-none hidden md:block opacity-90 animate-sway-left origin-top">
+        <svg width="65" height="145" viewBox="0 0 65 145" fill="none">
+          <line x1="32" y1="0" x2="32" y2="40" stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="3 3" />
+          <circle cx="32" cy="72" r="30" fill="url(#ornamentRed)" stroke="#FBBF24" strokeWidth="2" />
+          <ellipse cx="32" cy="72" rx="20" ry="10" fill="#FDE047" opacity="0.3" />
+          <circle cx="32" cy="72" r="8" fill="#FFFBEB" opacity="0.9" />
+          <rect x="27" y="38" width="10" height="6" rx="2" fill="#F59E0B" />
+          <line x1="20" y1="102" x2="16" y2="140" stroke="#F59E0B" strokeWidth="2" strokeDasharray="3 3" />
+          <line x1="32" y1="102" x2="32" y2="145" stroke="#EF4444" strokeWidth="2" />
+          <line x1="44" y1="102" x2="48" y2="140" stroke="#F59E0B" strokeWidth="2" strokeDasharray="3 3" />
+          <defs>
+            <linearGradient id="ornamentRed" x1="10" y1="50" x2="55" y2="105" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#EF4444" />
+              <stop offset="0.6" stopColor="#B91C1C" />
+              <stop offset="1" stopColor="#450A0A" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div className="absolute top-8 right-4 sm:right-8 md:right-12 lg:right-16 z-10 pointer-events-none hidden md:block opacity-90 animate-sway-right origin-top">
+        <svg width="65" height="145" viewBox="0 0 65 145" fill="none">
+          <line x1="32" y1="0" x2="32" y2="40" stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="3 3" />
+          <circle cx="32" cy="72" r="30" fill="url(#ornamentGold)" stroke="#FEF08A" strokeWidth="2" />
+          {/* Star motif */}
+          <polygon points="32,52 35,66 48,72 35,78 32,92 29,78 16,72 29,66" fill="#FFFBEB" />
+          <rect x="27" y="38" width="10" height="6" rx="2" fill="#D97706" />
+          <line x1="20" y1="102" x2="18" y2="140" stroke="#FBBF24" strokeWidth="2" strokeDasharray="3 3" />
+          <line x1="32" y1="102" x2="32" y2="145" stroke="#F59E0B" strokeWidth="2" />
+          <line x1="44" y1="102" x2="46" y2="140" stroke="#FBBF24" strokeWidth="2" strokeDasharray="3 3" />
+          <defs>
+            <linearGradient id="ornamentGold" x1="10" y1="50" x2="55" y2="105" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#FEF08A" />
+              <stop offset="0.5" stopColor="#F59E0B" />
+              <stop offset="1" stopColor="#78350F" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      {/* Top Auspicious Festive Ribbon */}
+      <div className="w-full relative z-20 py-2 sm:py-2.5 bg-gradient-to-r from-[#7f1d1d]/90 via-[#0f2e22]/95 to-[#78350f]/90 border-b border-amber-400/40 backdrop-blur-md shadow-md">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-3 sm:px-6 text-xs font-serif tracking-widest text-amber-200 select-none overflow-hidden">
+          <span className="hidden lg:inline text-sm">🎄 🎁 ❄️ ✨ 🔔 🍾 🥂</span>
+          <span className="mx-auto lg:mx-0 flex items-center justify-center gap-1.5 sm:gap-2.5 font-sans font-bold uppercase text-[10px] sm:text-xs md:text-sm tracking-[0.16em] text-yellow-300 text-center">
+            <span className="animate-pulse">✨</span>
+            <span className="truncate max-w-[290px] sm:max-w-none">
+              Merry Christmas &amp; Happy New Year 2027 • இனிய கிறிஸ்துமஸ் &amp; புத்தாண்டு நல்வாழ்த்துகள்
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-          </div>
-          <span className="hidden md:inline text-[11px] uppercase tracking-[0.25em] text-stone-400">
-            Kanchipuram • Banaras • Couture
+            <span className="animate-pulse">✨</span>
           </span>
+          <span className="hidden lg:inline text-sm">🥂 🍾 🔔 ✨ ❄️ 🎁 🎄</span>
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-12 sm:pt-16 md:pt-24 pb-14 sm:pb-18 text-center z-10">
+      {/* Hero Main Content */}
+      <section className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-10 sm:py-14 md:py-20 text-center z-10">
         
-        {/* Minimal Luxury Monogram Badge */}
-        <div className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-1.5 rounded-full bg-stone-900/80 border border-amber-400/40 shadow-inner mb-6 sm:mb-8 backdrop-blur-md">
-          <span className="text-amber-400 text-xs font-serif italic">Edition</span>
-          <span className="w-1 h-1 rounded-full bg-amber-400/60" />
-          <span className="text-[10px] sm:text-xs font-sans tracking-[0.25em] uppercase font-bold text-amber-200">
-            Holiday Season &amp; New Year 2027
+        {/* Festive Dual Badge */}
+        <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 rounded-full bg-gradient-to-r from-red-950/90 via-stone-900 to-amber-950/90 border border-amber-400/60 shadow-lg shadow-rose-950/40 mb-4 sm:mb-6">
+          <span className="text-base sm:text-lg animate-bounce">🎄</span>
+          <span className="text-[11px] sm:text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-amber-200">
+            Christmas &amp; New Year Festive Carnival 2027
           </span>
+          <span className="text-base sm:text-lg animate-bounce">🥂</span>
         </div>
 
-        {/* Vogue/High-Fashion Serif Headline */}
-        <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight max-w-4xl mx-auto leading-[1.12] sm:leading-[1.1] text-stone-100">
-          Where Heritage Weaves Meet{" "}
-          <span className="italic font-light bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 bg-clip-text text-transparent">
-            Midnight Celebrations
+        {/* High-Impact Headline with Rich Shimmering Gold & Ruby Red Gradient */}
+        <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight max-w-5xl mx-auto leading-[1.18] sm:leading-[1.15]">
+          A Season of Joy, A Year of Grace:{" "}
+          <span className="bg-gradient-to-r from-yellow-300 via-amber-200 to-rose-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(251,191,36,0.4)]">
+            Royal Silks &amp; Holiday Glamour
           </span>
         </h1>
 
-        {/* Sophisticated Editorial Subtitle */}
-        <p className="mt-5 sm:mt-6 text-stone-300 text-xs sm:text-sm md:text-base lg:text-lg max-w-2xl mx-auto font-light leading-relaxed">
-          From sacred Christmas morning Eucharists in pure zari silks to high-octane 2027 countdown galas in hand-embroidered velvet lehengas. Draped for distinction.
+        {/* Subtitle */}
+        <p className="mt-4 sm:mt-5 text-stone-200 text-xs sm:text-sm md:text-base lg:text-lg max-w-3xl mx-auto font-light leading-relaxed px-2">
+          Celebrate Christmas mornings in authentic Kanchipuram wedding silks, and step into New Year 2027 countdown parties in twirling designer velvet lehengas and cocktail couture.
         </p>
 
-        {/* High-End Countdown Strip - Architectural & Clean */}
-        <div className="mt-8 sm:mt-10 max-w-2xl mx-auto p-4 sm:p-5 rounded-2xl bg-stone-900/60 border border-amber-500/30 backdrop-blur-md">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-            <div className="text-center sm:text-left">
-              <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-amber-400/90 block">
-                Countdown to 2027
-              </span>
-              <span className="text-xs text-stone-300 font-light mt-0.5 block">
-                Complimentary luxury gift box on orders &gt; ₹1,499
-              </span>
+        {/* Live New Year 2027 Countdown & Automatic Markdowns Box */}
+        <div className="mt-7 sm:mt-9 max-w-3xl mx-auto p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-stone-950/95 via-[#1a0f16]/95 to-stone-950/95 border-2 border-amber-400/60 shadow-2xl shadow-rose-950/40 backdrop-blur-md">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-5">
+            {/* Offer Details */}
+            <div className="text-center md:text-left w-full md:w-auto">
+              <div className="flex items-center justify-center md:justify-start gap-1.5 text-xs sm:text-sm font-bold text-amber-300 uppercase tracking-widest">
+                <Gift size={16} className="text-rose-400" />
+                <span>Christmas &amp; New Year Gala • Flat 25% Off Storewide</span>
+              </div>
+              <div className="text-stone-100 text-xs sm:text-sm font-semibold mt-1.5 flex items-center justify-center md:justify-start gap-1.5">
+                <span>🎁 Free Year-End Luxury Gift Box on orders above ₹1,499</span>
+              </div>
+              <div className="text-amber-400/90 text-[11px] sm:text-xs mt-1 font-medium">
+                Automatic Festive Discount applied at checkout — no coupons needed!
+              </div>
             </div>
 
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              {[
-                { label: "Days", val: timeLeft.days },
-                { label: "Hours", val: timeLeft.hours },
-                { label: "Mins", val: timeLeft.minutes },
-                { label: "Secs", val: timeLeft.seconds },
-              ].map((item, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col items-center justify-center w-12 sm:w-14 h-13 sm:h-14 rounded-xl bg-stone-950/90 border border-stone-800"
-                >
-                  <span className="font-mono text-amber-300 font-semibold text-base sm:text-lg leading-none">
-                    {String(item.val).padStart(2, "0")}
-                  </span>
-                  <span className="text-[8px] sm:text-[9px] uppercase tracking-wider text-stone-400 mt-1 font-sans">
-                    {item.label}
-                  </span>
-                </div>
-              ))}
+            {/* Countdown Display */}
+            <div className="text-center md:text-right w-full md:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-amber-500/20">
+              <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest text-amber-300 block mb-1.5 flex items-center justify-center md:justify-end gap-1">
+                <Clock size={13} className="text-amber-400" />
+                <span>Countdown to New Year 2027:</span>
+              </span>
+              <div className="flex items-center justify-center md:justify-end gap-1.5 sm:gap-2">
+                {[
+                  { label: "Days", val: timeLeft.days },
+                  { label: "Hours", val: timeLeft.hours },
+                  { label: "Mins", val: timeLeft.minutes },
+                  { label: "Secs", val: timeLeft.seconds },
+                ].map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="flex flex-col items-center justify-center w-12 sm:w-14 h-14 sm:h-16 rounded-xl bg-stone-950/90 border border-amber-500/50 shadow-inner"
+                  >
+                    <span className="font-mono text-amber-300 font-bold text-base sm:text-lg leading-none">
+                      {String(item.val).padStart(2, "0")}
+                    </span>
+                    <span className="text-[9px] uppercase tracking-wider text-stone-400 mt-1">
+                      {item.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10px] text-amber-300/80 mt-1.5 tracking-wider">
+                🎅 Christmas Eve &amp; New Year Deals Active!
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Luxury CTA Action Buttons */}
-        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 w-full max-w-md sm:max-w-none mx-auto">
+        {/* Action Buttons - Fully Optimized for Touch Devices & Mobile */}
+        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-5 w-full max-w-md sm:max-w-none mx-auto">
           <button
             onClick={onShopSarees}
-            className="w-full sm:w-auto px-8 sm:px-10 py-3.5 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-stone-950 font-bold text-xs sm:text-sm tracking-[0.15em] uppercase shadow-lg shadow-amber-500/20 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2.5"
+            className="w-full sm:w-auto px-7 sm:px-9 py-3.5 rounded-full bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 hover:from-red-500 hover:to-amber-400 text-white font-bold text-sm sm:text-base tracking-wide shadow-xl shadow-rose-600/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
           >
-            <span>Explore Bridal &amp; Silks</span>
-            <ArrowRight size={16} />
+            <span>Shop Christmas Sarees 🥻</span>
+            <ArrowRight size={18} />
           </button>
 
           <button
             onClick={onShopAll}
-            className="w-full sm:w-auto px-8 sm:px-10 py-3.5 rounded-full bg-stone-900/80 hover:bg-stone-800 text-stone-200 hover:text-amber-300 font-medium text-xs sm:text-sm tracking-[0.15em] uppercase border border-stone-700 hover:border-amber-400/50 transition-all flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-7 sm:px-9 py-3.5 rounded-full bg-stone-900/90 hover:bg-stone-800 text-amber-300 font-semibold text-sm sm:text-base tracking-wide border-2 border-amber-400/50 shadow-lg transition-all flex items-center justify-center gap-2"
           >
-            <span>Party &amp; Lehengas</span>
+            <span>New Year Party Collection ✨</span>
           </button>
         </div>
 
-        {/* Minimalist Trust Features */}
-        <div className="mt-12 sm:mt-16 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto pt-6 sm:pt-8 border-t border-stone-800/80 text-left">
-          <div className="p-3 sm:p-4 rounded-xl bg-stone-900/40 border border-stone-800/80">
-            <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-amber-400/90 block">Silk Mark</span>
-            <span className="text-xs text-stone-200 font-medium mt-1 block">Certified 100% Pure Zari</span>
+        {/* Trust Badges - Optimized Grid for Mobile, Tablet, Laptop, and Desktop */}
+        <div className="mt-12 sm:mt-16 grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 max-w-4xl mx-auto pt-6 sm:pt-8 border-t border-amber-500/20 text-left">
+          <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-stone-900/60 border border-amber-500/30 shadow-md">
+            <span className="text-2xl sm:text-3xl shrink-0">🎄</span>
+            <div className="min-w-0">
+              <div className="text-xs sm:text-sm font-bold text-amber-300 truncate">Holiday Certified</div>
+              <div className="text-[10px] sm:text-xs text-stone-300 truncate">100% Authentic Silks</div>
+            </div>
           </div>
 
-          <div className="p-3 sm:p-4 rounded-xl bg-stone-900/40 border border-stone-800/80">
-            <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-amber-400/90 block">Express Dispatch</span>
-            <span className="text-xs text-stone-200 font-medium mt-1 block">Guaranteed Pre-Holiday</span>
+          <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-stone-900/60 border border-amber-500/30 shadow-md">
+            <span className="text-2xl sm:text-3xl shrink-0">⚡</span>
+            <div className="min-w-0">
+              <div className="text-xs sm:text-sm font-bold text-amber-300 truncate">Express Delivery</div>
+              <div className="text-[10px] sm:text-xs text-stone-300 truncate">Guaranteed Pre-Xmas</div>
+            </div>
           </div>
 
-          <div className="p-3 sm:p-4 rounded-xl bg-stone-900/40 border border-stone-800/80">
-            <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-amber-400/90 block">Atelier Packaging</span>
-            <span className="text-xs text-stone-200 font-medium mt-1 block">Signature Gift Box</span>
+          <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-stone-900/60 border border-amber-500/30 shadow-md">
+            <span className="text-2xl sm:text-3xl shrink-0">🎁</span>
+            <div className="min-w-0">
+              <div className="text-xs sm:text-sm font-bold text-amber-300 truncate">Free Holiday Box</div>
+              <div className="text-[10px] sm:text-xs text-stone-300 truncate">On Orders &gt; ₹1,499</div>
+            </div>
           </div>
 
-          <div className="p-3 sm:p-4 rounded-xl bg-stone-900/40 border border-stone-800/80">
-            <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-amber-400/90 block">Verified Checkout</span>
-            <span className="text-xs text-stone-200 font-medium mt-1 block">Zero Convenience Surcharge</span>
+          <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-stone-900/60 border border-amber-500/30 shadow-md">
+            <span className="text-2xl sm:text-3xl shrink-0">💳</span>
+            <div className="min-w-0">
+              <div className="text-xs sm:text-sm font-bold text-amber-300 truncate">Instant Safe UPI</div>
+              <div className="text-[10px] sm:text-xs text-stone-300 truncate">Zero Extra Charges</div>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Sway animation keyframes */}
+      <style>{`
+        @keyframes swayLeft {
+          0%, 100% { transform: rotate(-5deg); }
+          50% { transform: rotate(5deg); }
+        }
+        @keyframes swayRight {
+          0%, 100% { transform: rotate(5deg); }
+          50% { transform: rotate(-5deg); }
+        }
+        .animate-sway-left {
+          animation: swayLeft 4s ease-in-out infinite;
+        }
+        .animate-sway-right {
+          animation: swayRight 4.5s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }
