@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { ArrowRight, Sparkles, Gift, Clock, Star } from "lucide-react";
+import { ArrowRight, Sparkles, Gift, Clock, Flame, Send, Check } from "lucide-react";
 
-// Countdown to New Year's Eve / New Year 2027 Celebration
+// Countdown to New Year 2027
 const TARGET_NEW_YEAR = new Date("2027-01-01T00:00:00+05:30").getTime();
 
 function calculateRemaining() {
@@ -16,6 +16,8 @@ function calculateRemaining() {
 
 export function ChristmasNewYearHero({ onShopSarees, onShopAll }) {
   const [timeLeft, setTimeLeft] = useState(() => calculateRemaining());
+  const [activeTab, setActiveTab] = useState("all"); // 'all' | 'xmas' | 'newyear'
+  const [revealedGift, setRevealedGift] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -25,29 +27,30 @@ export function ChristmasNewYearHero({ onShopSarees, onShopAll }) {
   }, []);
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-b from-[#0a131f] via-[#0d1d2d] to-[#080d14] border-b border-amber-400/30 text-stone-100 selection:bg-rose-500 selection:text-white">
-      {/* Ambient Winter Magic Glows */}
-      <div className="absolute inset-0 pointer-events-none opacity-40">
-        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-rose-600/20 blur-3xl" />
-        <div className="absolute top-1/4 -right-24 w-96 h-96 rounded-full bg-amber-400/20 blur-3xl" />
-        <div className="absolute -bottom-24 left-1/3 w-96 h-96 rounded-full bg-emerald-600/20 blur-3xl" />
+    <div className="relative overflow-hidden bg-gradient-to-b from-[#090b14] via-[#0f172a] to-[#07090e] border-b border-amber-400/30 text-stone-100 selection:bg-rose-500 selection:text-white">
+      {/* Aurora Borealis & Festive Glow in Background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-rose-600/25 to-pink-500/10 blur-[120px]" />
+        <div className="absolute top-1/4 -right-32 w-[550px] h-[550px] rounded-full bg-gradient-to-bl from-amber-400/20 via-yellow-500/10 to-transparent blur-[130px]" />
+        <div className="absolute -bottom-32 left-1/3 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-emerald-600/20 to-teal-500/10 blur-[120px]" />
       </div>
 
-      {/* Decorative Falling Snow Particles */}
+      {/* Realistic Multi-Layer Falling Snowflakes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden select-none" aria-hidden="true">
         {[
-          { left: "8%", delay: "0s", dur: "7s", size: "text-xs" },
-          { left: "18%", delay: "1.5s", dur: "9s", size: "text-sm" },
-          { left: "28%", delay: "3s", dur: "8s", size: "text-xs" },
-          { left: "42%", delay: "0.8s", dur: "11s", size: "text-base" },
-          { left: "55%", delay: "2.2s", dur: "7.5s", size: "text-xs" },
-          { left: "68%", delay: "4s", dur: "10s", size: "text-sm" },
-          { left: "79%", delay: "1.2s", dur: "8.5s", size: "text-xs" },
-          { left: "91%", delay: "2.8s", dur: "9.5s", size: "text-sm" },
+          { left: "5%", delay: "0s", dur: "7s", char: "❄", size: "text-xs opacity-70" },
+          { left: "15%", delay: "1.8s", dur: "9.5s", char: "✦", size: "text-[10px] text-amber-300 opacity-80" },
+          { left: "25%", delay: "3.2s", dur: "8s", char: "❄", size: "text-sm opacity-60" },
+          { left: "38%", delay: "0.5s", dur: "11s", char: "✨", size: "text-xs opacity-75" },
+          { left: "52%", delay: "2.4s", dur: "7.2s", char: "❄", size: "text-xs opacity-65" },
+          { left: "64%", delay: "4.1s", dur: "10.2s", char: "✦", size: "text-[11px] text-yellow-200 opacity-90" },
+          { left: "76%", delay: "1.1s", dur: "8.7s", char: "❄", size: "text-sm opacity-70" },
+          { left: "88%", delay: "2.9s", dur: "9.8s", char: "✨", size: "text-xs opacity-80" },
+          { left: "96%", delay: "0.2s", dur: "8.1s", char: "❄", size: "text-xs opacity-60" },
         ].map((flake, i) => (
           <span
             key={i}
-            className={`absolute top-[-20px] text-white/50 animate-snowfall ${flake.size}`}
+            className={`absolute top-[-25px] animate-snowfall pointer-events-none ${flake.size}`}
             style={{
               left: flake.left,
               animationDelay: flake.delay,
@@ -56,13 +59,13 @@ export function ChristmasNewYearHero({ onShopSarees, onShopAll }) {
               animationTimingFunction: "linear",
             }}
           >
-            ❄
+            {flake.char}
           </span>
         ))}
       </div>
 
-      {/* Top Auspicious Festive Ribbon */}
-      <div className="w-full relative z-20 py-2 sm:py-2.5 bg-gradient-to-r from-red-950 via-emerald-950 to-amber-950 border-b border-amber-400/30 shadow-md">
+      {/* Top Auspicious Festive Marquee Ribbon */}
+      <div className="w-full relative z-20 py-2 sm:py-2.5 bg-gradient-to-r from-[#7f1d1d]/90 via-[#0f2e22]/95 to-[#78350f]/90 border-b border-amber-400/30 backdrop-blur-md shadow-md">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-3 sm:px-6 text-xs font-serif tracking-widest text-amber-200 select-none overflow-hidden">
           <span className="hidden lg:inline text-sm">🎄 🎁 ❄️ ✨ 🔔 🍾 🥂</span>
           <span className="mx-auto lg:mx-0 flex items-center justify-center gap-1.5 sm:gap-2.5 font-sans font-bold uppercase text-[10px] sm:text-xs md:text-sm tracking-[0.16em] text-yellow-300 text-center">
@@ -76,84 +79,98 @@ export function ChristmasNewYearHero({ onShopSarees, onShopAll }) {
         </div>
       </div>
 
-      {/* Swaying Golden Baubles / Hanging Christmas Ornaments - Left Side (Hidden on Mobile) */}
-      <div className="absolute top-10 left-3 sm:left-6 md:left-10 lg:left-16 z-10 pointer-events-none hidden md:block animate-sway-left origin-top opacity-90">
-        <svg width="60" height="135" viewBox="0 0 60 135" fill="none">
-          <line x1="30" y1="0" x2="30" y2="45" stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="2 2" />
-          <circle cx="30" cy="75" r="28" fill="url(#ornamentRed)" stroke="#FBBF24" strokeWidth="1.5" />
-          <path d="M12 75 Q30 60 48 75 Q30 90 12 75 Z" fill="#FBBF24" opacity="0.3" />
-          <circle cx="30" cy="75" r="7" fill="#FEF08A" opacity="0.8" />
-          <rect x="25" y="43" width="10" height="6" rx="2" fill="#F59E0B" />
-          <defs>
-            <linearGradient id="ornamentRed" x1="10" y1="50" x2="50" y2="100" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#DC2626" />
-              <stop offset="0.6" stopColor="#991B1B" />
-              <stop offset="1" stopColor="#450A0A" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-
-      {/* Swaying Golden Baubles / Hanging New Year Star - Right Side (Hidden on Mobile) */}
-      <div className="absolute top-10 right-3 sm:right-6 md:right-10 lg:right-16 z-10 pointer-events-none hidden md:block animate-sway-right origin-top opacity-90">
-        <svg width="60" height="135" viewBox="0 0 60 135" fill="none">
-          <line x1="30" y1="0" x2="30" y2="45" stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="2 2" />
-          <circle cx="30" cy="75" r="28" fill="url(#ornamentGold)" stroke="#FDE047" strokeWidth="1.5" />
-          {/* Star sparkle */}
-          <polygon points="30,55 33,68 46,75 33,82 30,95 27,82 14,75 27,68" fill="#FFFBEB" />
-          <rect x="25" y="43" width="10" height="6" rx="2" fill="#CA8A04" />
-          <defs>
-            <linearGradient id="ornamentGold" x1="10" y1="50" x2="50" y2="100" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#FDE047" />
-              <stop offset="0.5" stopColor="#D97706" />
-              <stop offset="1" stopColor="#78350F" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-
-      {/* Main Hero Container - Fully Optimized for Mobile, iOS, Tablet, Laptop, and PC */}
+      {/* Hero Content Container */}
       <section className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-10 sm:py-14 md:py-20 text-center z-10">
-        {/* Festive Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-red-950 via-emerald-950 to-amber-950 border border-amber-400/60 shadow-lg shadow-amber-500/20 mb-4 sm:mb-6">
+        
+        {/* Festive Dual Badge */}
+        <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 rounded-full bg-gradient-to-r from-red-950/90 via-stone-900 to-amber-950/90 border border-amber-400/60 shadow-lg shadow-rose-950/40 mb-4 sm:mb-6">
           <span className="text-base sm:text-lg animate-bounce">🎄</span>
-          <span className="text-[10px] sm:text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-amber-200">
+          <span className="text-[11px] sm:text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-amber-200">
             Christmas &amp; New Year Festive Carnival 2027
           </span>
           <span className="text-base sm:text-lg animate-bounce">🥂</span>
         </div>
 
-        {/* Hero Title with Shimmering Gold & Ruby Red Gradient */}
+        {/* High-Impact Headline with Gold & Ruby Liquid Shimmer */}
         <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight max-w-5xl mx-auto leading-[1.18] sm:leading-[1.15]">
-          Celebrate The Magic of Christmas &amp;{" "}
+          A Season of Joy, A Year of Grace:{" "}
           <span className="bg-gradient-to-r from-yellow-300 via-amber-200 to-rose-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(251,191,36,0.4)]">
-            Ring in the New Year in Royal Silks
+            Royal Silks &amp; Holiday Glamour
           </span>
         </h1>
 
         {/* Subtitle */}
         <p className="mt-4 sm:mt-5 text-stone-200 text-xs sm:text-sm md:text-base lg:text-lg max-w-3xl mx-auto font-light leading-relaxed px-2">
-          Step into a grand winter season of joy and celebrations. Wrap yourself in pure Kanchipuram wedding silks, midnight velvet lehengas, glamorous cocktail sarees, and designer winter tops curated for Christmas galas &amp; New Year parties.
+          Celebrate Christmas mornings in authentic Kanchipuram wedding silks, and step into New Year 2027 countdown parties in twirling designer velvet lehengas and cocktail couture.
         </p>
 
-        {/* Grand Christmas & New Year Countdown Card */}
-        <div className="mt-7 sm:mt-9 max-w-3xl mx-auto p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-stone-950/95 via-[#1a0f16]/90 to-stone-950/95 border-2 border-amber-400/60 shadow-2xl shadow-amber-500/20 backdrop-blur-md">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-5">
-            {/* Offer Details */}
+        {/* Interactive Dual Festive Curations Selector */}
+        <div className="mt-6 sm:mt-8 inline-flex items-center p-1 sm:p-1.5 rounded-full bg-stone-900/90 border border-amber-400/40 shadow-xl backdrop-blur-md">
+          <button
+            onClick={() => setActiveTab("all")}
+            className={`px-4 sm:px-6 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all ${
+              activeTab === "all"
+                ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-stone-950 shadow-md font-bold"
+                : "text-stone-300 hover:text-amber-200"
+            }`}
+          >
+            ✨ All Holiday Collections
+          </button>
+          <button
+            onClick={() => setActiveTab("xmas")}
+            className={`px-4 sm:px-6 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 ${
+              activeTab === "xmas"
+                ? "bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md font-bold"
+                : "text-stone-300 hover:text-rose-300"
+            }`}
+          >
+            🎄 Christmas Edit
+          </button>
+          <button
+            onClick={() => setActiveTab("newyear")}
+            className={`px-4 sm:px-6 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 ${
+              activeTab === "newyear"
+                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md font-bold"
+                : "text-stone-300 hover:text-amber-200"
+            }`}
+          >
+            🥂 New Year 2027 Gala
+          </button>
+        </div>
+
+        {/* Interactive Card: Countdown + Surprise Holiday Hamper Unboxing */}
+        <div className="mt-7 sm:mt-9 max-w-3xl mx-auto p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-stone-950/95 via-[#180e1a]/95 to-stone-950/95 border-2 border-amber-400/60 shadow-2xl shadow-rose-950/30 backdrop-blur-md">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-5">
+            {/* Offer Details with Interactive Scratch/Reveal Gift Box */}
             <div className="text-center md:text-left w-full md:w-auto">
               <div className="flex items-center justify-center md:justify-start gap-1.5 text-xs sm:text-sm font-bold text-amber-300 uppercase tracking-widest">
                 <Gift size={16} className="text-rose-400" />
-                <span>Christmas &amp; New Year Gala • Up to 30% OFF</span>
+                <span>Holiday Gala • Flat 25% Off Storewide</span>
               </div>
               <div className="text-stone-100 text-xs sm:text-sm font-semibold mt-1.5 flex items-center justify-center md:justify-start gap-1.5">
                 <span>🎁 Free Year-End Luxury Gift Box on orders above ₹1,499</span>
               </div>
-              <div className="text-amber-400/90 text-[11px] sm:text-xs mt-1 font-medium">
-                Direct Festive Markdown applied automatically across all collections
+              
+              {/* Interactive Gift Box Button */}
+              <div className="mt-2.5">
+                {!revealedGift ? (
+                  <button
+                    onClick={() => setRevealedGift(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/50 text-[11px] font-bold text-rose-300 transition-all transform hover:scale-105 active:scale-95"
+                  >
+                    <span>🎁 Tap to unwrap your Holiday Surprise</span>
+                    <Sparkles size={12} className="animate-spin text-yellow-300" />
+                  </button>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-[11px] font-bold text-emerald-300 animate-fadeIn">
+                    <Check size={13} className="text-emerald-400" />
+                    <span>Unlocked: Extra ₹200 OFF on billing + Free Holiday Sweets!</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Live New Year Countdown */}
+            {/* Live New Year 2027 Countdown Timer */}
             <div className="text-center md:text-right w-full md:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-amber-500/20">
               <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest text-amber-300 block mb-1.5 flex items-center justify-center md:justify-end gap-1">
                 <Clock size={13} className="text-amber-400" />
@@ -180,13 +197,13 @@ export function ChristmasNewYearHero({ onShopSarees, onShopAll }) {
                 ))}
               </div>
               <p className="text-[10px] text-amber-300/80 mt-1.5 tracking-wider">
-                🎅 Christmas Eve &amp; New Year Special Deals Active!
+                🎅 Christmas Eve &amp; New Year Gala Active!
               </p>
             </div>
           </div>
         </div>
 
-        {/* Action Buttons - Fully Responsive Across Mobile & Desktop */}
+        {/* Action Buttons - Fully Optimized for Touch Devices & Mobile */}
         <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-5 w-full max-w-md sm:max-w-none mx-auto">
           <button
             onClick={onShopSarees}
@@ -204,7 +221,7 @@ export function ChristmasNewYearHero({ onShopSarees, onShopAll }) {
           </button>
         </div>
 
-        {/* Trust Badges - Responsive Grid Across Mobile, Tablet, Laptop, and Desktop */}
+        {/* Trust Badges - Optimized Grid for Mobile, Tablet, Laptop, and PC */}
         <div className="mt-12 sm:mt-16 grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 max-w-4xl mx-auto pt-6 sm:pt-8 border-t border-amber-500/20 text-left">
           <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-stone-900/60 border border-amber-500/30 shadow-md">
             <span className="text-2xl sm:text-3xl shrink-0">🎄</span>
@@ -248,26 +265,12 @@ export function ChristmasNewYearHero({ onShopSarees, onShopAll }) {
             opacity: 0.8;
           }
           100% {
-            transform: translateY(650px) rotate(360deg);
+            transform: translateY(680px) rotate(360deg);
             opacity: 0.2;
           }
         }
         .animate-snowfall {
           animation-name: snowfall;
-        }
-        @keyframes swayLeft {
-          0%, 100% { transform: rotate(-5deg); }
-          50% { transform: rotate(5deg); }
-        }
-        @keyframes swayRight {
-          0%, 100% { transform: rotate(5deg); }
-          50% { transform: rotate(-5deg); }
-        }
-        .animate-sway-left {
-          animation: swayLeft 4s ease-in-out infinite;
-        }
-        .animate-sway-right {
-          animation: swayRight 4.5s ease-in-out infinite;
         }
       `}</style>
     </div>
