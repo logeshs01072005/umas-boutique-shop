@@ -1,7 +1,8 @@
 import ImageCropModal from "./components/ImageCropModal";
-import { DiwaliHeroSection } from "./components/diwali/DiwaliHeroSection";
-import { DiwaliSpotlightSection } from "./components/diwali/DiwaliSpotlightSection";
-import { DiwaliInteractiveDiya } from "./components/diwali/DiwaliInteractiveDiya";
+import { ChristmasNewYearHero } from "./components/festive/ChristmasNewYearHero";
+import { ChristmasNewYearSpotlight } from "./components/festive/ChristmasNewYearSpotlight";
+import { ChristmasInteractiveWish } from "./components/festive/ChristmasInteractiveWish";
+import { ChristmasNewYearCelebrationModal } from "./components/festive/ChristmasNewYearCelebrationModal";
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   ShoppingBag, Search, User, X, Plus, Minus, Trash2, ChevronRight, ChevronLeft,
@@ -255,7 +256,7 @@ function Nav({ view, setView, cartCount, currentUser, onOpenAuth, onLogout, newL
             <span className="font-serif text-2xl md:text-3xl text-amber-300 tracking-wide flex items-center gap-1.5 group-hover:text-amber-200 transition-colors">
               Uma's
               {seasonalTheme === "winter" && <span className="text-[10px] bg-sky-950 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded-full font-sans tracking-normal">❄️ Winter Edition</span>}
-              {seasonalTheme === "diwali" && <span className="hidden sm:inline text-[10px] bg-yellow-950 text-yellow-300 border border-yellow-500/40 px-2 py-0.5 rounded-full font-sans tracking-normal animate-pulse">🪔 Diwali Edition</span>}
+              {seasonalTheme === "christmas" && <span className="hidden sm:inline text-[10px] bg-red-950 text-amber-300 border border-amber-400/50 px-2.5 py-0.5 rounded-full font-sans tracking-normal animate-pulse">🎄 Christmas &amp; New Year Edition ✨</span>}
             </span>
             <span className="text-[10px] md:text-xs tracking-[0.3em] uppercase text-stone-400 mt-0.5">Fashion &amp; Boutique</span>
           </div>
@@ -557,104 +558,21 @@ const SEASONAL_THEMES = {
     btnPrimary: "bg-pink-400 hover:bg-pink-300 text-rose-950 shadow-pink-500/20",
     btnSecondary: "bg-rose-900 hover:bg-rose-800 text-pink-200 border-rose-500/30"
   },
-  diwali: {
-    name: "Diwali Deepavali",
-    icon: "🪔",
-    announcement: "🪔 HAPPY DEEPAVALI • DIWALI SPECIAL — FLAT 25% OFF ALL ETHNIC WEAR & FESTIVE SAREES 🎆",
-    heroBadge: "✨ DIWALI FESTIVAL COLLECTION 2026 ✨",
-    heroTitle: "Light Up Your Festival Look",
-    heroDesc: "Celebrate the Festival of Lights with our curated Diwali collection — dazzling silk sarees, embroidered lehengas, and festive kurtis fit for every celebration.",
-    bgClass: "bg-yellow-950 text-yellow-50",
-    barClass: "bg-gradient-to-r from-orange-900 via-yellow-700 to-red-900 text-yellow-100 border-yellow-400/40",
-    heroClass: "bg-gradient-to-b from-yellow-950 via-orange-950 to-red-950 border-yellow-500/30",
-    badgeClass: "bg-yellow-500/20 text-yellow-300 border-yellow-500/40",
-    btnPrimary: "bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-300 hover:to-orange-300 text-stone-950 shadow-yellow-500/30",
-    btnSecondary: "bg-orange-950 hover:bg-orange-900 text-yellow-200 border-yellow-500/30"
+  christmas: {
+    name: "Christmas & New Year 2027",
+    icon: "🎄",
+    announcement: "🎄 MERRY CHRISTMAS & HAPPY NEW YEAR 2027 • GALA FESTIVE SALE — FLAT 25% OFF STOREWIDE 🥂",
+    heroBadge: "✨ CHRISTMAS & NEW YEAR GALA 2027 ✨",
+    heroTitle: "Celebrate in Royal Silk & Holiday Glam",
+    heroDesc: "Ring in 2027 draped in timeless elegance. Explore authentic Kanchipuram bridal silks, royal velvet lehengas, midnight party tops, and festive celebration wear.",
+    bgClass: "bg-[#080d14] text-slate-100",
+    barClass: "bg-gradient-to-r from-red-950 via-emerald-950 to-amber-950 text-amber-200 border-amber-400/40",
+    heroClass: "bg-gradient-to-b from-[#0a131f] via-[#0d1d2d] to-[#080d14] border-amber-400/30",
+    badgeClass: "bg-red-500/20 text-amber-300 border-amber-400/40",
+    btnPrimary: "bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 hover:from-red-500 hover:to-amber-400 text-white shadow-rose-600/30",
+    btnSecondary: "bg-stone-900/90 hover:bg-stone-800 text-amber-300 border-amber-400/50"
   }
 };
-
-/* -------------------------------- Diwali Celebration Component -------------------------------- */
-
-function DiwaliCelebration({ onClose }) {
-  const [visible, setVisible] = useState(true);
-
-  const handleClose = () => {
-    setVisible(false);
-    if (onClose) onClose();
-  };
-
-  if (!visible) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md animate-fadeIn">
-      {/* Background Decorative Rangoli and Warm Bokeh Glow */}
-      <div className="relative w-full max-w-lg rounded-3xl overflow-hidden bg-gradient-to-br from-[#2a0b0b] via-stone-900 to-[#1a0505] border-2 border-amber-400/60 shadow-2xl shadow-amber-500/25 p-6 sm:p-8 text-center text-stone-100">
-        
-        {/* Ambient Glows */}
-        <div className="absolute -top-16 -left-16 w-48 h-48 rounded-full bg-amber-500/20 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-16 -right-16 w-48 h-48 rounded-full bg-red-600/20 blur-3xl pointer-events-none" />
-
-        {/* Close button */}
-        <button
-          onClick={handleClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-stone-900/80 text-stone-400 hover:text-amber-300 hover:bg-stone-800 transition-colors border border-amber-500/30 text-sm"
-          aria-label="Close"
-        >
-          <X size={18} />
-        </button>
-
-        {/* Auspicious Garland Header */}
-        <div className="text-amber-400/80 text-sm tracking-[0.3em] mb-3 select-none">
-          ✦ 🌸 ✦ 🌺 ✦ 🪔 ✦ 🌺 ✦ 🌸 ✦
-        </div>
-
-        {/* Badge */}
-        <span className="inline-block px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest bg-yellow-500/20 text-yellow-300 border border-yellow-400/40 mb-3">
-          ✨ Festival of Lights 2026 ✨
-        </span>
-
-        {/* Big Greeting Headline */}
-        <h2 className="font-serif text-2xl sm:text-3xl font-extrabold text-amber-200 tracking-tight leading-snug">
-          शुभ दीपावली • Happy Deepavali!
-        </h2>
-
-        {/* Tamil Blessing */}
-        <p className="text-amber-300/90 text-xs sm:text-sm font-medium italic mt-2">
-          தீபாவளி திருநாள் நல்வாழ்த்துக்கள்!
-        </p>
-
-        {/* Decorative Diya Centerpiece */}
-        <div className="my-5 flex justify-center">
-          <div className="relative w-20 h-20 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full bg-amber-500/25 blur-xl animate-pulse" />
-            <span className="text-5xl drop-shadow-[0_0_15px_#ff9800]">🪔</span>
-          </div>
-        </div>
-
-        {/* Offer Box */}
-        <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-400/40 mb-5">
-          <div className="text-xs sm:text-sm font-bold text-amber-300 uppercase tracking-wider">
-            🎁 Diwali Dhamaka • Flat 25% Off Storewide 🎁
-          </div>
-          <div className="text-[11px] sm:text-xs text-stone-300 mt-1">
-            Pure Silk Sarees • Designer Lehengas • Festive Kurtis
-          </div>
-          <div className="text-[10px] sm:text-[11px] text-yellow-400 font-semibold mt-1">
-            Free Gift Hamper on orders above ₹1,499
-          </div>
-        </div>
-
-        {/* CTA Button */}
-        <button
-          onClick={handleClose}
-          className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-stone-950 font-bold text-sm tracking-wider uppercase shadow-xl shadow-amber-500/25 transition-all transform hover:scale-105 active:scale-95"
-        >
-          🛍️ Explore Festive Collections
-        </button>
-      </div>
-    </div>
-  );
-}
 
 /* ----------------------------------- Home view ---------------------------------- */
 
@@ -667,13 +585,13 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
     return available.length > 0 ? available.slice(0, 8) : products.slice(0, 8);
   }, [products]);
 
-  const activeTheme = SEASONAL_THEMES[seasonalTheme] || SEASONAL_THEMES.diwali || SEASONAL_THEMES.summer;
-  // Only show the grand Diwali celebration overlay ONCE upon first opening the site, NOT on navigation back
-  const [showDiwaliIntro, setShowDiwaliIntro] = useState(() => {
+  const activeTheme = SEASONAL_THEMES[seasonalTheme] || SEASONAL_THEMES.christmas || SEASONAL_THEMES.summer;
+  // Only show the grand Christmas & New Year celebration overlay ONCE upon first opening the site
+  const [showFestiveIntro, setShowFestiveIntro] = useState(() => {
     if (typeof window === "undefined") return false;
-    const hasSeen = sessionStorage.getItem("umas:diwali_intro_seen");
-    if (!hasSeen && seasonalTheme === "diwali") {
-      sessionStorage.setItem("umas:diwali_intro_seen", "true");
+    const hasSeen = sessionStorage.getItem("umas:xmas_intro_seen");
+    if (!hasSeen && seasonalTheme === "christmas") {
+      sessionStorage.setItem("umas:xmas_intro_seen", "true");
       return true;
     }
     return false;
@@ -681,7 +599,7 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
 
   const [bannerDismissed, setBannerDismissed] = useState(() => {
     if (typeof window === "undefined") return false;
-    return sessionStorage.getItem("umas:diwali_banner_dismissed") === "true";
+    return sessionStorage.getItem("umas:xmas_banner_dismissed") === "true";
   });
 
   
@@ -690,38 +608,37 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
       className={`transition-colors duration-500 relative ${activeTheme.bgClass}`}
     >
 
-      {/* Diwali Full-Screen Celebration Modal (Only on first site open or when clicked) */}
-      {seasonalTheme === "diwali" && showDiwaliIntro && (
-        <DiwaliCelebration onClose={() => setShowDiwaliIntro(false)} />
+      {/* Christmas & New Year Full-Screen Celebration Modal */}
+      {seasonalTheme === "christmas" && showFestiveIntro && (
+        <ChristmasNewYearCelebrationModal onClose={() => setShowFestiveIntro(false)} />
       )}
 
-      {/* Diwali festive top bar - dismissible so it never annoys the user */}
-      {seasonalTheme === "diwali" && !bannerDismissed && (
+      {/* Christmas & New Year festive top bar - dismissible */}
+      {seasonalTheme === "christmas" && !bannerDismissed && (
         <div
-          className="relative py-2 px-4 text-xs font-bold tracking-wider text-center flex items-center justify-between border-b border-amber-400/40 shadow-md transition-all"
+          className="relative py-2 px-3 sm:px-4 text-xs font-bold tracking-wider text-center flex items-center justify-between border-b border-amber-400/40 shadow-md transition-all"
           style={{
-            background: "linear-gradient(90deg, #7c2d12, #92400e, #b45309, #92400e, #7c2d12)",
+            background: "linear-gradient(90deg, #7f1d1d, #14532d, #78350f, #14532d, #7f1d1d)",
             backgroundSize: "200%",
-            animation: "diwalishine 4s linear infinite",
-            color: "#fde68a",
+            color: "#fef08a",
           }}
         >
           <div
-            className="flex-1 flex items-center justify-center gap-2 cursor-pointer select-none"
-            onClick={() => setShowDiwaliIntro(true)}
-            title="Click to view full celebration greeting"
+            className="flex-1 flex items-center justify-center gap-2 cursor-pointer select-none truncate"
+            onClick={() => setShowFestiveIntro(true)}
+            title="Click to view Christmas & New Year greeting"
           >
-            <span className="text-sm">🪔</span>
-            <span>HAPPY DEEPAVALI 2026 • FLAT 25% OFF ALL ETHNIC WEAR & FESTIVE SAREES ✨</span>
-            <span className="text-[10px] uppercase underline text-amber-200 hover:text-white hidden sm:inline ml-1">(View Greeting 🪔)</span>
+            <span className="text-sm">🎄</span>
+            <span className="truncate">CHRISTMAS &amp; NEW YEAR 2027 GALA • FLAT 25% OFF ALL ETHNIC &amp; PARTY WEAR 🥂</span>
+            <span className="text-[10px] uppercase underline text-amber-200 hover:text-white hidden sm:inline ml-1 shrink-0">(Special Greetings 🎁)</span>
           </div>
 
           <button
             onClick={() => {
               setBannerDismissed(true);
-              sessionStorage.setItem("umas:diwali_banner_dismissed", "true");
+              sessionStorage.setItem("umas:xmas_banner_dismissed", "true");
             }}
-            className="p-1 text-amber-300/80 hover:text-white rounded-full transition-colors ml-2"
+            className="p-1 text-amber-200/80 hover:text-white rounded-full transition-colors ml-2 shrink-0"
             title="Dismiss Announcement"
           >
             <X size={14} />
@@ -730,7 +647,7 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
       )}
 
       {/* Top Announcement Bar - Pure clean promo banner for non-Diwali */}
-      {seasonalTheme !== "diwali" && (
+      {seasonalTheme !== "christmas" && (
         <div className={`text-xs font-semibold py-2.5 px-4 text-center tracking-wider uppercase flex items-center justify-center gap-2 border-b transition-colors duration-500 ${activeTheme.barClass}`}>
           <span>{activeTheme.announcement}</span>
         </div>
@@ -739,11 +656,10 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
       {banners && banners.length > 0 && <BannerSlider banners={banners} />}
 
       {/* High-Impact Hero Banner */}
-      {seasonalTheme === "diwali" ? (
-        <DiwaliHeroSection
+      {seasonalTheme === "christmas" ? (
+        <ChristmasNewYearHero
           onShopSarees={() => { setCategoryFilter("Sarees"); setView("shop"); }}
           onShopAll={() => { setCategoryFilter(null); setView("shop"); }}
-          saleEndDate={promoSettings?.saleEndDate}
         />
       ) : (
         <section className={`relative overflow-hidden py-16 md:py-24 px-6 border-b transition-colors duration-500 ${activeTheme.heroClass}`}>
@@ -782,15 +698,14 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
       </section>
 
       {/* Spotlight Cards */}
-      {seasonalTheme === "diwali" ? (
+      {seasonalTheme === "christmas" ? (
         <>
-          <DiwaliSpotlightSection
+          <ChristmasNewYearSpotlight
             onSelectCategory={(cat) => { setCategoryFilter(cat); setView("shop"); }}
             onViewAll={() => { setCategoryFilter(null); setView("shop"); }}
           />
           <div className="py-8 px-4 md:px-6">
-            <DiwaliInteractiveDiya
-            />
+            <ChristmasInteractiveWish />
           </div>
         </>
       ) : (
@@ -838,11 +753,11 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
           <div className="flex items-center justify-between mb-10">
             <div>
               <h2 className="font-serif text-2xl md:text-4xl text-amber-300 font-bold">
-                {seasonalTheme === "diwali" ? "✨ Diwali Bestsellers & Festive Sarees" : "Trending & Bestsellers"}
+                {seasonalTheme === "christmas" ? "🎄 Christmas & New Year Bestsellers ✨" : "Trending & Bestsellers"}
               </h2>
               <p className="text-stone-400 text-xs md:text-sm mt-1">
-                {seasonalTheme === "diwali"
-                  ? "Handcrafted festive sarees, royal lehengas and party fits curated for Diwali 2026"
+                {seasonalTheme === "christmas"
+                  ? "Handpicked bridal silks, midnight lehengas, and cocktail fits curated for Christmas & New Year 2027"
                   : "Our most loved saree and apparel collections"}
               </p>
             </div>
@@ -855,7 +770,7 @@ function HomeView({ products, banners, promoSettings, setView, setCategoryFilter
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {featured.map((p) => (
-                <ProductCard key={p.id} product={p} onOpen={openProduct} isFestive={seasonalTheme === "diwali"} />
+                <ProductCard key={p.id} product={p} onOpen={openProduct} isFestive={seasonalTheme === "christmas"} />
               ))}
             </div>
           )}
@@ -5038,11 +4953,11 @@ function AdminThemeManager({ activeTheme, onThemeUpdated, showToast }) {
       preview: "bg-gradient-to-br from-rose-900 via-pink-800 to-purple-900",
     },
     {
-      key: "diwali",
-      name: "Diwali Deepavali",
-      icon: "🪔",
-      desc: "🎆 Festive gold & orange tones — shows fireworks cracker overlay & Diwali greeting to all visitors!",
-      preview: "bg-gradient-to-br from-orange-900 via-yellow-700 to-red-900",
+      key: "christmas",
+      name: "Christmas & New Year",
+      icon: "🎄",
+      desc: "✨ Festive ruby red, emerald & gold tones with snowfall, countdown to New Year 2027, and holiday tree wish!",
+      preview: "bg-gradient-to-br from-red-900 via-emerald-900 to-amber-900",
     },
   ];
 
@@ -7060,9 +6975,9 @@ export default function App() {
   const [showNewLaunchesModal, setShowNewLaunchesModal] = useState(false);
   const [seasonalTheme, setSeasonalTheme] = useState(() => {
     const cached = typeof window !== "undefined" ? localStorage.getItem("umas:activeTheme") : null;
-    if (!cached || cached === "summer") {
-      if (typeof window !== "undefined") localStorage.setItem("umas:activeTheme", "diwali");
-      return "diwali";
+    if (!cached || cached === "summer" || cached === "diwali") {
+      if (typeof window !== "undefined") localStorage.setItem("umas:activeTheme", "christmas");
+      return "christmas";
     }
     return cached;
   });
@@ -7169,7 +7084,7 @@ export default function App() {
       const res = await fetch(`${API_BASE}/settings/active-theme`);
       const data = await res.json();
       if (res.ok && data.activeTheme) {
-        const theme = data.activeTheme === "summer" ? "diwali" : data.activeTheme;
+        const theme = (data.activeTheme === "summer" || data.activeTheme === "diwali") ? "christmas" : data.activeTheme;
         setSeasonalTheme(theme);
         localStorage.setItem("umas:activeTheme", theme);
       }

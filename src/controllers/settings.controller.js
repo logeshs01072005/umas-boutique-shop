@@ -94,13 +94,13 @@ async function getActiveTheme(req, res, next) {
   try {
     let settingDoc = await Setting.findOne({ key: "active_theme" });
     if (!settingDoc) {
-      settingDoc = await Setting.create({ key: "active_theme", value: { theme: "diwali" } });
+      settingDoc = await Setting.create({ key: "active_theme", value: { theme: "christmas" } });
     }
     let current = settingDoc.value?.theme;
-    if (!current || current === "summer") {
-      settingDoc.value = { theme: "diwali" };
+    if (!current || current === "summer" || current === "diwali") {
+      settingDoc.value = { theme: "christmas" };
       await settingDoc.save();
-      current = "diwali";
+      current = "christmas";
     }
     res.json({ activeTheme: current });
   } catch (err) {

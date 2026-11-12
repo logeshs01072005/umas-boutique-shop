@@ -1,54 +1,54 @@
 import React from "react";
 import { ChevronRight, Sparkles } from "lucide-react";
 
-export function DiwaliSpotlightSection({ onSelectCategory, onViewAll }) {
+export function ChristmasNewYearSpotlight({ onSelectCategory, onViewAll }) {
   const festiveCards = [
     {
-      title: "Pooja & Muhurat Sarees",
+      title: "Christmas Midnight Silks",
       category: "Sarees",
-      tag: "Pure Kanjeevaram & Banarasi",
-      badge: "🪔 Diwali Special",
+      tag: "Ruby Red & Emerald Kanjeevarams",
+      badge: "🎄 Christmas Special",
       discount: "Flat 25% OFF",
-      gradient: "from-amber-900 via-yellow-950 to-stone-900",
-      border: "border-amber-400/40 hover:border-amber-400",
-      accent: "text-amber-300",
-      description: "Authentic Kanchipuram silk sarees with pure zari pallu, ideal for Lakshmi Pooja & morning festive rituals.",
+      gradient: "from-red-950 via-[#1f0a10] to-stone-900",
+      border: "border-red-400/40 hover:border-red-400",
+      accent: "text-red-300",
+      description: "Magnificent bridal and festive silks woven in rich crimson, wine red, and forest emerald for Christmas Mass & parties.",
       emoji: "🥻",
     },
     {
-      title: "Royal Diwali Lehengas",
+      title: "New Year Eve Lehengas",
       category: "Lehengas",
-      tag: "Heavy Zari & Velvet Embroidery",
-      badge: "✨ Royal Edit",
+      tag: "Shimmer Sequin & Velvet Royalty",
+      badge: "✨ NYE Gala Edit",
       discount: "Up to 30% OFF",
-      gradient: "from-rose-950 via-red-950 to-stone-900",
-      border: "border-rose-400/40 hover:border-rose-400",
-      accent: "text-rose-300",
-      description: "Dazzle every evening party with handcrafted festive lehengas in ruby red, emerald, and royal navy.",
+      gradient: "from-indigo-950 via-[#10132b] to-stone-900",
+      border: "border-indigo-400/40 hover:border-amber-400",
+      accent: "text-amber-300",
+      description: "Steal the spotlight this New Year's Eve with twirling designer lehengas detailed with zari embroidery and star sequins.",
       emoji: "👗",
     },
     {
-      title: "Designer Festive Kurtis",
+      title: "Holiday Designer Kurtis",
       category: "Kurtis",
-      tag: "Chanderi Silk & Anarkalis",
-      badge: "🎆 Festive Must-Have",
+      tag: "Warm Chanderi & Gota Work",
+      badge: "❄️ Winter Cozy",
       discount: "Flat 20% OFF",
-      gradient: "from-purple-950 via-violet-950 to-stone-900",
-      border: "border-purple-400/40 hover:border-purple-400",
-      accent: "text-purple-300",
-      description: "Lightweight festive elegance featuring fine gota-patti and mirror embroidery for comfortable family feasts.",
+      gradient: "from-emerald-950 via-[#0a1f14] to-stone-900",
+      border: "border-emerald-400/40 hover:border-emerald-400",
+      accent: "text-emerald-300",
+      description: "Comfortable and graceful kurtis and anarkalis perfect for holiday family gatherings, feasts, and secret Santa celebrations.",
       emoji: "👘",
     },
     {
-      title: "Festive Tops & Western",
+      title: "Party Tops & Western Wear",
       category: "Tops",
-      tag: "Contemporary Festive Fusion",
-      badge: "🌟 Party Ready",
+      tag: "Glamorous Cocktail & Party Fits",
+      badge: "🍾 Party Ready",
       discount: "Buy 2 Get 10% Extra",
-      gradient: "from-orange-950 via-amber-950 to-stone-900",
-      border: "border-orange-400/40 hover:border-orange-400",
-      accent: "text-orange-300",
-      description: "Chic fusion tops and western wear crafted for modern Diwali get-togethers and card parties.",
+      gradient: "from-purple-950 via-[#1c0b2b] to-stone-900",
+      border: "border-purple-400/40 hover:border-purple-400",
+      accent: "text-purple-300",
+      description: "Dazzling tops, satin blouses, and contemporary silhouettes tailored for high-energy year-end countdown bashes.",
       emoji: "👚",
     },
   ];
@@ -60,13 +60,13 @@ export function DiwaliSpotlightSection({ onSelectCategory, onViewAll }) {
         <div>
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-amber-400 mb-1">
             <Sparkles size={14} />
-            <span>Curated Festival Collections</span>
+            <span>Curated Holiday Collections</span>
           </div>
           <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-stone-100 font-bold">
-            Diwali Dhamaka Spotlight
+            Christmas &amp; New Year Spotlight
           </h2>
           <p className="text-stone-300 text-xs sm:text-sm mt-1 max-w-xl font-light">
-            Handpicked festive collections woven with celebratory spirit, pure fabrics, and rich tradition.
+            Exquisite festive collections blending timeless Indian craftsmanship with sparkling New Year glam.
           </p>
         </div>
 
@@ -74,18 +74,18 @@ export function DiwaliSpotlightSection({ onSelectCategory, onViewAll }) {
           onClick={onViewAll}
           className="text-xs tracking-widest uppercase text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold group self-start md:self-auto"
         >
-          <span>Explore Full Festival Catalog</span>
+          <span>Explore All Holiday Collections</span>
           <ChevronRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
         </button>
       </div>
 
-      {/* Grid of Festive Spotlight Cards - responsive from mobile 1-col to 4-col desktop */}
+      {/* Grid of Festive Spotlight Cards - Responsive for Mobile, Tablet, and Desktop */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {festiveCards.map((card) => (
           <div
             key={card.title}
             onClick={() => onSelectCategory(card.category)}
-            className={`group relative rounded-2xl p-5 sm:p-6 bg-gradient-to-br ${card.gradient} border ${card.border} cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/15 flex flex-col justify-between min-h-[240px] sm:min-h-[260px] text-left transform hover:-translate-y-1`}
+            className={`group relative rounded-2xl p-5 sm:p-6 bg-gradient-to-br ${card.gradient} border ${card.border} cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-rose-500/15 flex flex-col justify-between min-h-[240px] sm:min-h-[260px] text-left transform hover:-translate-y-1`}
           >
             {/* Top decorative glow */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/5 rounded-full blur-2xl group-hover:bg-amber-400/10 transition-all pointer-events-none" />
@@ -112,7 +112,7 @@ export function DiwaliSpotlightSection({ onSelectCategory, onViewAll }) {
             </div>
 
             <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between">
-              <span className="text-xs font-bold text-yellow-300 bg-amber-950/60 px-2.5 py-1 rounded-md border border-amber-500/30">
+              <span className="text-xs font-bold text-yellow-300 bg-black/50 px-2.5 py-1 rounded-md border border-amber-500/30">
                 {card.discount}
               </span>
 
