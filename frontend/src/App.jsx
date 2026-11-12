@@ -565,12 +565,12 @@ const SEASONAL_THEMES = {
     heroBadge: "✨ CHRISTMAS & NEW YEAR GALA 2027 ✨",
     heroTitle: "Celebrate in Royal Silk & Holiday Glam",
     heroDesc: "Ring in 2027 draped in timeless elegance. Explore authentic Kanchipuram bridal silks, royal velvet lehengas, midnight party tops, and festive celebration wear.",
-    bgClass: "bg-[#faf7f2] text-stone-900",
-    barClass: "bg-gradient-to-r from-red-800 via-emerald-800 to-amber-700 text-yellow-100 border-amber-300",
-    heroClass: "bg-gradient-to-b from-[#fffdfa] via-[#fbf6ee] to-[#f5ede2] border-amber-300",
-    badgeClass: "bg-red-100 text-red-800 border-red-300",
-    btnPrimary: "bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-red-600/30",
-    btnSecondary: "bg-white hover:bg-stone-50 text-stone-900 border-stone-800"
+    bgClass: "bg-[#0c0f17] text-stone-100",
+    barClass: "bg-gradient-to-r from-red-900 via-emerald-900 to-amber-900 text-amber-200 border-amber-400/40",
+    heroClass: "bg-gradient-to-b from-[#141824] via-[#10141e] to-[#0c0f17] border-amber-400/40",
+    badgeClass: "bg-red-500/20 text-amber-300 border-amber-400/40",
+    btnPrimary: "bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-rose-900/40",
+    btnSecondary: "bg-stone-900/90 hover:bg-stone-800 text-amber-300 border-amber-400/50"
   }
 };
 
