@@ -12,46 +12,46 @@ export function ChristmasNewYearCelebrationModal({ onClose }) {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md animate-fadeIn">
-      {/* Luxury Editorial Modal Container */}
-      <div className="relative w-full max-w-lg rounded-2xl overflow-hidden bg-gradient-to-b from-[#15131b] via-[#0d0c11] to-[#070709] border border-amber-500/40 shadow-2xl p-6 sm:p-8 text-center text-stone-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fadeIn">
+      {/* Luxury Light Modal Container */}
+      <div className="relative w-full max-w-lg rounded-2xl overflow-hidden bg-gradient-to-b from-white via-[#fffdfa] to-[#faf4eb] border-2 border-amber-400 shadow-2xl p-6 sm:p-8 text-center text-stone-900">
         
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-stone-400 hover:text-amber-300 hover:bg-stone-900 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full text-stone-500 hover:text-stone-900 hover:bg-stone-100 transition-colors"
           aria-label="Close"
         >
           <X size={18} />
         </button>
 
-        {/* Monogram / Header */}
+        {/* Header */}
         <div className="mb-4">
-          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-400 block mb-1">
+          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-red-700 font-bold block mb-1">
             Complimentary Invitation
           </span>
-          <div className="w-8 h-[1px] bg-amber-400/40 mx-auto mt-2" />
+          <div className="w-8 h-[2px] bg-amber-400 mx-auto mt-2" />
         </div>
 
-        {/* Headline */}
-        <h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight text-stone-100 leading-snug">
+        {/* Headline with High-Contrast Dark Typography */}
+        <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 leading-snug">
           The Holiday &amp; New Year Gala 2027
         </h2>
 
         {/* Tamil Blessing */}
-        <p className="text-amber-200/90 text-xs sm:text-sm font-light italic mt-2">
+        <p className="text-amber-900 text-xs sm:text-sm font-medium italic mt-2">
           இனிய கிறிஸ்துமஸ் &amp; புத்தாண்டு நல்வாழ்த்துகள்
         </p>
 
         {/* Courtesy Card */}
-        <div className="my-6 p-4 rounded-xl bg-stone-900/60 border border-stone-800 text-center">
-          <span className="text-xs uppercase font-mono tracking-wider text-amber-300 font-semibold block">
+        <div className="my-6 p-5 rounded-xl bg-amber-50/80 border border-amber-300 text-center shadow-sm">
+          <span className="text-xs uppercase font-mono tracking-wider text-red-700 font-extrabold block">
             Storewide Seasonal Courtesy: Flat 25% Off
           </span>
-          <p className="text-[11px] text-stone-400 mt-1 font-light">
+          <p className="text-xs text-stone-700 mt-1.5 font-normal">
             Heirloom Bridal Silks • Handcrafted Lehengas • Contemporary Party Silhouettes
           </p>
-          <span className="text-[10px] text-amber-400/80 font-mono tracking-wider block mt-2">
+          <span className="text-[11px] text-amber-900 font-bold tracking-wider block mt-2">
             Complimentary signature gift box with every holiday order &gt; ₹1,499
           </span>
         </div>
@@ -59,7 +59,7 @@ export function ChristmasNewYearCelebrationModal({ onClose }) {
         {/* CTA */}
         <button
           onClick={handleClose}
-          className="w-full sm:w-auto px-8 py-3 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-stone-950 font-bold text-xs tracking-[0.18em] uppercase shadow-lg shadow-amber-500/10 transition-all flex items-center justify-center gap-2 mx-auto"
+          className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-bold text-xs tracking-[0.18em] uppercase shadow-lg shadow-red-600/25 transition-all flex items-center justify-center gap-2 mx-auto"
         >
           <span>Enter Collection</span>
           <ArrowRight size={15} />
